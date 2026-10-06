@@ -50,10 +50,14 @@ jobs:
       - run: pip install -e ".[dev]"
       - name: Database tests must RUN, not skip
         run: |
-          pytest tests/db -q -rs | tee db.log
+          set -o pipefail
+          pytest tests/db -q -rs --junitxml=junit-db.xml | tee db.log
           ! grep -E "skipped" db.log
       - name: Whole suite against the database
-        run: pytest -q
+        run: pytest -q --junitxml=junit-all.xml
+      - name: Failing tests as annotations
+        if: failure()
+        run: for f in junit-db.xml junit-all.xml; do [ -f $f ] && python scripts/ci_annotate.py $f; done; true
   compose:
     name: docker compose database comes up healthy
     runs-on: ubuntu-latest
@@ -79,6 +83,9 @@ jobs:
       - name: DB tests against the compose database
         env:
           COPILOT_TEST_DATABASE_URL: postgresql://copilot_admin:ci-only-throwaway@127.0.0.1:5433/copilot
-        run: pytest tests/db -q -rs
+        run: pytest tests/db -q -rs --junitxml=junit-compose.xml
+      - name: Failing tests as annotations
+        if: failure()
+        run: python scripts/ci_annotate.py junit-compose.xml
       - if: always()
         run: docker compose down -v
