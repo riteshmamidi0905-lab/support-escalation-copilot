@@ -6,6 +6,7 @@ import pytest
 
 from copilot.db import admin as A
 from copilot.db.rebuild import rebuild
+from copilot.retrieval.embed import PlumbingEmbedder
 from tests.db.conftest import DSN
 
 pytestmark = pytest.mark.db
@@ -32,7 +33,8 @@ def test_rebuilding_twice_gives_identical_database_contents():
     b = rebuild(DSN, "copilot_rebuild_b2", 20260101, envvars(), drop_after=True)
     assert a["file_hashes"] == b["file_hashes"]
     assert a["table_digest"] == b["table_digest"] and len(a["table_digest"]) >= 10
-    c = rebuild(DSN, "copilot_rebuild_b3", 7, envvars(), drop_after=True)
+    # another seed has a different corpus that the committed real-model cache does not cover: use the labelled NON-SEMANTIC plumbing embedder (this test is about loading, not retrieval quality)
+    c = rebuild(DSN, "copilot_rebuild_b3", 7, envvars(), drop_after=True, embedder=PlumbingEmbedder())
     assert c["table_digest"]["tickets"] != a["table_digest"]["tickets"]
     assert c["loaded"]["tickets"] == 300
     with psycopg.connect(DSN, autocommit=True) as conn:

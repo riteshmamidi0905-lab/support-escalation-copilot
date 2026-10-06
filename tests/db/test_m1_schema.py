@@ -20,7 +20,7 @@ def q(env, sql, *a):
 def test_migrations_are_idempotent_and_recorded(env):
     assert A.migrate(env.admin_dsn) == []
     done = [r[0] for r in q(env, "SELECT version FROM public.schema_migrations ORDER BY version")]
-    assert done == [p.name for p in A.migration_files()] and len(done) == 5
+    assert done == [p.name for p in A.migration_files()] and len(done) == 6          # 001-005 (M1) + 006 runbook_chunks (M2)
 
 
 def test_role_audit_is_clean(env):
@@ -108,4 +108,6 @@ def test_R3_baseline_weakness_is_still_observable(env):
 
 
 def test_catalogue_size_is_fixed(env):
-    assert len(NAMES) == 10
+    # the catalogue is closed: adding a query means editing this list on purpose (M1: 10 queries; M2 added the five retrieval ones)
+    assert set(NAMES) == {"get_account", "list_contracts", "list_integrations", "get_ticket", "ticket_history", "account_tickets", "open_incidents_for_account", "recent_deployments",
+                          "get_runbook", "fts_runbooks_baseline", "list_runbooks", "get_doc_chunks", "search_chunks_lexical", "search_chunks_vector", "similar_account_tickets"}

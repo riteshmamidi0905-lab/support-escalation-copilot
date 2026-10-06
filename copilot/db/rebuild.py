@@ -35,7 +35,8 @@ def table_digest(db_admin_dsn: str) -> dict:
     return out
 
 
-def rebuild(admin_dsn: str, dbname: str, seed: int, env: dict, out_dir: Path | None = None, drop_after: bool = False) -> dict:
+def rebuild(admin_dsn: str, dbname: str, seed: int, env: dict, out_dir: Path | None = None, drop_after: bool = False, embedder=None) -> dict:
+    """`embedder`: vectors for the runbook chunks. Default = the committed real-model cache, which only covers the committed seed; any other seed needs an explicit embedder."""
     db_admin = admin.create_database(admin_dsn, dbname)
     summary: dict = {"database": dbname, "seed": seed}
     summary["migrations"] = admin.migrate(db_admin)
@@ -46,7 +47,7 @@ def rebuild(admin_dsn: str, dbname: str, seed: int, env: dict, out_dir: Path | N
     rep.raise_if_failed()
     drep.raise_if_failed()
     summary["contract_validation"], summary["design_validation"] = "ok", "ok"
-    summary["loaded"] = load_dataset(admin.role_dsn(admin_dsn, "copilot_loader", env["loader_password"], dbname), ds)
+    summary["loaded"] = load_dataset(admin.role_dsn(admin_dsn, "copilot_loader", env["loader_password"], dbname), ds, embedder)
     # sweep: every account, through the real scoped path, must see exactly its own tickets
     signer = Signer(env["scope_secret"])
     guard = ScopeGuard(signer)

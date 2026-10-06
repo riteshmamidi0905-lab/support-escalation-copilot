@@ -122,8 +122,8 @@ def audit_roles(db_admin_dsn: str) -> list[str]:
 
 
 _PRIVS = ("SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE", "REFERENCES", "TRIGGER")
-_APP_READ = {"accounts", "account_contacts", "contracts", "integrations", "tickets", "ticket_history", "incident_accounts", "cases", "incidents", "deployments", "release_notes", "runbook_docs"}
-_LOADER = {"accounts", "account_contacts", "contracts", "integrations", "tickets", "ticket_history", "incident_accounts", "incidents", "deployments", "release_notes", "runbook_docs"}
+_APP_READ = {"accounts", "account_contacts", "contracts", "integrations", "tickets", "ticket_history", "incident_accounts", "cases", "incidents", "deployments", "release_notes", "runbook_docs", "runbook_chunks"}
+_LOADER = {"accounts", "account_contacts", "contracts", "integrations", "tickets", "ticket_history", "incident_accounts", "incidents", "deployments", "release_notes", "runbook_docs", "runbook_chunks"}
 EXPECTED_PRIVILEGES = {                     # role -> {table: exact set of table privileges}; everything not listed must be empty
     "copilot_app": {t: {"SELECT"} for t in _APP_READ},
     "copilot_loader": {**{t: {"INSERT", "TRUNCATE"} for t in _LOADER}, "cases": {"TRUNCATE"}},

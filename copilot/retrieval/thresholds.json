@@ -1,0 +1,11 @@
+{
+ "chosen_on": "dev (generator tickets only; held-out ids excluded via contracts.tuning_view)",
+ "query_prefix": false,
+ "rrf_k": 60,
+ "thresholds": {
+  "hybrid": 0.98803,
+  "lexical": 0.02044,
+  "rerank": -0.72475,
+  "vector": 0.70721
+ }
+}

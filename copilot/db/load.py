@@ -8,12 +8,14 @@ import psycopg
 from psycopg import sql
 
 from copilot import contracts as C
+from copilot.retrieval import chunker, embed
 
 DATA_TABLES = ["accounts", "account_contacts", "contracts", "integrations", "incidents", "incident_accounts", "deployments", "release_notes",
-               "runbook_docs", "tickets", "ticket_history", "cases"]
+               "runbook_docs", "runbook_chunks", "tickets", "ticket_history", "cases"]
 
 
-def load_dataset(loader_dsn: str, dataset: Path) -> dict:
+def load_dataset(loader_dsn: str, dataset: Path, embedder=None) -> dict:
+    """`embedder` supplies chunk vectors (default: the committed embedding cache, so loading is deterministic and needs no model)."""
     C.validate_dataset(dataset).raise_if_failed()        # never load anything that does not satisfy the contracts
     rd = lambda n: C.read_jsonl(dataset / n)           # noqa: E731
     accounts, contracts, integrations = rd("accounts.jsonl"), rd("contracts.jsonl"), rd("integrations.jsonl")
@@ -48,11 +50,16 @@ def load_dataset(loader_dsn: str, dataset: Path) -> dict:
             visit(r)
         cur.executemany("INSERT INTO copilot.runbook_docs (doc_id,title,product_area,version,status,effective_from,supersedes,owner,source_path,body_markdown) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                         [(r["doc_id"], r["title"], r["product_area"], r["version"], r["status"], r["effective_from"], r["supersedes"], r["owner"], r["source_path"], r["body_markdown"]) for r in ordered])
+        chunks = chunker.chunk_corpus(ordered)
+        vecs = (embedder or embed.CachedEmbedder()).embed_docs([c["embed_text"] for c in chunks])
+        cur.executemany("INSERT INTO copilot.runbook_chunks (chunk_id,doc_id,ordinal,section,char_start,char_end,text,embed_text,embedding) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s::public.vector)",
+                        [(c["chunk_id"], c["doc_id"], c["ordinal"], c["section"], c["char_start"], c["char_end"], c["text"], c["embed_text"], "[" + ",".join(repr(x) for x in v) + "]") for c, v in zip(chunks, vecs, strict=True)])
         cur.executemany("INSERT INTO copilot.tickets VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", [(t["ticket_id"], t["account_id"], t["created_at"], t["product_area"], t["severity"], t["subject"], t["body"],
                         t["reporter"]["name"], t["reporter"]["email"], t["channel"]) for t in tickets])
         cur.executemany("INSERT INTO copilot.ticket_history VALUES (%s,%s,%s,%s,%s,%s)", [(t["ticket_id"], t["account_id"], n, h["at"], h["author"], h["text"]) for t in tickets for n, h in enumerate(t["history"], 1)])
     for name, rows in dict(accounts=accounts, contracts=contracts, integrations=integrations, incidents=incidents, deployments=deployments, release_notes=releases, runbook_docs=runbooks, tickets=tickets).items():
         counts[name] = len(rows)
+    counts["runbook_chunks"] = len(chunks)
     counts["ticket_history"] = sum(len(t["history"]) for t in tickets)
     counts["incident_accounts"] = sum(len(i["affected_account_ids"]) for i in incidents)
     return counts

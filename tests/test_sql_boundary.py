@@ -41,7 +41,7 @@ def test_the_query_catalogue_statements_are_constants_with_named_parameters():
     for name in Q.NAMES:
         text = Q.statement(name)
         assert isinstance(text, str) and "{" not in text and "%(" in text or "%(" not in text
-        assert "'" not in text.replace("'english'", "").replace("'resolved'", ""), f"{name}: literal values must be bound parameters"
+        assert "'" not in text.replace("'english'", "").replace("'resolved'", "").replace("'&'", "").replace("'|'", ""), f"{name}: literal values must be bound parameters"
 
 
 def test_model_facing_modules_cannot_import_the_privileged_roles():

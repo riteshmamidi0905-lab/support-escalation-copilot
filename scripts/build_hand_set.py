@@ -170,4 +170,4 @@ manifest = {"dataset_id": "hand-labelled-v1", "evidence_class": "hand_labelled",
             "files": [{"path": f, "sha256": hashlib.sha256((OUT / f).read_bytes()).hexdigest()} for f in ("hand_labels.jsonl", "hand_tickets.jsonl")], "created_on": "2026-03-02", "tuning_allowed": False}
 (OUT / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
 (OUT / "labelled-against.json").write_text(json.dumps({"dataset": "meridian-seed-20260101", "file_sha256": src}, indent=2, sort_keys=True) + "\n")
-print(len(tickets), "tickets;", {s: sum(1 for l in labels if l["primary_slice"] == s) for s in sorted({l["primary_slice"] for l in labels})})
+print(len(tickets), "tickets;", {s: sum(1 for x in labels if x["primary_slice"] == s) for s in sorted({x["primary_slice"] for x in labels})})

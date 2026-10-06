@@ -1,0 +1,335 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://support-escalation-copilot.example/contracts/evidence.schema.json",
+  "title": "Retrieval result (structured evidence)",
+  "description": "What retrieval hands to the rest of the system. Evidence items are always ACTIVE documents; superseded/draft ones appear only under `excluded`. There is deliberately no field that could carry a directive, a tool, a scope or an approval.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "strategy",
+    "query_sha256",
+    "threshold",
+    "top_confidence",
+    "excluded",
+    "outcome",
+    "evidence",
+    "conflict_sets",
+    "abstain_reason",
+    "tenant_evidence"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "strategy": {
+      "enum": [
+        "lexical",
+        "vector",
+        "hybrid",
+        "rerank"
+      ]
+    },
+    "query_sha256": {
+      "type": "string"
+    },
+    "threshold": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "top_confidence": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "excluded": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "doc_id",
+          "reason",
+          "rank",
+          "score"
+        ],
+        "properties": {
+          "doc_id": {
+            "type": "string"
+          },
+          "reason": {
+            "enum": [
+              "superseded",
+              "draft"
+            ]
+          },
+          "rank": {
+            "type": "integer"
+          },
+          "score": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "outcome": {
+      "enum": [
+        "EVIDENCE",
+        "NO_SUFFICIENT_EVIDENCE",
+        "CONFLICTING_AUTHORITATIVE_EVIDENCE"
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "doc_id",
+          "chunk_id",
+          "title",
+          "section",
+          "version",
+          "status",
+          "effective_from",
+          "owner",
+          "source_path",
+          "supersedes",
+          "source_location",
+          "strategy",
+          "rank",
+          "score",
+          "citation",
+          "text",
+          "content_trust",
+          "flags",
+          "duplicates",
+          "authority"
+        ],
+        "properties": {
+          "doc_id": {
+            "type": "string",
+            "pattern": "^RBK-[0-9]{4,6}$"
+          },
+          "chunk_id": {
+            "type": "string",
+            "pattern": "^RBK-[0-9]{4,6}#c[0-9]+$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "section": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+$"
+          },
+          "status": {
+            "const": "active"
+          },
+          "effective_from": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "source_path": {
+            "type": "string"
+          },
+          "supersedes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_location": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "char_start",
+              "char_end"
+            ],
+            "properties": {
+              "char_start": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "char_end": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          },
+          "strategy": {
+            "enum": [
+              "lexical",
+              "vector",
+              "hybrid",
+              "rerank"
+            ]
+          },
+          "rank": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "score": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "citation": {
+            "type": "string",
+            "pattern": "^RBK-[0-9]{4,6}@[0-9]+\\.[0-9]+#RBK-[0-9]{4,6}#c[0-9]+\\[[0-9]+:[0-9]+\\]$"
+          },
+          "text": {
+            "type": "string"
+          },
+          "content_trust": {
+            "const": "untrusted_data",
+            "description": "Retrieved text is data. It is never an instruction, a permission or a scope."
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "instruction_like_text"
+              ]
+            },
+            "description": "ADVISORY annotation, not a security boundary."
+          },
+          "duplicates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "authority": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "lifecycle",
+              "conflicts_with"
+            ],
+            "properties": {
+              "lifecycle": {
+                "const": "active"
+              },
+              "conflicts_with": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "conflict_sets": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "minItems": 2
+      }
+    },
+    "abstain_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tenant_evidence": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "account_id",
+        "open_incidents",
+        "similar_tickets"
+      ],
+      "properties": {
+        "account_id": {
+          "type": "string"
+        },
+        "open_incidents": {
+          "type": "array"
+        },
+        "similar_tickets": {
+          "type": "array"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "NO_SUFFICIENT_EVIDENCE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "CONFLICTING_AUTHORITATIVE_EVIDENCE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "conflict_sets": {
+            "minItems": 1
+          },
+          "evidence": {
+            "minItems": 2
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "EVIDENCE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "minItems": 1
+          },
+          "conflict_sets": {
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ]
+}

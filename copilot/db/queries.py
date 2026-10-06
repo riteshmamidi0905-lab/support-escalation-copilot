@@ -25,6 +25,17 @@ _Q: dict[str, tuple] = {
     "get_runbook": ("SELECT doc_id, title, product_area, version, status, effective_from, supersedes, owner, source_path, body_markdown FROM copilot.runbook_docs WHERE doc_id = %(doc_id)s", (("doc_id", str),)),
     # Infrastructure check only (M1): plain default full-text search, NO query normalisation, so the R-3 baseline weakness stays observable until M2 measures it.
     "fts_runbooks_baseline": ("SELECT doc_id, title, status, ts_rank(tsv, websearch_to_tsquery('english', %(q)s)) AS rank FROM copilot.runbook_docs WHERE tsv @@ websearch_to_tsquery('english', %(q)s) ORDER BY rank DESC, doc_id LIMIT %(limit)s", (("q", str), ("limit", int))),
+    # ---- M2 retrieval. Runbooks are global knowledge; none of these reads tenant data except similar_account_tickets, which runs under RLS. ----
+    "list_runbooks": ("SELECT doc_id, title, product_area, version, status, effective_from, supersedes, owner, source_path, body_markdown FROM copilot.runbook_docs ORDER BY doc_id", ()),
+    "get_doc_chunks": ("SELECT chunk_id, doc_id, ordinal, section, char_start, char_end, text FROM copilot.runbook_chunks WHERE doc_id = %(doc_id)s ORDER BY ordinal", (("doc_id", str),)),
+    # Lexical: OR of the query's lexemes (plainto_tsquery gives AND, which an ordinary ticket never satisfies). No synonyms, no normalisation: re-sync != resync stays visible.
+    "search_chunks_lexical": ("SELECT c.chunk_id, c.doc_id, ts_rank(c.tsv, q.tq) AS score FROM copilot.runbook_chunks c, (SELECT replace(plainto_tsquery('english', %(q)s)::text, '&', '|')::tsquery AS tq) q "
+                              "WHERE c.tsv @@ q.tq ORDER BY score DESC, c.chunk_id LIMIT %(limit)s", (("q", str), ("limit", int))),
+    "search_chunks_vector": ("SELECT chunk_id, doc_id, 1 - (embedding OPERATOR(public.<=>) %(v)s::public.vector) AS score FROM copilot.runbook_chunks ORDER BY embedding OPERATOR(public.<=>) %(v)s::public.vector, chunk_id LIMIT %(limit)s", (("v", "vec"), ("limit", int))),
+    # Tenant-scoped: similar tickets of the CASE'S OWN account. RLS decides which tickets exist for the session; there is no account parameter to abuse.
+    "similar_account_tickets": ("SELECT t.ticket_id, t.account_id, t.subject, ts_rank(to_tsvector('english', t.subject || chr(32) || t.body), q.tq) AS score FROM copilot.tickets t, "
+                                "(SELECT replace(plainto_tsquery('english', %(q)s)::text, '&', '|')::tsquery AS tq) q WHERE to_tsvector('english', t.subject || chr(32) || t.body) @@ q.tq "
+                                "AND t.ticket_id <> %(exclude)s ORDER BY score DESC, t.ticket_id LIMIT %(limit)s", (("q", str), ("exclude", str), ("limit", int))),
 }
 CATALOGUE: Mapping[str, tuple] = MappingProxyType(_Q)
 NAMES = tuple(_Q)
@@ -51,6 +62,10 @@ def _check_params(name: str, params: Mapping[str, Any]) -> dict[str, Any]:
         if typ is int:
             if isinstance(v, bool) or not isinstance(v, int) or not 1 <= v <= 500:
                 raise CatalogueError(f"{name}.{k}: must be an integer 1..500")
+        elif typ == "vec":
+            if not isinstance(v, (list, tuple)) or len(v) != 384 or not all(isinstance(x, float) and x == x and abs(x) < 1e3 for x in v):
+                raise CatalogueError(f"{name}.{k}: must be a list of 384 finite floats")
+            v = "[" + ",".join(repr(x) for x in v) + "]"
         elif not isinstance(v, str) or len(v) > MAX_TEXT:
             raise CatalogueError(f"{name}.{k}: must be a string of at most {MAX_TEXT} characters")
         out[k] = v

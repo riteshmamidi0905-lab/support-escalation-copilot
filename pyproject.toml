@@ -18,6 +18,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+models = ["fastembed==0.8.1"]            # local open-weights embedding + reranker; only needed to (re)build the committed caches or to run the live benchmark
 dev = ["pytest>=8", "ruff>=0.5", "pgserver>=0.1.4; platform_system != 'Windows'"]   # pgserver = embedded Postgres for laptops without Docker
 
 [tool.setuptools.packages.find]
@@ -44,4 +45,5 @@ ignore = ["S101"]            # asserts are the point of a test suite
 "copilot/data/*.py" = ["E501", "E741", "S311", "B007"]      # S311: the generator uses a SEEDED non-cryptographic RNG on purpose
 "copilot/db/*.py" = ["E501"]
 "copilot/invariants.py" = ["E501"]
+"copilot/retrieval/*.py" = ["E501", "S311"]      # S311: the bootstrap CI uses a SEEDED non-cryptographic RNG on purpose
 "copilot/scope.py" = ["E501"]    # canary secrets and f-string SQL are deliberate in adversarial tests

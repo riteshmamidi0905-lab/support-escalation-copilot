@@ -1,0 +1,218 @@
+{
+ "dev_sufficient": 265,
+ "dev_tickets": 300,
+ "prefix_dev": {
+  "prefix=False/hybrid": {
+   "hit@1": 0.9132,
+   "mrr@10": 0.956
+  },
+  "prefix=False/vector": {
+   "hit@1": 0.966,
+   "mrr@10": 0.9824
+  },
+  "prefix=True/hybrid": {
+   "hit@1": 0.9094,
+   "mrr@10": 0.9541
+  },
+  "prefix=True/vector": {
+   "hit@1": 0.9509,
+   "mrr@10": 0.9755
+  }
+ },
+ "rrf_k_dev_mrr": {
+  "20": 0.956,
+  "60": 0.956,
+  "100": 0.956
+ },
+ "thresholds": {
+  "hybrid": {
+   "dev_summary_without_abstention": {
+    "abstained_on_insufficient": 0.0,
+    "citation_precision": 0.3333,
+    "conflict_detected_on_conflicting": null,
+    "conflict_pair_returned_on_conflicting": null,
+    "false_confidence_on_insufficient": 0.9714,
+    "governed_adversarial_returned": 0,
+    "governed_success_on_sufficient": 0.9434,
+    "governed_superseded_or_draft_count": 0,
+    "hit@1": 0.9132,
+    "hit@3": 1.0,
+    "hit@5": 1.0,
+    "mrr@10": 0.956,
+    "n": 300,
+    "n_conflicting": 0,
+    "n_insufficient": 35,
+    "n_sufficient": 265,
+    "outcome_by_sufficiency": {
+     "conflicting": {},
+     "insufficient": {
+      "CONFLICTING_AUTHORITATIVE_EVIDENCE": 1,
+      "EVIDENCE": 34
+     },
+     "sufficient": {
+      "CONFLICTING_AUTHORITATIVE_EVIDENCE": 15,
+      "EVIDENCE": 250
+     }
+    },
+    "outcomes": {
+     "CONFLICTING_AUTHORITATIVE_EVIDENCE": 16,
+     "EVIDENCE": 284
+    },
+    "raw_top5_forbidden_rate": null,
+    "raw_top5_has_injected_doc": 71,
+    "raw_top5_superseded_or_draft_rate": null,
+    "recall@1": 0.8981,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "wrongly_abstained_on_sufficient": 0.0,
+    "wrongly_conflict_on_sufficient": 0.0566
+   },
+   "median_conf_insufficient": 0.9296,
+   "median_conf_sufficient": 1.0,
+   "threshold": 0.98803,
+   "youden_j": 0.598
+  },
+  "lexical": {
+   "dev_summary_without_abstention": {
+    "abstained_on_insufficient": 0.2,
+    "citation_precision": 0.3393,
+    "conflict_detected_on_conflicting": null,
+    "conflict_pair_returned_on_conflicting": null,
+    "false_confidence_on_insufficient": 0.8,
+    "governed_adversarial_returned": 0,
+    "governed_success_on_sufficient": 0.9283,
+    "governed_superseded_or_draft_count": 0,
+    "hit@1": 0.8642,
+    "hit@3": 0.9962,
+    "hit@5": 1.0,
+    "mrr@10": 0.9265,
+    "n": 300,
+    "n_conflicting": 0,
+    "n_insufficient": 35,
+    "n_sufficient": 265,
+    "outcome_by_sufficiency": {
+     "conflicting": {},
+     "insufficient": {
+      "EVIDENCE": 28,
+      "NO_SUFFICIENT_EVIDENCE": 7
+     },
+     "sufficient": {
+      "CONFLICTING_AUTHORITATIVE_EVIDENCE": 19,
+      "EVIDENCE": 246
+     }
+    },
+    "outcomes": {
+     "CONFLICTING_AUTHORITATIVE_EVIDENCE": 19,
+     "EVIDENCE": 274,
+     "NO_SUFFICIENT_EVIDENCE": 7
+    },
+    "raw_top5_forbidden_rate": null,
+    "raw_top5_has_injected_doc": 59,
+    "raw_top5_superseded_or_draft_rate": null,
+    "recall@1": 0.8491,
+    "recall@3": 0.9962,
+    "recall@5": 1.0,
+    "wrongly_abstained_on_sufficient": 0.0,
+    "wrongly_conflict_on_sufficient": 0.0717
+   },
+   "median_conf_insufficient": 0.0064,
+   "median_conf_sufficient": 0.0285,
+   "threshold": 0.02044,
+   "youden_j": 0.842
+  },
+  "rerank": {
+   "dev_summary_without_abstention": {
+    "abstained_on_insufficient": 0.0,
+    "citation_precision": 0.3333,
+    "conflict_detected_on_conflicting": null,
+    "conflict_pair_returned_on_conflicting": null,
+    "false_confidence_on_insufficient": 0.8857,
+    "governed_adversarial_returned": 0,
+    "governed_success_on_sufficient": 0.8943,
+    "governed_superseded_or_draft_count": 0,
+    "hit@1": 0.9698,
+    "hit@3": 1.0,
+    "hit@5": 1.0,
+    "mrr@10": 0.9849,
+    "n": 300,
+    "n_conflicting": 0,
+    "n_insufficient": 35,
+    "n_sufficient": 265,
+    "outcome_by_sufficiency": {
+     "conflicting": {},
+     "insufficient": {
+      "CONFLICTING_AUTHORITATIVE_EVIDENCE": 4,
+      "EVIDENCE": 31
+     },
+     "sufficient": {
+      "CONFLICTING_AUTHORITATIVE_EVIDENCE": 28,
+      "EVIDENCE": 237
+     }
+    },
+    "outcomes": {
+     "CONFLICTING_AUTHORITATIVE_EVIDENCE": 32,
+     "EVIDENCE": 268
+    },
+    "raw_top5_forbidden_rate": null,
+    "raw_top5_has_injected_doc": 76,
+    "raw_top5_superseded_or_draft_rate": null,
+    "recall@1": 0.9547,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "wrongly_abstained_on_sufficient": 0.0,
+    "wrongly_conflict_on_sufficient": 0.1057
+   },
+   "median_conf_insufficient": -10.7063,
+   "median_conf_sufficient": 3.4122,
+   "threshold": -0.72475,
+   "youden_j": 0.977
+  },
+  "vector": {
+   "dev_summary_without_abstention": {
+    "abstained_on_insufficient": 0.0,
+    "citation_precision": 0.3333,
+    "conflict_detected_on_conflicting": null,
+    "conflict_pair_returned_on_conflicting": null,
+    "false_confidence_on_insufficient": 0.9714,
+    "governed_adversarial_returned": 0,
+    "governed_success_on_sufficient": 0.9434,
+    "governed_superseded_or_draft_count": 0,
+    "hit@1": 0.966,
+    "hit@3": 1.0,
+    "hit@5": 1.0,
+    "mrr@10": 0.9824,
+    "n": 300,
+    "n_conflicting": 0,
+    "n_insufficient": 35,
+    "n_sufficient": 265,
+    "outcome_by_sufficiency": {
+     "conflicting": {},
+     "insufficient": {
+      "CONFLICTING_AUTHORITATIVE_EVIDENCE": 1,
+      "EVIDENCE": 34
+     },
+     "sufficient": {
+      "CONFLICTING_AUTHORITATIVE_EVIDENCE": 15,
+      "EVIDENCE": 250
+     }
+    },
+    "outcomes": {
+     "CONFLICTING_AUTHORITATIVE_EVIDENCE": 16,
+     "EVIDENCE": 284
+    },
+    "raw_top5_forbidden_rate": null,
+    "raw_top5_has_injected_doc": 68,
+    "raw_top5_superseded_or_draft_rate": null,
+    "recall@1": 0.9509,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "wrongly_abstained_on_sufficient": 0.0,
+    "wrongly_conflict_on_sufficient": 0.0566
+   },
+   "median_conf_insufficient": 0.6483,
+   "median_conf_sufficient": 0.8116,
+   "threshold": 0.70721,
+   "youden_j": 0.853
+  }
+ }
+}

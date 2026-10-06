@@ -213,7 +213,7 @@ def validate_hand_labels(hand_dir: Path, dataset: Path) -> Report:
     own = hand_dir / "hand_tickets.jsonl"
     if own.exists():
         own_rows = read_jsonl(own)
-        seen_t: Set[str] = set()
+        seen_t: set[str] = set()
         for i, r in enumerate(own_rows, 1):
             for e in validate_record("ticket", r):
                 rep.add(f"hand_tickets.jsonl:{i}: {e}")
@@ -227,7 +227,7 @@ def validate_hand_labels(hand_dir: Path, dataset: Path) -> Report:
         tickets = tickets | seen_t
     docs = {r["doc_id"]: r for r in read_jsonl(dataset / "runbooks.jsonl")}
     incidents = {r["incident_id"] for r in read_jsonl(dataset / "incidents.jsonl")}
-    seen: Set[str] = set()
+    seen: set[str] = set()
     for i, r in enumerate(read_jsonl(p), 1):
         for e in validate_record("hand_label", r):
             rep.add(f"hand_labels.jsonl:{i}: {e}")
