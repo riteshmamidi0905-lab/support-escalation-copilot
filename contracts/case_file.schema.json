@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://support-escalation-copilot.example/contracts/case_file.schema.json",
+  "title": "Case file",
+  "description": "The durable, structured record of one case: the primary object the M5 UI will display. Contains conclusions, citations, decisions and results; never hidden reasoning, raw model text or secrets.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "case_id",
+    "account_id",
+    "ticket",
+    "workflow",
+    "outcome",
+    "disposition",
+    "evidence",
+    "retrieval",
+    "hypotheses",
+    "contradictions",
+    "missing_evidence",
+    "applicability",
+    "verification",
+    "proposed_actions",
+    "policy_decisions",
+    "approvals",
+    "executions",
+    "draft_reply",
+    "internal_note",
+    "reason",
+    "limitations",
+    "audit_refs",
+    "model",
+    "degraded",
+    "rejected_proposals"
+  ],
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "pattern": "^CASE-[0-9]{6}$"
+    },
+    "account_id": {
+      "type": "string"
+    },
+    "ticket": {
+      "type": "object",
+      "required": [
+        "ticket_id",
+        "subject",
+        "body",
+        "redactions"
+      ],
+      "properties": {
+        "ticket_id": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "redactions": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "required": [
+        "state",
+        "version",
+        "transitions"
+      ],
+      "properties": {
+        "state": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "transitions": {
+          "type": "array",
+          "items": {
+            "type": "array"
+          }
+        }
+      }
+    },
+    "outcome": {
+      "enum": [
+        "ANSWER",
+        "APPROVAL",
+        "REFUSE",
+        "ESCALATE",
+        "INSUFFICIENT_EVIDENCE",
+        "CLARIFY",
+        "DEGRADED",
+        null
+      ]
+    },
+    "disposition": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "handle",
+          "citation",
+          "status"
+        ]
+      }
+    },
+    "retrieval": {
+      "type": "object",
+      "required": [
+        "outcome",
+        "strategy"
+      ]
+    },
+    "hypotheses": {
+      "type": "array"
+    },
+    "contradictions": {
+      "type": "array"
+    },
+    "missing_evidence": {
+      "type": "array"
+    },
+    "applicability": {
+      "type": "array"
+    },
+    "verification": {
+      "type": "object",
+      "required": [
+        "status"
+      ]
+    },
+    "proposed_actions": {
+      "type": "array"
+    },
+    "policy_decisions": {
+      "type": "array"
+    },
+    "approvals": {
+      "type": "array"
+    },
+    "executions": {
+      "type": "array"
+    },
+    "draft_reply": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "internal_note": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "reason": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "audit_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "event_id",
+          "type",
+          "hash"
+        ]
+      }
+    },
+    "model": {
+      "type": "object"
+    },
+    "degraded": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "rejected_proposals": {
+      "type": "array"
+    }
+  }
+}

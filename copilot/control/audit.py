@@ -65,22 +65,30 @@ class AuditLog:
     def __init__(self, pool, clock=None):
         self.pool, self.clock = pool, clock or SystemClock()
 
-    def append(self, event_type: str, case_id: str, account_id: str | None, actor: dict[str, Any], correlation: dict[str, Any], payload: dict[str, Any]) -> dict[str, Any]:
+    def append(self, event_type: str, case_id: str, account_id: str | None, actor: dict[str, Any], correlation: dict[str, Any], payload: dict[str, Any], conn=None) -> dict[str, Any]:
+        """`conn`: join the caller's open transaction (used by workflow transitions so state change and audit event commit or roll back together)."""
         body = {"event_id": "EVT-" + secrets.token_hex(8), "case_id": case_id, "account_id": account_id, "ts": self.clock.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ"), "actor": actor,
                 "type": event_type, "correlation": {k: v for k, v in correlation.items() if k in ("run_id", "request_id", "action_id", "action_hash", "approval_id", "idempotency_key")},
                 "payload": sanitize_payload(payload)}
-        with self.pool.connection() as c, c.transaction():
-            c.execute("SELECT pg_advisory_xact_lock(%s)", (LOCK_KEY,))
-            row = c.execute("SELECT hash FROM copilot.audit_events ORDER BY seq DESC LIMIT 1").fetchone()
-            body["prev_hash"] = row[0] if row else None
-            blob = canonical_json(body)
-            h = event_hash(blob)
-            errs = C.validate_record("audit_event", {**body, "hash": h})
-            if errs:
-                raise AuditError("event violates the audit contract: " + "; ".join(e[:120] for e in errs[:2]))
-            c.execute("INSERT INTO copilot.audit_events (event_id, case_id, account_id, event_type, ts, body, prev_hash, hash) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                      (body["event_id"], case_id, account_id, event_type, body["ts"], blob.decode(), body["prev_hash"], h))
+        if conn is not None:
+            h = self._insert(conn, body, event_type, case_id, account_id)
+        else:
+            with self.pool.connection() as c, c.transaction():
+                h = self._insert(c, body, event_type, case_id, account_id)
         return {**body, "hash": h}
+
+    def _insert(self, c, body, event_type, case_id, account_id) -> str:
+        c.execute("SELECT pg_advisory_xact_lock(%s)", (LOCK_KEY,))
+        row = c.execute("SELECT hash FROM copilot.audit_events ORDER BY seq DESC LIMIT 1").fetchone()
+        body["prev_hash"] = row[0] if row else None
+        blob = canonical_json(body)
+        h = event_hash(blob)
+        errs = C.validate_record("audit_event", {**body, "hash": h})
+        if errs:
+            raise AuditError("event violates the audit contract: " + "; ".join(e[:120] for e in errs[:2]))
+        c.execute("INSERT INTO copilot.audit_events (event_id, case_id, account_id, event_type, ts, body, prev_hash, hash) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                  (body["event_id"], case_id, account_id, event_type, body["ts"], blob.decode(), body["prev_hash"], h))
+        return h
 
     def rows(self) -> list[dict[str, Any]]:
         with self.pool.connection() as c:

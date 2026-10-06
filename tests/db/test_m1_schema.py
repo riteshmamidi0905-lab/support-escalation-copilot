@@ -20,7 +20,7 @@ def q(env, sql, *a):
 def test_migrations_are_idempotent_and_recorded(env):
     assert A.migrate(env.admin_dsn) == []
     done = [r[0] for r in q(env, "SELECT version FROM public.schema_migrations ORDER BY version")]
-    assert done == [p.name for p in A.migration_files()] and len(done) == 7          # 001-005 (M1) + 006 runbook_chunks (M2) + 007 control plane (M3)
+    assert done == [p.name for p in A.migration_files()] and len(done) == 8          # 001-005 (M1) + 006 chunks (M2) + 007 control plane (M3) + 008 case workflow (M4)
 
 
 def test_role_audit_is_clean(env):

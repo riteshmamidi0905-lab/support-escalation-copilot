@@ -66,7 +66,12 @@
         "idempotency_conflict_blocked",
         "draft_created",
         "forbidden_action_attempted",
-        "approval_denied_by_approver"
+        "approval_denied_by_approver",
+        "state_transition",
+        "stage_completed",
+        "model_output_rejected",
+        "verification_recorded",
+        "draft_rejected"
       ]
     },
     "payload": {

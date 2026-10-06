@@ -38,7 +38,7 @@ def redact_obj(v: Any) -> Any:
     return v
 
 
-_EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+")
+_EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}\b")  # alphabetic TLD: RBK-0019@2.0 is a citation, not an address
 HIDDEN_REASONING_KEYS = frozenset({"thought", "thoughts", "reasoning", "chain_of_thought", "cot", "scratchpad", "hidden_reasoning", "internal_monologue",
                                    "reasoning_trace"})
 

@@ -84,7 +84,7 @@ class Retriever:
         return out + [{**d, "score": float("-inf")} for d in tail]
 
     # ---- governed result ------------------------------------------------------------------------------------------------------------
-    def retrieve(self, query: str, strategy: str, *, scope=None, guard=None, ticket_id: str = "", top_k: int = config.TOP_K) -> dict[str, Any]:
+    def retrieve(self, query: str, strategy: str, *, scope=None, guard=None, ticket_id: str = "", top_k: int = config.TOP_K, include_context: bool = False) -> dict[str, Any]:
         raw = self.ranked(strategy, query)[:10]
         reg = self.registry
         excluded, active, seen_groups = [], [], set()
@@ -116,6 +116,9 @@ class Retriever:
         def conflict_result(sets):
             members = sorted({m for cs in sets for m in cs})
             items = [self._item(m, next((a for a in active if m in reg.group(a["doc_id"])), None), strategy, sets) for m in members]
+            if include_context:      # opt-in (workflow): keep the other best active matches next to the conflict members, so a false conflict cannot hide the relevant document
+                covered = {x for m in members for x in reg.group(m)}
+                items += [self._item(a["doc_id"], a, strategy, []) for a in active[:top_k] if a["doc_id"] not in covered]
             return {**base, "outcome": CONFLICT, "evidence": items, "conflict_sets": sets, "abstain_reason": "active documents disagree; no winner is chosen", "tenant_evidence": tenant}
 
         low = not active or (thr is not None and top_conf is not None and top_conf < thr)

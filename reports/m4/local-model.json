@@ -1,0 +1,11 @@
+{
+ "executed": false,
+ "model": "llama3.2",
+ "base_url": "http://127.0.0.1:11434",
+ "machine": {
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "machine": "arm64",
+  "python": "3.12.15"
+ },
+ "reason": "no local model server answered at http://127.0.0.1:11434; no real-model evaluation was executed"
+}

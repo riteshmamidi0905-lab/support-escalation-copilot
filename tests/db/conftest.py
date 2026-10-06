@@ -111,3 +111,15 @@ def env():
     yield e
     e.pool.close()
     dbadmin.drop_database(DSN, e.dbname)
+
+
+@pytest.fixture(scope="module")
+def m4env(env):
+    """A DEDICATED environment for the M4 workflow tests (they insert hostile tickets, open hundreds of cases and fill the audit log; the shared M1 environment must stay exactly as loaded).
+    Database roles are CLUSTER-wide, so building this environment re-bootstraps their passwords; on teardown the shared environment's passwords are put back."""
+    shared = env
+    e = build_env("copilot_m4")
+    yield e
+    e.pool.close()
+    dbadmin.drop_database(DSN, e.dbname)
+    dbadmin.bootstrap(shared.admin_dsn, shared.passwords, shared.scope_secret)
