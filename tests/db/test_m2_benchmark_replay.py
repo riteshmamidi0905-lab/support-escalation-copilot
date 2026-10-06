@@ -6,6 +6,8 @@ from pathlib import Path
 
 import pytest
 
+from copilot.db import admin as dbadmin
+
 pytestmark = pytest.mark.db
 ROOT = Path(__file__).resolve().parent.parent.parent
 
@@ -26,9 +28,22 @@ def same(a, b, path="", tol=2e-3):
         assert a == b, f"{path}: {a!r} vs {b!r}"
 
 
-def test_replay_reproduces_the_committed_results(tmp_path):
+def test_replay_reproduces_the_committed_results(tmp_path, env):
     out = tmp_path / "rep"
-    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "run_benchmark.py"), "--out", str(out)], capture_output=True, text=True, cwd=ROOT, timeout=900)  # noqa: S603
+    try:
+        r = _run(out)
+    finally:
+        # Database roles are CLUSTER-wide: the benchmark's own bootstrap gives copilot_* new passwords, which would lock the shared test environment out on a
+        # password-authenticating server (CI). Put the shared environment's passwords back.
+        dbadmin.bootstrap(env.admin_dsn, env.passwords, env.scope_secret)
+    _check(r, out)
+
+
+def _run(out):
+    return subprocess.run([sys.executable, str(ROOT / "scripts" / "run_benchmark.py"), "--out", str(out)], capture_output=True, text=True, cwd=ROOT, timeout=900)  # noqa: S603
+
+
+def _check(r, out):
     assert r.returncode == 0, r.stdout[-2000:] + r.stderr[-2000:]
     new = json.loads((out / "results.json").read_text())
     old = json.loads((ROOT / "reports" / "m2" / "results.json").read_text())
