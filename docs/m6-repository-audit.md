@@ -32,7 +32,8 @@ Historical reports that establish provenance were **kept as written**.
 | 13 | **No text implies a production deployment or real customers.** The only uses are negations or "what a real deployment would have to change" | the README states it plainly at the top; the release checks reject unqualified overclaim phrases |
 | 14 | `docs/spec.md` is the original approved specification and differs from the implementation in places (FastAPI mocks, YAML policy, hybrid hypothesis, ~400 accounts) | left unchanged (it says later documents win); the differences are tabulated in `architecture.md` §7 |
 | 15 | `scripts/` had no index and one superseded script (`run_m4_local_model.py`) | `scripts/README.md` added; the superseded script is kept because its report is part of the record |
-| 16 | CI annotations warn that `actions/checkout@v4` and `setup-python@v5` run on a deprecated Node version, and `ubuntu-latest` will move to a newer image on 2026-10-19 | **not changed**: noted, harmless today; revisit when the actions publish new majors |
+| 16 | **The `LICENSE` file was an abbreviated MIT text** (the warranty disclaimer was cut short), so GitHub classified the licence as "Other" | replaced with the complete standard MIT text (same copyright line); GitHub should now detect MIT |
+| 17 | CI annotations warn that `actions/checkout@v4` and `setup-python@v5` run on a deprecated Node version, and `ubuntu-latest` will move to a newer image on 2026-10-19 | **not changed**: noted, harmless today; revisit when the actions publish new majors |
 
 ## Not done, on purpose
 No `SECURITY.md`, `CONTRIBUTING.md` or issue templates (a process nobody has asked for); no lockfile or SBOM (the agent runtime is pinned to a commit; other dependencies use lower bounds, listed as a residual in `security.md`); no deployment infrastructure of any kind.

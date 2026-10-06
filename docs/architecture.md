@@ -130,15 +130,7 @@ stateDiagram-v2
     DRAFT --> ABSTAINED: insufficient evidence or clarify
     DRAFT --> ESCALATED: routed to engineering
     DRAFT --> HANDED_OFF: degraded, denied, expired, uncertain
-    INTAKE --> FAILED: reason recorded
-    SCOPE --> FAILED
-    RETRIEVE --> FAILED
-    VERIFY --> FAILED
-    DIAGNOSE --> FAILED
-    PLAN --> FAILED
-    REVIEW --> FAILED
-    EXECUTE --> FAILED
-    DRAFT --> FAILED
+    FAILED : FAILED - reachable from every state INTAKE to DRAFT, reason recorded
     CLOSED --> [*]
     REFUSED --> [*]
     ABSTAINED --> [*]
