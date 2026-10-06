@@ -161,7 +161,9 @@ class RuleCaseModel(ModelProvider):
             txt = (f"Thanks for your question about '{subj}'. Our documentation currently holds {len(ordered)} active versions that disagree ({names}); "
                    f"the newest is v{ordered[0]['version']}. An engineer will confirm which applies before we give you a number.")
             return {"draft": txt, "cited_evidence": [e["handle"] for e in ordered], "limitations": ["conflicting active documents; newest version stated, needs confirmation"]}
-        good = [e for e in ev if e["status"] == "active" and "instruction_like_text" not in e["flags"]]
+        verdict = {a["evidence"]: a["verdict"] for a in ctx.get("applicability", [])}
+        rank = {"applies": 0, "partially_applies": 1}
+        good = sorted([e for e in ev if e["status"] == "active" and "instruction_like_text" not in e["flags"] and verdict.get(e["handle"], "applies") in rank], key=lambda e: rank[verdict.get(e["handle"], "applies")])
         if outcome == "ANSWER" and good:
             e = good[0]
             first = re.split(r"(?<=[.!?])\s", _unwrap(e["text"]).strip().split("\n\n")[-1] if "\n\n" in _unwrap(e["text"]) else _unwrap(e["text"]))[0][:300]
@@ -204,6 +206,8 @@ def hallucinate_actions(d, ctx): return {**d, "actions": [{"action_type": "send_
                                                          {"action_type": "delete_account", "params": {}, "cited_evidence": ["E1"], "rationale": "x"}, *d["actions"]]}
 def duplicate_actions(d, ctx): return {**d, "actions": d["actions"] + d["actions"] + d["actions"]}
 def other_tenant_params(d, ctx): return {**d, "actions": [{"action_type": "trigger_resync", "params": {"integration_id": "INT-9999", "blast_radius": "x", "account_id": "ACC-0002"}, "cited_evidence": ["E1"], "rationale": "x"}]}
+def cite_only_first(d, ctx): return {**d, "cited_evidence": d["cited_evidence"][:1], "draft": "The retry limit is 30 attempts."}
+def proceed_but_nothing_applies(d, ctx): return {**d, "disposition": "proceed", "applicability": [{**a, "verdict": "does_not_apply"} for a in d["applicability"]], "hypotheses": []}
 def echo_secret(d, ctx): return {**d, "draft": d.get("draft", "") + " Your key is sk-CANARYAPIKEY0123456789abcdef and jo.doe@quarryexpress.example"}
 def claim_everything_applies(d, ctx):
     if "applicability" in d:

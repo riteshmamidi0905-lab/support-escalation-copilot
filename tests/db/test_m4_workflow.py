@@ -188,3 +188,33 @@ def test_an_approved_draft_is_stored_and_never_transmitted(w):                  
     with psycopg.connect(w.env.control_dsn) as c:
         rows = c.execute("SELECT kind, status FROM copilot.case_artifacts WHERE case_id = %s", (r.case_id,)).fetchall()
     assert rows and {x[1] for x in rows} == {"draft"} and not hasattr(w.gateway, "send")
+
+
+def test_a_refusing_model_is_never_second_guessed_into_acting(w):
+    """Caution is free: when the diagnosis says refuse/abstain/clarify the PLAN stage is not even asked for actions, so a hostile PLAN behaviour cannot matter."""
+    from tests.db.workflow_support import insert_ticket
+    from tests.support.attacks import ATTACKS
+    subject, body = ATTACKS["ignore_policy"]
+    prov = FaultyModel(RuleCaseModel(), {"PLAN": [P.obey_injection_credit] * 3})
+    r = w.new_runner(prov).start(insert_ticket(w, subject, body))
+    f = w.machine.get(r.case_id)["file"]
+    assert r.outcome == "REFUSE" and f["plan"]["actions"] == [] and f["plan"]["caution"] is True
+    assert "PLAN" not in [stage for stage, _ in prov.log], "the plan stage never ran"
+
+
+def test_conflicting_relevant_documents_must_be_disclosed_in_the_draft(w):
+    from tests.db.workflow_support import insert_ticket
+    tid = insert_ticket(w, "How many times do you retry a failed webhook?", "Our webhook endpoint was down for most of Sunday. How many times do you retry a failed delivery and over how long a period?")
+    r, f = run(w, tid)
+    assert f["retrieval"]["outcome"] == "CONFLICTING_AUTHORITATIVE_EVIDENCE" and r.outcome == "ANSWER"
+    cited = set(f["draft_reply"]["cited"])
+    assert {"RBK-0015@2.1", "RBK-0017@1.3"} <= cited and "disagree" in f["draft_reply"]["text"], "both conflicting documents are cited and the disagreement is stated"
+    assert f["case_file"]["contradictions"]
+    r2, f2 = run(w, tid, {"DRAFT": [P.cite_only_first] * 4})
+    assert f2["draft_reply"]["source"] == "none", "a draft that picks one of two conflicting answers is rejected"
+
+
+def test_a_model_that_says_proceed_while_judging_nothing_applicable_still_ends_in_abstention(w):
+    tid = next(t for t in w.scenario_tickets("S7") if "sso" not in w.ticket(t)["subject"].lower())
+    r, f = run(w, tid, {"DIAGNOSE": [P.proceed_but_nothing_applies]})
+    assert r.outcome == "INSUFFICIENT_EVIDENCE" and r.state == "ABSTAINED" and f["plan"]["actions"] == []

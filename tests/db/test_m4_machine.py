@@ -136,3 +136,17 @@ def test_every_transition_writes_an_audit_event_in_the_same_transaction(w):
 def test_terminal_states_have_no_exit_and_outcomes_are_checked():
     outs = {t.dst: t.outcomes for t in TRANSITIONS if t.dst in TERMINAL and t.dst != "FAILED"}
     assert "REFUSE" in outs["REFUSED"] and "ANSWER" not in outs["REFUSED"] and "DEGRADED" in outs["HANDED_OFF"] and "DEGRADED" not in outs["CLOSED"]
+
+
+def test_a_failure_AFTER_the_audit_event_is_written_still_rolls_the_whole_transition_back(w):
+    cid, _ = new_case(w)
+    n = len(w.audit.events(cid))
+
+    def boom(point, **kw):
+        if point == "after_audit":
+            raise RuntimeError("process died after writing the audit event, before commit")
+    w.machine.hook = boom
+    with pytest.raises(RuntimeError):
+        w.machine.advance(cid, "NEW", "INTAKE", {"ticket_id": "TCK-0001"})
+    w.machine.hook = lambda *a, **k: None
+    assert w.machine.get(cid)["state"] == "NEW" and w.machine.transitions(cid) == [] and len(w.audit.events(cid)) == n, "state, transition row and audit event commit or roll back together"

@@ -162,6 +162,11 @@ def main():
                          "failure_reason": None if n == 1 else ["duplicate effect"], "case_id": r.case_id, "cites_expected_runbook": None, "invariants": case_invariants(w, env, r.case_id, w.ticket(tid)["account_id"])})
         glob = global_invariants(w, env, rows)
         cat = catalogue()
+        examples = {}
+        for sid, label in (("S4", "approval_gated_resync_executed"), ("S1", "credit_above_policy_refused"), ("S7", "insufficient_evidence_abstained"), ("S9", "status_api_down_degraded"), ("S8", "conflicting_versions_answered_with_flag")):
+            row = next((r for r in rows if r["scenario"] == sid and r["outcome_ok"] and (sid != "S4" or r.get("post_approval"))), None)
+            if row:
+                examples[label] = {"ticket": row["ticket"], "case_file": w.machine.get(row["case_id"])["file"].get("case_file")}
     finally:
         w.close()
         bench_env.drop(env)
@@ -169,6 +174,7 @@ def main():
     dest = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "reports" / "m4"
     dest.mkdir(parents=True, exist_ok=True)
     (dest / "scenarios.json").write_text(json.dumps(out, indent=1, sort_keys=True, default=str) + "\n")
+    (dest / "case-file-examples.json").write_text(json.dumps(examples, indent=1, sort_keys=True, default=str) + "\n")
     if len(sys.argv) == 1:
         render(out)
     s = out["summary"]

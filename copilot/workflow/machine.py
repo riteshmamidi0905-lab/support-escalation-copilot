@@ -86,6 +86,7 @@ class CaseMachine:
             self.audit.append(tr.event, case_id, row["account_id"], actor or {"kind": "system", "id": "case-workflow", "role": None}, correlation or {},
                               {"from": expected_state, "to": dst, "version": row["version"] + 1, "inputs_sha256": digest, "outcome": inputs.get("outcome"),
                                "reasons": [inputs["failure"]["code"]] if dst == "FAILED" and isinstance(inputs.get("failure"), dict) else []}, conn=c)
+            self.hook("after_audit", case_id=case_id, src=expected_state, dst=dst)
         return self.get(case_id)
 
     def transitions(self, case_id: str) -> list[tuple[str, str, int]]:

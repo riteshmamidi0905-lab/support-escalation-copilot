@@ -34,7 +34,7 @@ M = [
     ("forbidden registry emptied", ACT, "    if t in FORBIDDEN:\n        raise ActionRejected(\"FORBIDDEN_ACTION\", t)", "    if False:\n        raise ActionRejected(\"FORBIDDEN_ACTION\", t)"),
     ("secret check in parameters disabled", ACT, "    if _has_secret(raw[\"params\"]):", "    if False:"),
     ("customer-system responses not scrubbed", GW, "res = scrub(system.call(key, payload), 500)", "res = system.call(key, payload)"),
-    ("audit chain does not commit to its predecessor", AUD, '            body["prev_hash"] = row[0] if row else None', '            body["prev_hash"] = None'),
+    ("audit chain does not commit to its predecessor", AUD, '        body["prev_hash"] = row[0] if row else None', '        body["prev_hash"] = None'),
     ("audit allows hidden reasoning keys", AUD, "            if bad:\n                raise AuditError", "            if False:\n                raise AuditError"),
     ("identity signature not verified", "copilot/control/identity.py", "        if not hmac.compare_digest(self._sig(ident.kind, ident.id, ident.role, ident.exp, ident.key_id), ident.sig):", "        if False:"),
     ("identity expiry not checked", "copilot/control/identity.py", "        if ident.exp < int(self._clock()):", "        if False:"),

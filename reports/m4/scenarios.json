@@ -24,7 +24,7 @@
    "pass": true
   },
   "audit chain intact": {
-   "detail": "5392 events verified",
+   "detail": "5394 events verified",
    "pass": true
   },
   "no duplicated effect": {
@@ -4889,8 +4889,8 @@
    "actual": "ANSWER",
    "approval_ok": true,
    "case_id": "CASE-000146",
-   "citation_ok": false,
-   "cites_expected_runbook": false,
+   "citation_ok": true,
+   "cites_expected_runbook": true,
    "classification": null,
    "disposition": null,
    "effects": 0,
@@ -5039,8 +5039,8 @@
    "actual": "ANSWER",
    "approval_ok": true,
    "case_id": "CASE-000151",
-   "citation_ok": false,
-   "cites_expected_runbook": false,
+   "citation_ok": true,
+   "cites_expected_runbook": true,
    "classification": null,
    "disposition": null,
    "effects": 0,
@@ -10488,7 +10488,7 @@
   "S8": {
    "action_ok": 12,
    "approval_ok": 12,
-   "citation_ok": 10,
+   "citation_ok": 12,
    "classes": {},
    "expected": "ANSWER",
    "invariant_violations": 0,

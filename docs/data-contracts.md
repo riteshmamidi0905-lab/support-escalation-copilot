@@ -42,3 +42,6 @@ Author the 40 tickets and labels *before* looking at any retrieval output; two p
 
 ## M3 contract changes
 `contracts/action.schema.json` was tightened (case id and idempotency-key patterns, `maxLength` on every free-text field, bounded unique evidence refs, incident id pattern); `contracts/audit_event.schema.json` gained `account_id`, a `correlation` object (run/request/action/hash/approval/idempotency ids) and the event types `policy_decided`, `execution_attempted`, `execution_uncertain`, `idempotent_replay`, `idempotency_conflict_blocked`, `draft_created`, `forbidden_action_attempted`, `approval_denied_by_approver`. Nothing was loosened.
+
+## M4 contract additions
+`contracts/case_file.schema.json` (the durable case file the M5 UI will display); audit event types `state_transition`, `stage_completed`, `model_output_rejected`, `verification_recorded`, `draft_rejected`. Model output schemas live in `copilot/workflow/schemas.py` (Diagnosis, ProposedActions, DraftReply). Nothing was loosened.

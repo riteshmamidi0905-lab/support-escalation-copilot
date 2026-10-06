@@ -1,4 +1,4 @@
-# What is real, what is simulated, what is only designed (M3)
+# What is real, what is simulated, what is only designed (M4)
 
 | Item | Status |
 |---|---|
@@ -19,7 +19,13 @@
 | Idempotent gateway, retries, uncertain-outcome handling, concurrency | **implemented and tested** (8-thread duplicate test); customer systems are **deterministic mocks** with fault injection, not real carrier/billing systems |
 | Audit log (hash chain, scrubbing, tamper tests) | **implemented**; guarantee is tamper-**evidence**, not immutability; no external anchor is deployed |
 | Runtime approver hook (R-1) | wrapped, tested with the real frozen `agent.security.Policy`; runtime unchanged |
-| Case state machine, case-file generation, diagnosis, real LLM calls, scenario suite S1–S16 as end-to-end runs, UI | designed (M4–M6) |
+| Case state machine (durable, DB-enforced edges), stages, resume, case file contract | **implemented and tested** against real PostgreSQL |
+| Frozen runtime integration (provider abstraction, structured-output repair, Agent loop in DIAGNOSE, budgets/retries, tracer) | **used**, unmodified (pinned `231b186`) |
+| Model decisions in the workflow (diagnosis, applicability, proposals, drafts) | produced by a **deterministic stand-in (`RuleCaseModel`) and deliberately misbehaving wrappers — NOT an LLM**. The OpenAI-compatible local path is tested against a protocol stub only |
+| S1–S16 end-to-end runs (315 case executions) | **real workflow/control plane, scripted stand-in model**; measures orchestration and safety, not model quality; stand-in tuned during development |
+| Real local model evaluation (Ollama etc.) | **not executed** (no local model server available); script and boundary exist |
+| Status / Carrier / Ticketing APIs | **deterministic mocks** with fault injection |
+| UI, M5 observability/deployment, real identity provider | designed (M5–M6) / mock |
 | Retrieval quality (hand-labelled held-out), abstention, conflicts, lifecycle, latency/resources on one laptop | **measured** (`docs/m2-results.md`); descriptive, small n |
 | Real-model (LLM) behaviour, task completion, business metrics | **nothing measured** |
 | Approval/refusal/idempotency behaviour of the control plane | **demonstrated by deterministic tests and the clean-database run** (`docs/m3-scenarios.md`): a property of the controls, not a performance metric |

@@ -458,7 +458,7 @@ class CaseRunner:
         if cand is not None:                                                    # resumed after a crash: reuse the SAME text so the idempotency key and payload match
             return self._store_draft(row, scope, f, cand)
         ms = ModelStage(self.d.provider, self.d.tracer_factory(cid) if self.d.tracer_factory else None, sleep=self.d.sleep)
-        ctx = {**self._context(row, scope, facts), "outcome": outcome, "disposition": f.get("disposition"), "conflict_handles": sorted(required),
+        ctx = {**self._context(row, scope, facts), "outcome": outcome, "disposition": f.get("disposition"), "conflict_handles": sorted(required), "applicability": [{"evidence": a["evidence"], "verdict": a["verdict"]} for a in (f.get("diagnosis") or {}).get("applicability", [])],
                "plan": [{"type": e["type"], "status": e["status"], "reasons": e["reasons"]} for e in f.get("plan", {}).get("actions", [])]}
         instr = ("Write a DRAFT reply for the support engineer to review (it is never sent by this system). Cite evidence handles. If outcome is REFUSE, INSUFFICIENT_EVIDENCE or CLARIFY say so plainly "
                  "and ask only for what is missing. If evidence conflicts, say the documents disagree and which is newer. Never repeat credentials or e-mail addresses. State limitations.")

@@ -57,3 +57,19 @@
 | R-37 | The SLA-breach rule trusts the `sla-monitor` author field of ticket history | design | acceptable for synthetic data; a real ticketing integration must guarantee that customers cannot author as the monitor |
 | R-38 | Whether a runbook *applies* to the symptoms (semantic sufficiency) is not decided by any control | scoping | stated in each decision (`SEMANTIC_APPLICABILITY_NOT_ASSESSED`); human approver judges; real-model evaluation is separate |
 | R-39 | A long customer-system call that outlives the 60 s lease will be treated as `uncertain` by a second request | design analysis | the second request never re-executes without confirmation (lookup) or a human; safe, but can strand a slow success as UNCERTAIN until reconciled |
+
+## M4: new findings
+| ID | Finding | How found | Handling |
+|---|---|---|---|
+| R-40 | The e-mail masking regex of M3 treated a citation such as `RBK-0019@2.0` as an address and masked it in case files/audit | first end-to-end case file | the TLD must now be alphabetic (a false-positive fix in `copilot.redact`; real addresses are still masked; M3 tests unchanged) |
+| R-41 | Conflict-first retrieval (M2/M3) returned only the conflicting pair for an unrelated ticket and so hid the relevant document from the case (TCK-0064) | S8 scenario | opt-in `include_context` keeps the other best active matches next to conflict members for the workflow; frozen M2/M3 retrieval behaviour and results are unchanged by default |
+| R-42 | The circuit breaker for external APIs never closed again (a Status API that recovered stayed 'unavailable') | S11 scenario | half-open after a cool-down on the injected clock; tested |
+| R-43 | The scripted stand-in's heuristics were iterated during M4 after seeing scenario results (typo tolerance, topic gating, recent re-sync, applicability-aware draft) | development | the S1–S16 match rates are **development results of a stand-in**, not evidence of LLM quality or generalisation |
+| R-44 | Scenario labels disagree with runbooks/data in 24 of 315 cases: S7 negative-answer topics (10/30: RBK-0034, RBK-0052), S4 accounts with an open carrier-gateway incident (11/25), S14 accounts with an open tracking incident (3/130) | scenario run | reported individually as LABEL_CONFLICT; expectations not edited |
+| R-45 | A fooled model can mark everything applicable and turn an abstention into an ANSWER *draft* | adversarial test | non-executable and human-reviewed, but a misleading draft is still a harm path; only a real-model evaluation can say how often it happens |
+| R-46 | Injected documents still reach the model prompt (they are on-topic evidence); only the architecture contains them | injection matrix | 0 invariant violations over 32 attack runs incl. detectors OFF; draft text can still be steered (see R-45) |
+| R-47 | Hostile tickets were not recognised as out of policy by the stand-in in 10 cases (S2: 4, S3: 6) and ended safely as ANSWER/ESCALATE drafts; recognising intent is the model's job | scenario run | contained (no unsafe action); intent recognition by a real model is **not measured** |
+| R-48 | Resume is by polling durable state; no worker/scheduler resumes cases automatically | design | M5/M6 |
+| R-49 | The case file (jsonb) holds scrubbed ticket text, evidence excerpts and draft text; retention/erasure policy is undefined | design | document before any real data |
+| R-50 | No real local model could be run here (no Ollama/local server); the integration is tested at its HTTP boundary only | environment | stated in every report; `scripts/run_m4_local_model.py` records or refuses honestly |
+| R-51 | The static 'no SQL outside copilot/db' test exempts calls whose receiver is named `gateway` (`ControlGateway.execute` is not SQL) | CI | documented in the test; the workflow package is separately checked for no SQL/email/network imports |
