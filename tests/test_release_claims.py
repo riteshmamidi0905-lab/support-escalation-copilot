@@ -15,7 +15,9 @@ from copilot.invariants import ATTACKS
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = ROOT / "content" / "public-claims.json"
 EVIDENCE = ROOT / "reports" / "m6" / "release-evidence.json"
-PROTECTED = ("copilot/", "contracts/", "tests/", "data/", "scripts/", "pyproject.toml")        # code the evidence describes: changing it after the evidence run makes the evidence stale
+# Code the evidence describes: the application, its contracts, the dataset, the tests, the dependency pins and the scripts that produce scenario, mutation and isolation results. Changing any of it after the
+# evidence run makes the evidence stale. Documentation, the claims/evidence tooling, the demo scripts and CI configuration may change: they do not alter what was measured.
+PROTECTED = ("copilot/", "contracts/", "tests/", "data/", "pyproject.toml", "scripts/mutation_check_", "scripts/run_m3_scenarios.py", "scripts/run_m4_", "scripts/with_local_pg.py", "scripts/bench_env.py")
 RESUME_OK = {"deterministic_tests", "mutation_checks", "design_documented"}
 
 
@@ -64,6 +66,11 @@ def test_usage_policy_no_stand_in_or_development_result_is_offered_for_a_resume(
         if c["evidence_class"] == "not_executed":
             assert c["kind"] == "limitation", c["id"]
         assert c["qualification"].strip(), c["id"]
+
+
+def test_the_stand_in_scenario_match_rate_is_never_offered_as_a_portfolio_or_cv_claim(manifest):
+    c = next(c for c in manifest["claims"] if c["id"] == "workflow-standin-scenario-matches")
+    assert c["suitable_for"] == {"readme": True, "portfolio": False, "resume": False} and "NOT a model-accuracy figure" in c["qualification"]
 
 
 def test_a_real_llm_claim_is_impossible_without_a_recorded_real_model_result(manifest):

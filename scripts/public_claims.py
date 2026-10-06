@@ -6,6 +6,7 @@
 Every claim is derived from a RUN (the release evidence) or from a named artifact that tests enforce; none is typed in as a number. Claims about the workflow carry `model: deterministic_stand_in`;
 `real_llm` is impossible without a recorded real-model result file. Résumé use is limited to claims backed by deterministic tests or mutation checks, never to stand-in or development results."""
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -35,6 +36,7 @@ def claims(ev: dict) -> list[dict]:
     lat = json.loads((ROOT / "reports/m2/results.json").read_text())["latency"]
     gated = sorted(k for k, v in ACTIONS.items() if v[0] == "GATED_WRITE")
     code = ev["code_sha"]
+    chain_events = re.search(r"\d+", m4s["audit_chain"]).group(0)
     out: list[dict] = []
 
     def c(id_, text, kind, category, cls, model, artifacts, qual, readme, portfolio, resume, value=None, commit=None):
@@ -93,7 +95,7 @@ def claims(ev: dict) -> list[dict]:
     c("mutation-checks", f"Deliberately breaking each defence makes the tests fail: M2 retrieval {mt['m2']}, M3 control plane {mt['m3']}, M4 workflow {mt['m4']}, M5 operator surface {mt['m5']} mutations killed.", "measurement", "testing", "mutation_checks", "none",
       ["scripts/mutation_check_m2.py", "scripts/mutation_check_m3.py", "scripts/mutation_check_m4.py", "scripts/mutation_check_m5.py", "reports/m6/release-evidence.json"],
       "Hand-chosen mutations by the author (not a systematic mutation tool); a first M5 run had one survivor, which led to an added test. Mutation checks are manual, not run in CI.", True, True, True, {"killed_of_total": mt}, commit=code)
-    c("invariants-held-in-scenario-runs", f"Across {m3s['total']} control-plane scenarios, {m4s['cases']} end-to-end case executions and {inj['attack_runs']} injection attack runs, no invariant was violated and the audit hash chain verified ({m4s['audit_chain']}).", "measurement", "security",
+    c("invariants-held-in-scenario-runs", f"Across {m3s['total']} control-plane scenarios, {m4s['cases']} end-to-end case executions and {inj['attack_runs']} injection attack runs, no invariant was violated and the audit hash chain verified over {chain_events} events.", "measurement", "security",
       "standin_workflow_runs", "deterministic_stand_in", ["reports/m6/release-evidence.json", "docs/m3-scenarios.md", "docs/m4-scenarios.md", "docs/m4-injection.md"],
       "This measures the controls around the model, not the model: the model is the stand-in and, in the injection runs, a deliberately obedient scripted model. Containment is not the same as a correct outcome.", True, True, False,
       {"m3_scenarios": m3s["total"], "m4_cases": m4s["cases"], "injection_runs": inj["attack_runs"], "invariant_violations": inj["invariant_violations"]}, commit=code)
@@ -144,6 +146,8 @@ def build_manifest(ev: dict) -> dict:
             "evidence": {"file": "reports/m6/release-evidence.json", "code_sha": ev["code_sha"]}, "claims": cl}
 
 
+LABELS = {"deterministic_tests": "deterministic tests", "mutation_checks": "mutation checks", "frozen_heldout_retrieval_eval": "frozen held-out retrieval eval", "synthetic_dev_retrieval_eval": "synthetic dev retrieval eval",
+          "standin_workflow_runs": "stand-in workflow runs", "adversarial_dev_corpus": "adversarial dev corpus", "manual_browser_pass": "manual browser pass", "design_documented": "documented design", "not_executed": "not executed"}
 README_ORDER = ["scope-fictional-synthetic", "model-is-standin", "real-model-evaluation-status", "test-suite", "threat-catalogue", "mutation-checks", "invariants-held-in-scenario-runs", "retrieval-vector-beat-hybrid",
                 "similarity-is-not-sufficiency", "workflow-standin-scenario-matches", "draft-steering-result"]
 
@@ -154,14 +158,14 @@ def render(manifest: dict, which: str) -> str:
         for cl in manifest["claims"]:
             if cl["suitable_for"]["resume"] or cl["suitable_for"]["portfolio"]:
                 use = "CV, portfolio" if cl["suitable_for"]["resume"] else "portfolio only"
-                lines.append(f"- **{cl['claim']}**  \n  *Limit:* {cl['qualification']} *(use: {use}; evidence: {cl['evidence_class'].replace('_', ' ')}; id `{cl['id']}`)*")
+                lines.append(f"- **{cl['claim']}**  \n  *Limit:* {cl['qualification']} *(use: {use}; evidence: {LABELS[cl['evidence_class']]}; id `{cl['id']}`)*")
         return "\n".join(lines) + f"\n\n*Generated from [`content/public-claims.json`](../content/public-claims.json) at code commit `{manifest['evidence']['code_sha'][:10]}`. Claims marked \"portfolio only\" are not for a CV.*"
     by_id = {c["id"]: c for c in manifest["claims"]}
     chosen = [by_id[i] for i in README_ORDER] if which == "readme" else manifest["claims"]
     assert all(c["suitable_for"]["readme"] for c in chosen) or which != "readme", "a README claim is not marked suitable for the README"
     rows = []
     for cl in chosen:
-        tag = {"capability": "design + tests", "measurement": cl["evidence_class"].replace("_", " "), "limitation": "limitation"}[cl["kind"]]
+        tag = {"capability": "design + tests", "measurement": LABELS[cl["evidence_class"]], "limitation": "limitation"}[cl["kind"]]
         rows.append(f"| {cl['claim']} | {tag} | {cl['qualification']} |")
     head = "| Claim | Evidence | Limit |\n|---|---|---|\n"
     return head + "\n".join(rows) + f"\n\n*Generated from [`content/public-claims.json`]({'' if which == 'readme' else '../'}content/public-claims.json) at code commit `{manifest['evidence']['code_sha'][:10]}`. {len(chosen)} of {len(manifest['claims'])} claims shown; the manifest holds source artifacts, commits and per-claim usage.*"
