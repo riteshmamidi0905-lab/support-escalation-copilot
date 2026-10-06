@@ -1,16 +1,16 @@
-# What is real, what is simulated, what is only designed (M0)
+# What is real, what is simulated, what is only designed (M1)
 
 | Item | Status |
 |---|---|
-| JSON Schema data contracts and validators (cross-record rules, synthetic markers, manifests, held-out filter) | **implemented and tested** |
-| Typed action vocabulary (no email action) as a contract | **implemented and tested** (contract only; no executor yet) |
-| Secret redaction + canary detector with positive control | **implemented and tested** |
-| Invariant/attack catalogue and its consistency checks | **implemented and tested** (attack tests mostly *planned*; statuses are honest) |
-| PostgreSQL 16 + pgvector + FTS + RLS behaviour for a real non-owner role | **demonstrated by spike tests** (locally on 16.2/pgvector 0.6.2 via an embedded server; CI uses `pgvector/pgvector:pg16`) |
-| Pinned frozen runtime and a smoke run | **implemented and tested** |
-| CI (lint, tests, database job, compose database) | **configured; status reported with the commit** |
-| Synthetic dataset generator | designed (contracts exist; two tiny hand-written fixtures only) |
-| Tenant-isolation implementation (schema, roles, ScopeGuard) | designed; mechanism spiked |
-| Retrieval, policy engine, approvals, audit, workflow, mocks, UI, observability | designed only |
-| Real-model behaviour | **nothing measured** |
-Nothing in M0 has any performance or quality result.
+| Seeded Meridian dataset generator (deterministic, contract-valid, designed difficulty) | **implemented and tested**; output is synthetic and fictional |
+| Committed dataset `data/meridian-seed-20260101` and its manifest/SHA-256s | **real files**, regenerated and compared in CI |
+| PostgreSQL schema, migrations, roles, FORCE'd RLS, signed scope function | **implemented and tested against real PostgreSQL** |
+| Fixed query catalogue, ScopeGuard, scoped sessions, pool reset, trusted intake, loader | **implemented and tested** |
+| Tenant-isolation attack tests (22 of 45 catalogued attacks now executable) | **implemented**; mutation-tested |
+| Clean-database rebuild (migrate → bootstrap → generate → validate → load → sweep) | **implemented**; run in tests, CI and the Compose job |
+| FTS / pgvector infrastructure | **functions** (queries and an index exist; no embeddings, no tuned retrieval) |
+| R-3 (`resync` vs `re-sync`) | **observed baseline weakness, deliberately unfixed** (a test records it) |
+| Hand-labelled evaluation set | **does not exist yet** (authored blind in M2) |
+| Typed actions as a contract only; approvals, policy engine, audit log, tools | designed (M3) |
+| Case workflow, diagnosis, drafts, scenario runs, mocks, observability, UI, real-model path | designed (M4–M6) |
+| Retrieval quality, task completion, latency, approval behaviour, business metrics | **nothing measured** |

@@ -40,4 +40,8 @@ select = ["E", "F", "I", "B", "S", "UP"]
 ignore = ["S101"]            # asserts are the point of a test suite
 [tool.ruff.lint.per-file-ignores]
 "scripts/**" = ["E701", "E702", "E501", "S603", "S607"]
-"tests/**" = ["S105", "S106", "S608"]    # canary secrets and f-string SQL are deliberate in adversarial tests
+"tests/**" = ["S105", "S106", "S608", "E501", "E741", "UP031", "B905", "B007"]
+"copilot/data/*.py" = ["E501", "E741", "S311", "B007"]      # S311: the generator uses a SEEDED non-cryptographic RNG on purpose
+"copilot/db/*.py" = ["E501"]
+"copilot/invariants.py" = ["E501"]
+"copilot/scope.py" = ["E501"]    # canary secrets and f-string SQL are deliberate in adversarial tests

@@ -7,7 +7,8 @@ Principle: **tests try to violate the invariants; they do not merely assert that
 |---|---|---|---|
 | Contract tests | schemas valid; every validator rule has a failing mutation | none | CI |
 | Unit tests | redaction, policy decisions, state machine transitions, ScopeGuard | none | CI |
-| Database tests | RLS, FTS, vector, migrations, roles — against real PostgreSQL 16 + pgvector | Postgres | CI (**must not skip**) |
+| Database tests | RLS, signed scope, FTS, vector, migrations, roles/privilege audits, clean rebuild — against real PostgreSQL 16 + pgvector | Postgres | CI (**must not skip**) |
+| Mutation checks (manual, M1) | deliberately break each defence (signature, expiry, case consistency, FORCE, pool reset, excess grant) and confirm a test fails | Postgres | recorded in docs/risks.md; positive controls kept as tests |
 | Invariant attack tests | the catalogue in `copilot/invariants.py` (I1–I4) | varies | CI |
 | Scenario suite | S1–S16 with expected terminal outcomes, deterministic providers | Postgres | CI from M4 |
 | Fault-injection suite | timeouts, 500s, malformed, rate limits, breaker open | mocks | CI from M5 |
@@ -16,7 +17,7 @@ Principle: **tests try to violate the invariants; they do not merely assert that
 | Compose smoke | stack comes up healthy; end-to-end run | Docker | CI |
 
 ## Invariant attack catalogue
-`copilot/invariants.py` lists 31 attacks (I1: 10, I2: 10, I3: 5, I4: 6) with a milestone and honest status; at M0, 7 are implemented and 24 are planned. `tests/test_invariant_catalog.py` fails if an attack is missing from the threat model, if a test references an unknown attack, or if an attack is marked *implemented* without a test naming it.
+`copilot/invariants.py` lists 45 attacks (I1: 10, I2: 24, I3: 5, I4: 6) with a milestone and honest status; after M1, 22 have executable tests (all in I2 and I4) and 23 are planned (I1/I3 arrive with M3–M4). `tests/test_invariant_catalog.py` fails if an attack is missing from the threat model, if a test references an unknown attack, or if an attack is marked *implemented* without a test naming it.
 
 ## Principles
 1. Fail first: write the violating test, watch it fail against a deliberately weak implementation where practical, then make it pass. Where a mutation is cheap, include it in the suite (e.g. weaken the policy and assert the invariant test notices).

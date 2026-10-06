@@ -17,6 +17,12 @@ jobs:
           cache: pip
       - run: pip install -e ".[dev]"
       - run: ruff check .
+      - run: python scripts/sync_threat_model.py && git diff --exit-code docs/threat-model.md
+      - name: Dataset determinism across platforms (regenerates and compares with the committed files)
+        run: |
+          python -m copilot.data.cli generate --seed 20260101 --out /tmp/regen
+          diff -r /tmp/regen data/meridian-seed-20260101
+          python -m copilot.data.cli verify data/meridian-seed-20260101
       - run: pytest -q
   database:
     name: PostgreSQL 16 + pgvector (RLS, FTS, vector)
@@ -61,6 +67,14 @@ jobs:
           cache: pip
       - run: docker compose up -d --wait
       - run: pip install -e ".[dev]"
+      - name: Clean rebuild against the compose database (migrate, bootstrap, generate, validate, load, tenant sweep)
+        env:
+          COPILOT_ADMIN_DSN: postgresql://copilot_admin:ci-only-throwaway@127.0.0.1:5433/copilot
+          COPILOT_APP_PASSWORD: ci-app-throwaway-1
+          COPILOT_LOADER_PASSWORD: ci-loader-throwaway-1
+          COPILOT_INTAKE_PASSWORD: ci-intake-throwaway-1
+          COPILOT_SCOPE_SECRET: ci-only-scope-secret-0123456789abcdef0123456789
+        run: python -m copilot.db.rebuild --dbname copilot_ci_rebuild
       - name: DB tests against the compose database
         env:
           COPILOT_TEST_DATABASE_URL: postgresql://copilot_admin:ci-only-throwaway@127.0.0.1:5433/copilot

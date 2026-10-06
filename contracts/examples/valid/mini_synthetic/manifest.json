@@ -38,6 +38,10 @@
       "sha256": "bd19f820ed2e0042f277671ea8d4118ef00bcf8676832703f125061c82b10558"
     },
     {
+      "path": "scenarios.jsonl",
+      "sha256": "4490c42bd2a3d3f2d3a00aba9ed02341bd67f6f2c916412df3f1762b61fd74bb"
+    },
+    {
       "path": "synthetic_labels.jsonl",
       "sha256": "51919bc97ccf6cd3b147d997ef6a77d13fcf03a21882e2c577e3f0b2a87b2ced"
     },

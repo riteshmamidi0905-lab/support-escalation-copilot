@@ -27,7 +27,7 @@ Out of scope for this project: a compromised host, a malicious DB administrator,
 | Elevation of privilege | injection convinces the agent to act | tool tiers, typed actions, approval gates (I1) |
 
 ## Invariants and the attacks that must try to break them
-Each attack below is a *test that attempts the violation*. `implemented` means a test exists in the repository now; `planned` names the milestone that adds it. The catalogue lives in `copilot/invariants.py` and `tests/test_invariant_catalog.py` keeps this document, the catalogue and the tests in sync.
+Each attack below is a *test that attempts the violation*. `implemented` means a test exists in the repository now; `planned` names the milestone that adds it. The catalogue lives in `copilot/invariants.py`; `tests/test_invariant_catalog.py` keeps this document, the catalogue and the tests in sync (regenerate with `python scripts/sync_threat_model.py`).
 
 ### I1 — No gated action executes without a valid, role-authorised, unexpired human approval.
 | Attack | Attempted violation | Milestone | Status |
@@ -47,15 +47,29 @@ Each attack below is a *test that attempts the violation*. `implemented` means a
 | Attack | Attempted violation | Milestone | Status |
 |---|---|---|---|
 | A-I2-01 | Query tenant tables with no account scope set (must return zero rows). | M1 | implemented |
-| A-I2-02 | Application passes the wrong account id; ScopeGuard must reject it. | M1 | planned |
+| A-I2-02 | Application passes the wrong account id; ScopeGuard rejects it before SQL, and the database independently returns nothing when the guard is bypassed. | M1 | implemented |
 | A-I2-03 | Session-level scope leaks across pooled connections (must be transaction-local). | M1 | implemented |
 | A-I2-04 | Table owner without FORCE ROW LEVEL SECURITY bypasses policies. | M1 | implemented |
-| A-I2-05 | SQL executed by the app role sets the scope itself (documents what RLS does NOT protect against). | M1 | implemented |
+| A-I2-05 | SQL executed by the app role sets the scope itself, with no or garbage signature (with signed scope this must return nothing). | M1 | implemented |
 | A-I2-06 | Ticket text asks to compare with, or reveal, another account. | M4 | planned |
 | A-I2-07 | Retrieved document or API response instructs the agent to fetch another account's data. | M4 | planned |
 | A-I2-08 | Account id smuggled in tool arguments differs from the case's account. | M3 | planned |
 | A-I2-09 | Search/retrieval returns another account's ticket history. | M2 | planned |
 | A-I2-10 | Audit/log queries filtered by account return other accounts' events. | M5 | planned |
+| A-I2-11 | Incident data reveals which OTHER accounts an incident affected. | M1 | implemented |
+| A-I2-12 | Global runbook corpus contains tenant identifiers (ids, names, contact emails). | M1 | implemented |
+| A-I2-13 | Forged scope: someone else's signature, wrong secret, garbage or malformed signature. | M1 | implemented |
+| A-I2-14 | Tamper with any signed scope field (account, case, expiry, key id) or replay a token for a different case. | M1 | implemented |
+| A-I2-15 | Use an expired scope. | M1 | implemented |
+| A-I2-16 | A validly SIGNED scope whose case does not belong to its account (buggy or malicious signer) must fail closed. | M1 | implemented |
+| A-I2-17 | Application role tries to read the signing key, call the HMAC function, or find any signing oracle. | M1 | implemented |
+| A-I2-18 | Exception, SQL error, statement timeout or buggy session-level setting leaves scope behind for the next borrower of a pooled connection. | M1 | implemented |
+| A-I2-19 | Direct references to another account's tickets, history, cases or rows through joins. | M1 | implemented |
+| A-I2-20 | Ticket text or model-supplied arguments try to set or change the scope of a case. | M1 | implemented |
+| A-I2-21 | Superuser/BYPASSRLS/owner behaviour: roles that bypass RLS see everything, the audit detects them, and FORCE binds the owner. | M1 | implemented |
+| A-I2-22 | Arbitrary SQL, unknown query names, extra/mistyped parameters and SQL-injection payloads against the fixed catalogue. | M1 | implemented |
+| A-I2-23 | Any code path outside copilot.db executes SQL, or builds SQL by string formatting (static check). | M1 | implemented |
+| A-I2-24 | Application role attempts writes, DDL, role/policy changes, SET ROLE, COPY, file reads. | M1 | implemented |
 
 ### I3 — No customer email is ever sent by the system.
 | Attack | Attempted violation | Milestone | Status |
@@ -75,6 +89,8 @@ Each attack below is a *test that attempts the violation*. `implemented` means a
 | A-I4-04 | A deliberately leaky logger is detected by the canary scanner (positive control). | M0 | implemented |
 | A-I4-05 | API error responses and stack traces contain no secrets. | M3 | planned |
 | A-I4-06 | Tool/API responses containing secrets are redacted before storage and display. | M3 | planned |
+
+**Totals:** 45 attacks; 22 have executable tests; 23 are planned.
 
 ## Threats specific to the design
 - **T-I2-5 — RLS by session setting protects against application bugs, not against arbitrary SQL.** Any code that can run SQL as the app role can set `app.account_id` itself (demonstrated by A-I2-05). Mitigations: (a) the model and users can never author SQL — only a fixed, parameterised query catalogue exists; (b) ScopeGuard checks the scope against the case's account before every query (A-I2-02/08); (c) M1 evaluates *signed scope*: the case service mints an HMAC over (account, case, expiry) that a SQL function verifies using a secret the app role cannot read. The decision is recorded in ADR-0004.

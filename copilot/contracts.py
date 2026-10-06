@@ -24,6 +24,7 @@ TABLES = {
     "accounts.jsonl": ("account", "account_id"), "contracts.jsonl": ("contract", "contract_id"), "integrations.jsonl": ("integration", "integration_id"),
     "incidents.jsonl": ("incident", "incident_id"), "deployments.jsonl": ("deployment", "deployment_id"), "tickets.jsonl": ("ticket", "ticket_id"),
     "runbooks.jsonl": ("runbook_doc", "doc_id"), "release_notes.jsonl": ("release_note", "release_id"), "synthetic_labels.jsonl": ("synthetic_label", "ticket_id"),
+    "scenarios.jsonl": ("scenario", "scenario_id"),
 }
 # Documentation-only address space (RFC 5737). Any other IPv4 literal in free text is treated as potentially real.
 _DOC_NETS = ("192.0.2.", "198.51.100.", "203.0.113.")

@@ -1,0 +1,55 @@
+{
+  "created_on": "2026-03-02",
+  "customer": "Meridian Freight Systems (fictional)",
+  "dataset_id": "meridian-seed-20260101",
+  "evidence_class": "synthetic_label",
+  "fictional": true,
+  "files": [
+    {
+      "path": "accounts.jsonl",
+      "sha256": "d73bec2df57c91ad611f28664abb51f67e119a642e9bae484e0d2f707d4d137b"
+    },
+    {
+      "path": "contracts.jsonl",
+      "sha256": "05cc0b9afcabd04d8abf776f60d68375aa8fa476600c55d0a1592ebb0675af51"
+    },
+    {
+      "path": "deployments.jsonl",
+      "sha256": "16dbb969cdf376795621540660e76e0023037f198a53dce34c4c4c1f0682224c"
+    },
+    {
+      "path": "incidents.jsonl",
+      "sha256": "78277f29e79bbc91bb4cdcce1701e5d7e24c7a53bac9636c96576cb80530c97f"
+    },
+    {
+      "path": "integrations.jsonl",
+      "sha256": "a9e34562db287720a57b1ac40e0d8740093f17a1095f0006c82cabbe49dfa836"
+    },
+    {
+      "path": "release_notes.jsonl",
+      "sha256": "6e0fd835b48215bad555c531d80d0cffb49ca6bcb73e289e1c5a26d2d3354cde"
+    },
+    {
+      "path": "runbooks.jsonl",
+      "sha256": "e7a8660a20d18ce66b72daaed7c5d1f6604d6b81a7e73159948fa148f14cc074"
+    },
+    {
+      "path": "scenarios.jsonl",
+      "sha256": "2227daec524fda84ef042234cabb8dbc4f0312c669db3c1cb99cac61dc55c130"
+    },
+    {
+      "path": "synthetic_labels.jsonl",
+      "sha256": "5484c395342c28e982fa6ac15b3366c492d29021c043866f036c75e020b5d0be"
+    },
+    {
+      "path": "tickets.jsonl",
+      "sha256": "cf5049098e47cf14dbcd1fd4935ede932fa463a1c1639e2042c6b72d5bea1b14"
+    }
+  ],
+  "generator": {
+    "name": "meridian-synthetic-generator",
+    "seed": 20260101,
+    "version": "1.0.0"
+  },
+  "tuning_allowed": true
+}

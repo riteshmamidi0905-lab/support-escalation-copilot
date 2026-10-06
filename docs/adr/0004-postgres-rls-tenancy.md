@@ -13,3 +13,6 @@ Isolation is enforced below the application. Limit: a caller who can execute SQL
 
 ## Alternatives considered
 Application-layer filtering only (rejected); database-per-tenant (rejected: operational weight for this scope).
+
+## Update (M1)
+The signed-scope hardening described above was adopted: see [ADR-0012](0012-signed-trusted-scope.md). RLS remains an independent defence-in-depth layer: policies are FORCE'd and keyed on the verified scope; the application role is read-only, owns nothing and cannot DDL.
