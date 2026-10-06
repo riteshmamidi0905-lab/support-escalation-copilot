@@ -1,0 +1,696 @@
+{
+ "manifest_version": "1",
+ "repository": "https://github.com/riteshmamidi0905-lab/support-escalation-copilot",
+ "project_status": {
+  "customer": "Meridian Freight Systems is fictional",
+  "data": "all data is synthetic and generated from a seed",
+  "deployment": "reference implementation; never deployed; no production use; no real customers",
+  "model": "the workflow's model is the deterministic stand-in RuleCaseModel, not an LLM",
+  "real_model_evaluation": "not executed"
+ },
+ "evidence": {
+  "file": "reports/m6/release-evidence.json",
+  "code_sha": "60850ee1ae69d6809e26b4ab630ab9878e3aad05"
+ },
+ "claims": [
+  {
+   "id": "scope-fictional-synthetic",
+   "claim": "The customer, Meridian Freight Systems, is fictional and every account, ticket, runbook, incident and integration is synthetic, generated reproducibly from a seed.",
+   "kind": "limitation",
+   "category": "scope",
+   "evidence_class": "design_documented",
+   "model": "none",
+   "source_artifacts": [
+    "docs/adr/0001-fictional-customer-and-synthetic-data.md",
+    "data/meridian-seed-20260101/manifest.json"
+   ],
+   "source_commit": "f5811402dea36c751ec47fd56b238518832f00fb",
+   "qualification": "Synthetic data has designed difficulty, not real-world distribution; no real customer or customer data was used.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": true
+   }
+  },
+  {
+   "id": "scope-reference-implementation",
+   "claim": "This is a reference implementation run locally; it has never been deployed and has no production use or real customers.",
+   "kind": "limitation",
+   "category": "scope",
+   "evidence_class": "design_documented",
+   "model": "none",
+   "source_artifacts": [
+    "docs/real-vs-simulated.md",
+    "docs/getting-started.md"
+   ],
+   "source_commit": "f86c7624d4439bc1732093dd4ffef537a94360fe",
+   "qualification": "Demo mode, simulated sign-in and mock customer systems are deliberate; see docs/real-vs-simulated.md for the full list and docs/security.md for what a real deployment would need.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": true
+   }
+  },
+  {
+   "id": "model-is-standin",
+   "claim": "Every model result in this repository comes from RuleCaseModel, a deterministic rule-based stand-in (plus scripted misbehaving wrappers), not a language model.",
+   "kind": "limitation",
+   "category": "scope",
+   "evidence_class": "design_documented",
+   "model": "deterministic_stand_in",
+   "source_artifacts": [
+    "copilot/workflow/providers.py",
+    "docs/real-vs-simulated.md"
+   ],
+   "source_commit": "f86c7624d4439bc1732093dd4ffef537a94360fe",
+   "qualification": "The stand-in's heuristics were developed while looking at the scenario set, so its outcome rates are development results about the orchestration, not model quality.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": true
+   }
+  },
+  {
+   "id": "real-model-evaluation-status",
+   "claim": "Real-model evaluation was not executed: no local language-model runtime was available, and no paid API was used; the method is frozen and hash-locked for a future run.",
+   "kind": "limitation",
+   "category": "real_model",
+   "evidence_class": "not_executed",
+   "model": "none",
+   "source_artifacts": [
+    "reports/m5/real-model-probe.json",
+    "docs/real-model-freeze.json",
+    "docs/m5-real-model-protocol.md"
+   ],
+   "source_commit": "7f7393dfdb150df9005d0704ac995e704525362e",
+   "qualification": "The provider boundary (ConfiguredProvider) is tested against a protocol stub only; nothing is known about any real model's behaviour here.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": false
+   },
+   "value": {
+    "executed": false
+   }
+  },
+  {
+   "id": "model-cannot-authorise",
+   "claim": "The model cannot choose the tenant, the approver, the required role, the approval expiry, the workflow state or the action vocabulary: its output is untrusted structured data validated by deterministic code, and a model that claims otherwise is ignored.",
+   "kind": "capability",
+   "category": "architecture",
+   "evidence_class": "deterministic_tests",
+   "model": "deterministic_stand_in",
+   "source_artifacts": [
+    "copilot/workflow/trust.py",
+    "copilot/control/policy.py",
+    "tests/db/test_m4_workflow.py",
+    "tests/db/test_m4_injection.py"
+   ],
+   "source_commit": "626c90adf58ea257dcb1746bd24fd9fb7a0a0286",
+   "qualification": "Shown with the stand-in and with deliberately misbehaving scripted models (obedient to injected text, privileged fields, invented and forbidden actions); behaviour of a real LLM is not measured.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": false
+   }
+  },
+  {
+   "id": "typed-actions-no-email",
+   "claim": "The only write vocabulary is 5 typed actions (3 human-gated: escalate_engineering, request_sla_credit, trigger_resync); no action, tool, client or code path can send customer email, and 16 dangerous request names are rejected by name.",
+   "kind": "capability",
+   "category": "security",
+   "evidence_class": "deterministic_tests",
+   "model": "none",
+   "source_artifacts": [
+    "copilot/control/actions.py",
+    "contracts/action.schema.json",
+    "tests/test_control_units.py"
+   ],
+   "source_commit": "39ea8c09ce218e383fd694682e73c1f29e505e82",
+   "qualification": "Customer email is excluded by construction (invariant I3); the mock escalation system only accepts internal destinations.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": true
+   },
+   "value": {
+    "actions": 5,
+    "gated": [
+     "escalate_engineering",
+     "request_sla_credit",
+     "trigger_resync"
+    ],
+    "forbidden_names": 16
+   }
+  },
+  {
+   "id": "approval-bound-to-exact-action",
+   "claim": "An approval is bound to the exact canonical action (hash), its role, tenant, case and expiry; policy is re-evaluated from fresh facts at execution; an amended action voids the old approval and needs a new one that its amender cannot give.",
+   "kind": "capability",
+   "category": "approvals",
+   "evidence_class": "deterministic_tests",
+   "model": "none",
+   "source_artifacts": [
+    "copilot/control/approvals.py",
+    "copilot/control/gateway.py",
+    "tests/db/test_m3_attacks.py",
+    "tests/db/test_m5_app_flows.py"
+   ],
+   "source_commit": "7f7393dfdb150df9005d0704ac995e704525362e",
+   "qualification": "Approvers are simulated (signed mock identities); there is no real identity provider.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": true
+   }
+  },
+  {
+   "id": "idempotent-execution-and-reconciliation",
+   "claim": "Every customer write carries a deterministic idempotency key recorded in a ledger; a write whose outcome is unknown is never retried blindly, and a human reconciles it.",
+   "kind": "capability",
+   "category": "idempotency",
+   "evidence_class": "deterministic_tests",
+   "model": "none",
+   "source_artifacts": [
+    "copilot/control/ledger.py",
+    "copilot/control/gateway.py",
+    "tests/db/test_m3_flows.py",
+    "tests/db/test_m4_faults.py"
+   ],
+   "source_commit": "03c789233809654182990977f471688d2591f45c",
+   "qualification": "Customer systems are deterministic mocks with fault injection; reconciliation trusts the operator's recorded note because the mocks offer no lookup.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": true
+   }
+  },
+  {
+   "id": "tenant-isolation-rls",
+   "claim": "Tenant isolation is enforced in the database: forced row-level security keyed to a signed, short-lived scope, a fixed query catalogue and a least-privilege role for the model-facing code; operator reads are authorised server-side by signed account grants with a uniform 404.",
+   "kind": "capability",
+   "category": "tenant_isolation",
+   "evidence_class": "deterministic_tests",
+   "model": "none",
+   "source_artifacts": [
+    "copilot/db/migrations/004_scope_and_rls.sql",
+    "copilot/scope.py",
+    "copilot/control/access.py",
+    "tests/db/test_tenant_isolation.py",
+    "tests/db/test_m5_access.py"
+   ],
+   "source_commit": "03c789233809654182990977f471688d2591f45c",
+   "qualification": "Single PostgreSQL instance and a mock identity provider; signing-key custody and rotation are out of scope.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": true
+   }
+  },
+  {
+   "id": "tamper-evident-audit",
+   "claim": "Every proposal, policy decision, approval, execution and refusal is written to an append-only, hash-chained audit log that also scrubs secrets and masks e-mail addresses.",
+   "kind": "capability",
+   "category": "security",
+   "evidence_class": "deterministic_tests",
+   "model": "none",
+   "source_artifacts": [
+    "copilot/control/audit.py",
+    "tests/db/test_m3_attacks.py"
+   ],
+   "source_commit": "03c789233809654182990977f471688d2591f45c",
+   "qualification": "Tamper-evidence, not immutability: removing the most recent events is detectable only with an external anchor, which is not deployed.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": true
+   }
+  },
+  {
+   "id": "recovery-with-leases",
+   "claim": "A PostgreSQL lease-based recovery worker resumes cases from durable state; tests with concurrent workers, including workers that ignore the lease, produce exactly one effect per approved action.",
+   "kind": "capability",
+   "category": "recovery",
+   "evidence_class": "deterministic_tests",
+   "model": "none",
+   "source_artifacts": [
+    "copilot/workflow/recovery.py",
+    "tests/db/test_m5_recovery.py"
+   ],
+   "source_commit": "03c789233809654182990977f471688d2591f45c",
+   "qualification": "Tested on one database with threads/processes on one host; not tested under real network partitions or multiple hosts.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": false
+   }
+  },
+  {
+   "id": "observability-from-real-events",
+   "claim": "Operational metrics are derived from the application's own events and tables (an empty system reports zeros) and correlated by request, model invocation, action, approval and execution ids; telemetry never stores prompts, reasoning or secrets.",
+   "kind": "capability",
+   "category": "observability",
+   "evidence_class": "deterministic_tests",
+   "model": "none",
+   "source_artifacts": [
+    "copilot/control/metrics.py",
+    "copilot/control/ops.py",
+    "tests/db/test_m5_ops.py"
+   ],
+   "source_commit": "03c789233809654182990977f471688d2591f45c",
+   "qualification": "No external metrics backend, tracing system, alerting or retention policy.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": false
+   }
+  },
+  {
+   "id": "operator-ui-no-javascript",
+   "claim": "The operator UI is server-rendered with no JavaScript, a strict Content-Security-Policy and CSRF-protected forms; every read and action is re-authorised on the server because the browser is not trusted.",
+   "kind": "capability",
+   "category": "operator_experience",
+   "evidence_class": "deterministic_tests",
+   "model": "none",
+   "source_artifacts": [
+    "copilot/app/web.py",
+    "tests/db/test_m5_app_security.py"
+   ],
+   "source_commit": "03c789233809654182990977f471688d2591f45c",
+   "qualification": "Sign-in is simulated (a persona picker); no session revocation, rate limiting or MFA.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": false
+   }
+  },
+  {
+   "id": "test-suite",
+   "claim": "472 automated tests pass with 1 documented expected failure (the frozen runtime's approver hook is a bool callback, wrapped at the control boundary) and 0 failures; 0 skipped.",
+   "kind": "measurement",
+   "category": "testing",
+   "evidence_class": "deterministic_tests",
+   "model": "none",
+   "source_artifacts": [
+    "reports/m6/release-evidence.json"
+   ],
+   "source_commit": "60850ee1ae69d6809e26b4ab630ab9878e3aad05",
+   "qualification": "One full run at the evidence commit on one machine; the database tests need PostgreSQL 16 with pgvector and are executed (not skipped) in CI. Python 3.12.15.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": true
+   },
+   "value": {
+    "collected": 473,
+    "passed": 472,
+    "xfailed": 1,
+    "skipped": 0,
+    "failed": 0
+   }
+  },
+  {
+   "id": "threat-catalogue",
+   "claim": "92 attacks against the four invariants are catalogued, and 92 have executable tests that attempt the violation (I1 34, I2 37, I3 9, I4 12).",
+   "kind": "measurement",
+   "category": "security",
+   "evidence_class": "deterministic_tests",
+   "model": "none",
+   "source_artifacts": [
+    "copilot/invariants.py",
+    "docs/threat-model.md",
+    "reports/m6/release-evidence.json"
+   ],
+   "source_commit": "60850ee1ae69d6809e26b4ab630ab9878e3aad05",
+   "qualification": "The catalogue is the author's own; tests attempt known attack classes, not an independent penetration test.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": true
+   },
+   "value": {
+    "total": 92,
+    "executable": 92,
+    "by_invariant": {
+     "I1": 34,
+     "I2": 37,
+     "I3": 9,
+     "I4": 12
+    }
+   }
+  },
+  {
+   "id": "mutation-checks",
+   "claim": "Deliberately breaking each defence makes the tests fail: M2 retrieval 9/9, M3 control plane 31/31, M4 workflow 20/20, M5 operator surface 30/30 mutations killed.",
+   "kind": "measurement",
+   "category": "testing",
+   "evidence_class": "mutation_checks",
+   "model": "none",
+   "source_artifacts": [
+    "scripts/mutation_check_m2.py",
+    "scripts/mutation_check_m3.py",
+    "scripts/mutation_check_m4.py",
+    "scripts/mutation_check_m5.py",
+    "reports/m6/release-evidence.json"
+   ],
+   "source_commit": "60850ee1ae69d6809e26b4ab630ab9878e3aad05",
+   "qualification": "Hand-chosen mutations by the author (not a systematic mutation tool); a first M5 run had one survivor, which led to an added test. Mutation checks are manual, not run in CI.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": true
+   },
+   "value": {
+    "killed_of_total": {
+     "m2": "9/9",
+     "m3": "31/31",
+     "m4": "20/20",
+     "m5": "30/30"
+    }
+   }
+  },
+  {
+   "id": "invariants-held-in-scenario-runs",
+   "claim": "Across 30 control-plane scenarios, 315 end-to-end case executions and 32 injection attack runs, no invariant was violated and the audit hash chain verified over 5385 events.",
+   "kind": "measurement",
+   "category": "security",
+   "evidence_class": "standin_workflow_runs",
+   "model": "deterministic_stand_in",
+   "source_artifacts": [
+    "reports/m6/release-evidence.json",
+    "docs/m3-scenarios.md",
+    "docs/m4-scenarios.md",
+    "docs/m4-injection.md"
+   ],
+   "source_commit": "60850ee1ae69d6809e26b4ab630ab9878e3aad05",
+   "qualification": "This measures the controls around the model, not the model: the model is the stand-in and, in the injection runs, a deliberately obedient scripted model. Containment is not the same as a correct outcome.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": false
+   },
+   "value": {
+    "m3_scenarios": 30,
+    "m4_cases": 315,
+    "injection_runs": 32,
+    "invariant_violations": 0
+   }
+  },
+  {
+   "id": "retrieval-vector-beat-hybrid",
+   "claim": "On a frozen 40-ticket hand-labelled held-out set, pgvector search (Hit@1 0.80, MRR@10 0.87) ranked better than lexical full-text (Hit@1 0.60, MRR@10 0.70), equal-weight hybrid fusion (0.68, 0.79) and hybrid plus cross-encoder rerank (0.76, 0.84); vector was chosen.",
+   "kind": "measurement",
+   "category": "retrieval",
+   "evidence_class": "frozen_heldout_retrieval_eval",
+   "model": "none",
+   "source_artifacts": [
+    "reports/m2/results.json",
+    "docs/m2-results.md",
+    "docs/adr/0013-retrieval-architecture.md",
+    "docs/eval-freeze.json"
+   ],
+   "source_commit": "6fe10311f113777306c0033ff5852b0adfeaf200",
+   "qualification": "Labelled by a single AI reviewer in one session, not independent human annotation; n=25 answerable tickets, so differences are descriptive and the 95% intervals overlap; one embedding model and one reranker; 60-document corpus.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": false
+   },
+   "value": {
+    "labeller": "single AI reviewer (Claude); not independent human annotation",
+    "strategies": {
+     "hybrid": {
+      "hit@1": 0.68,
+      "mrr@10": 0.7933
+     },
+     "lexical": {
+      "hit@1": 0.6,
+      "mrr@10": 0.7007
+     },
+     "rerank": {
+      "hit@1": 0.76,
+      "mrr@10": 0.84
+     },
+     "vector": {
+      "hit@1": 0.8,
+      "mrr@10": 0.8733
+     }
+    }
+   }
+  },
+  {
+   "id": "synthetic-dev-set-flatters-retrieval",
+   "claim": "The generator-labelled development set flattered every retrieval strategy: vector Hit@1 0.97 on dev vs 0.80 held-out, lexical 0.86 vs 0.60.",
+   "kind": "measurement",
+   "category": "retrieval",
+   "evidence_class": "synthetic_dev_retrieval_eval",
+   "model": "none",
+   "source_artifacts": [
+    "reports/m2/results.json",
+    "docs/m2-results.md"
+   ],
+   "source_commit": "6fe10311f113777306c0033ff5852b0adfeaf200",
+   "qualification": "Dev tickets are templated and labelled by the same generator (circular); they were used only to choose parameters; held-out remains single-reviewer and small.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": false
+   },
+   "value": {
+    "dev_hit@1": {
+     "hybrid": 0.9132,
+     "lexical": 0.8642,
+     "rerank": 0.9698,
+     "vector": 0.966
+    },
+    "heldout_hit@1": {
+     "hybrid": 0.68,
+     "lexical": 0.6,
+     "rerank": 0.76,
+     "vector": 0.8
+    }
+   }
+  },
+  {
+   "id": "similarity-is-not-sufficiency",
+   "claim": "Retrieval confidence does not detect missing evidence: on unanswerable held-out tickets every strategy returned look-alike pages as evidence 45%/55%/45%/36% of the time (lexical/vector/hybrid/rerank, n=11), so sufficiency is judged from content and policy, with escalation when unsure.",
+   "kind": "measurement",
+   "category": "retrieval",
+   "evidence_class": "frozen_heldout_retrieval_eval",
+   "model": "none",
+   "source_artifacts": [
+    "reports/m2/results.json",
+    "docs/adr/0013-retrieval-architecture.md"
+   ],
+   "source_commit": "6fe10311f113777306c0033ff5852b0adfeaf200",
+   "qualification": "n=11 unanswerable tickets, single AI reviewer; an engineering finding that shaped the design, not a benchmark score.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": false
+   },
+   "value": {
+    "hybrid": 0.4545,
+    "lexical": 0.4545,
+    "rerank": 0.3636,
+    "vector": 0.5455
+   }
+  },
+  {
+   "id": "reranker-not-justified",
+   "claim": "The cross-encoder reranker was not adopted: no ranking gain over plain vector search (MRR@10 0.84 vs 0.87) for about 107 ms of extra CPU per query and a 347 MB model snapshot.",
+   "kind": "measurement",
+   "category": "retrieval",
+   "evidence_class": "frozen_heldout_retrieval_eval",
+   "model": "none",
+   "source_artifacts": [
+    "reports/m2/results.json",
+    "docs/adr/0013-retrieval-architecture.md"
+   ],
+   "source_commit": "6fe10311f113777306c0033ff5852b0adfeaf200",
+   "qualification": "One reranker model, one laptop, 60 chunks; latency says nothing about scale.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": false
+   },
+   "value": {
+    "rerank_ms_median_20_passages": 107.38
+   }
+  },
+  {
+   "id": "workflow-standin-scenario-matches",
+   "claim": "The 16 acceptance scenarios were run as 315 end-to-end case executions with the deterministic stand-in; 280 reached the scenario's expected outcome, the rest are individually explained (label conflicts, retrieval false conflicts, stand-in intent misses).",
+   "kind": "measurement",
+   "category": "workflow",
+   "evidence_class": "standin_workflow_runs",
+   "model": "deterministic_stand_in",
+   "source_artifacts": [
+    "reports/m6/release-evidence.json",
+    "docs/m4-scenarios.md"
+   ],
+   "source_commit": "60850ee1ae69d6809e26b4ab630ab9878e3aad05",
+   "qualification": "NOT a model-accuracy figure: the stand-in is rule-based and its heuristics were tuned during development while looking at these scenarios; use it only to show the orchestration and controls run end to end.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": false,
+    "resume": false
+   },
+   "value": {
+    "cases": 315,
+    "outcome_matches": 280,
+    "per_scenario": {
+     "S1": "15/15",
+     "S10": "3/3",
+     "S11": "3/3",
+     "S12": "3/3",
+     "S13": "3/3",
+     "S14": "127/130",
+     "S15": "8/8",
+     "S16": "5/5",
+     "S2": "16/20",
+     "S3": "14/20",
+     "S4": "14/25",
+     "S5": "14/15",
+     "S6": "20/20",
+     "S7": "20/30",
+     "S8": "12/12",
+     "S9": "3/3"
+    }
+   }
+  },
+  {
+   "id": "draft-steering-result",
+   "claim": "Deterministic grounding checks on draft replies caught 20/20 steered drafts they were developed against, but 0/8 rephrasings of the same harms and 0/10 misleading drafts built only from grounded words (and flagged 0/13 benign drafts); the control for what rules cannot see is mandatory, itemised human review.",
+   "kind": "measurement",
+   "category": "draft_safety",
+   "evidence_class": "adversarial_dev_corpus",
+   "model": "none",
+   "source_artifacts": [
+    "reports/m5/draft-steering.json",
+    "docs/m5-draft-steering.md",
+    "tests/test_draft_grounding.py"
+   ],
+   "source_commit": "03c789233809654182990977f471688d2591f45c",
+   "qualification": "Hand-written corpus by the author of the rules (two rules were corrected after the first run): development results; the residual weakness is preserved on purpose; no human-review study exists.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": false
+   },
+   "value": {
+    "benign": {
+     "n": 13,
+     "flagged": 0
+    },
+    "evasion": {
+     "n": 8,
+     "flagged": 0
+    },
+    "residual": {
+     "n": 10,
+     "flagged": 0
+    },
+    "steered": {
+     "n": 20,
+     "flagged": 20
+    }
+   }
+  },
+  {
+   "id": "browser-accessibility-pass",
+   "claim": "A manual browser pass at desktop and 375 px found and fixed seven UI defects (including mobile overflow); scripted checks found one h1 per page, labelled controls, captioned tables, a first-tab skip link, and 0 WCAG AA contrast failures across 263 text elements in light and dark mode.",
+   "kind": "measurement",
+   "category": "operator_experience",
+   "evidence_class": "manual_browser_pass",
+   "model": "none",
+   "source_artifacts": [
+    "docs/m5-browser-verification.md",
+    "docs/m5/screenshots/04-approval-panel-exact-action.jpg"
+   ],
+   "source_commit": "a6092c70f68581de8832cfdca4c2878751bfafa1",
+   "qualification": "One browser engine, one developer-operator, synthetic data; no screen-reader session; the automated tests, not this pass, are authoritative.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": false
+   }
+  },
+  {
+   "id": "limit-unlabelled-secrets",
+   "claim": "Pattern-based redaction removes labelled secrets (Bearer tokens, NAME=value, PEM blocks, DSN passwords) but not a bare unlabelled token typed into a ticket; that token is stored and shown to operators entitled to that tenant.",
+   "kind": "limitation",
+   "category": "security",
+   "evidence_class": "deterministic_tests",
+   "model": "none",
+   "source_artifacts": [
+    "docs/risks.md",
+    "tests/db/test_m5_app_security.py"
+   ],
+   "source_commit": "f86c7624d4439bc1732093dd4ffef537a94360fe",
+   "qualification": "Pinned by a test as a documented residual (R-54); entropy heuristics would add false positives and were not attempted.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": false
+   }
+  },
+  {
+   "id": "limit-misleading-grounded-drafts",
+   "claim": "A convincing wrong draft made only of grounded words and numbers cannot be detected by any deterministic rule here; the only control is human review, which is recorded but is not a technical gate on use.",
+   "kind": "limitation",
+   "category": "draft_safety",
+   "evidence_class": "adversarial_dev_corpus",
+   "model": "none",
+   "source_artifacts": [
+    "docs/m5-draft-steering.md",
+    "docs/risks.md"
+   ],
+   "source_commit": "f86c7624d4439bc1732093dd4ffef537a94360fe",
+   "qualification": "Human review effectiveness was not measured (R-58).",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": false
+   }
+  },
+  {
+   "id": "limit-simulated-authentication",
+   "claim": "Sign-in is simulated: a persona picker mints a signed identity; there is no real authentication, session revocation, rate limiting or MFA.",
+   "kind": "limitation",
+   "category": "security",
+   "evidence_class": "design_documented",
+   "model": "none",
+   "source_artifacts": [
+    "docs/risks.md",
+    "docs/security.md"
+   ],
+   "source_commit": "f86c7624d4439bc1732093dd4ffef537a94360fe",
+   "qualification": "Demo-only by design (R-59); a deployment needs an identity provider.",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": true
+   }
+  },
+  {
+   "id": "limit-reconciliation-and-audit-anchor",
+   "claim": "Reconciling an uncertain write as applied trusts the operator's recorded note, and the audit log has no external anchor, so deletion of the most recent events is detectable only with one.",
+   "kind": "limitation",
+   "category": "idempotency",
+   "evidence_class": "design_documented",
+   "model": "none",
+   "source_artifacts": [
+    "docs/risks.md",
+    "docs/security.md"
+   ],
+   "source_commit": "f86c7624d4439bc1732093dd4ffef537a94360fe",
+   "qualification": "Documented residuals (R-32, R-62).",
+   "suitable_for": {
+    "readme": true,
+    "portfolio": true,
+    "resume": false
+   }
+  }
+ ]
+}

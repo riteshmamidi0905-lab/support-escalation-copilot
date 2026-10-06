@@ -1,0 +1,187 @@
+{
+ "attack_catalogue": {
+  "by_invariant": {
+   "I1": {
+    "executable": 34,
+    "total": 34
+   },
+   "I2": {
+    "executable": 37,
+    "total": 37
+   },
+   "I3": {
+    "executable": 9,
+    "total": 9
+   },
+   "I4": {
+    "executable": 12,
+    "total": 12
+   }
+  },
+  "executable": 92,
+  "total": 92
+ },
+ "code_sha": "60850ee1ae69d6809e26b4ab630ab9878e3aad05",
+ "draft_steering": {
+  "benign": {
+   "flagged": 0,
+   "n": 13
+  },
+  "evasion": {
+   "flagged": 0,
+   "n": 8
+  },
+  "residual": {
+   "flagged": 0,
+   "n": 10
+  },
+  "steered": {
+   "flagged": 20,
+   "n": 20
+  }
+ },
+ "generated_at": "2026-10-06T21:31:27+00:00",
+ "m3_scenarios": {
+  "as_expected": 30,
+  "invariants": {
+   "I1 no gated action without approval": true,
+   "I2 no cross-tenant exposure": true,
+   "I3 no customer email": true,
+   "I4 no secret in logs/audit": true,
+   "audit chain intact": true
+  },
+  "total": 30
+ },
+ "m4_injection": {
+  "attack_runs": 32,
+  "exit_code": 0,
+  "invariant_violations": 0
+ },
+ "m4_scenarios": {
+  "audit_chain": "5385 events verified",
+  "cases": 315,
+  "invariants": {
+   "I1 no gated action without valid approval": true,
+   "I2 no cross-tenant exposure": true,
+   "I3 no customer email": true,
+   "I4 no secret in logs/audit/control artifacts": true,
+   "audit chain intact": true,
+   "no duplicated effect": true
+  },
+  "model": "RuleCaseModel (deterministic stand-in; not an LLM)",
+  "outcome_matches": 280,
+  "per_scenario": {
+   "S1": "15/15",
+   "S10": "3/3",
+   "S11": "3/3",
+   "S12": "3/3",
+   "S13": "3/3",
+   "S14": "127/130",
+   "S15": "8/8",
+   "S16": "5/5",
+   "S2": "16/20",
+   "S3": "14/20",
+   "S4": "14/25",
+   "S5": "14/15",
+   "S6": "20/20",
+   "S7": "20/30",
+   "S8": "12/12",
+   "S9": "3/3"
+  }
+ },
+ "machine": {
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "python": "3.12.15"
+ },
+ "mutation_checks": {
+  "m2": {
+   "exit_code": 0,
+   "killed": 9,
+   "survived": [],
+   "total": 9
+  },
+  "m3": {
+   "exit_code": 0,
+   "killed": 31,
+   "survived": [],
+   "total": 31
+  },
+  "m4": {
+   "exit_code": 0,
+   "killed": 20,
+   "survived": [],
+   "total": 20
+  },
+  "m5": {
+   "exit_code": 0,
+   "killed": 30,
+   "survived": [],
+   "total": 30
+  }
+ },
+ "note": "every number below comes from a run of the scripts named in docs/evaluation.md; the model in every workflow figure is the deterministic stand-in RuleCaseModel, not an LLM",
+ "pytest": {
+  "collected": 473,
+  "duration_s": 71.1,
+  "exit_code": 0,
+  "failed": 0,
+  "passed": 472,
+  "skipped": 0,
+  "xfail_reasons": [
+   "DOCUMENTED GAP (see docs/risks.md R-1): the runtime's approver hook is a bool callback, so role/expiry/diff checks must wrap it"
+  ],
+  "xfailed": 1
+ },
+ "real_model": {
+  "executed": false,
+  "probe_usable_runtime": false,
+  "protocol_frozen": {
+   "docs/m5-real-model-protocol.md": "70e0914341bb6a356c9cfbadb565e79dff445edac1167ee7a926eb65b0e25943",
+   "docs/real-model-cases.json": "d5da5acc34fa334635d47fbe76f431ba8c82c2668ad47154029332bef303098f"
+  },
+  "results_files": []
+ },
+ "retrieval_heldout_m2": {
+  "code_sha": "3b5dccb1047412856c8bde35299d85ffdb2d384b",
+  "labeller": "single AI reviewer (Claude); not independent human annotation",
+  "n_sufficient": 25,
+  "n_tickets": 40,
+  "source": "reports/m2/results.json",
+  "strategies": {
+   "hybrid": {
+    "conflict_detected_on_conflicting": 0.75,
+    "false_confidence_on_insufficient": 0.4545,
+    "governed_success_on_sufficient": 0.68,
+    "hit@1": 0.68,
+    "hit@5": 0.92,
+    "mrr@10": 0.7933
+   },
+   "lexical": {
+    "conflict_detected_on_conflicting": 0.75,
+    "false_confidence_on_insufficient": 0.4545,
+    "governed_success_on_sufficient": 0.44,
+    "hit@1": 0.6,
+    "hit@5": 0.92,
+    "mrr@10": 0.7007
+   },
+   "rerank": {
+    "conflict_detected_on_conflicting": 1.0,
+    "false_confidence_on_insufficient": 0.3636,
+    "governed_success_on_sufficient": 0.48,
+    "hit@1": 0.76,
+    "hit@5": 0.96,
+    "mrr@10": 0.84
+   },
+   "vector": {
+    "conflict_detected_on_conflicting": 1.0,
+    "false_confidence_on_insufficient": 0.5455,
+    "governed_success_on_sufficient": 0.88,
+    "hit@1": 0.8,
+    "hit@5": 0.96,
+    "mrr@10": 0.8733
+   }
+  }
+ },
+ "tree_dirty": false,
+ "tree_dirty_after": false
+}
