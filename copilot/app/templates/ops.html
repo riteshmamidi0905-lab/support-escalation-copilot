@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "base.html" import badge %}
+{% block title %}Operations{% endblock %}
+{% macro dict_table(title, d, k1='Name', k2='Count') %}<div class="scroll"><table><caption>{{ title }}</caption><thead><tr><th scope="col">{{ k1 }}</th><th scope="col">{{ k2 }}</th></tr></thead><tbody>{% for k, val in d.items() %}<tr><th scope="row">{{ k }}</th><td>{{ val }}</td></tr>{% else %}<tr><td colspan="2">No events yet.</td></tr>{% endfor %}</tbody></table></div>{% endmacro %}
+{% block main %}
+<h1>Operations</h1>
+<p>Every figure here is computed from the application's own recorded events (cases, transitions, approvals, the idempotency ledger, the audit log and the ops-event stream) at {{ m.generated_at }}. Nothing is hard-coded: an empty system shows zeros. Prometheus text: <a href="/metrics">/metrics</a>. Totals: {{ m.totals.cases }} cases, {{ m.totals.audit_events }} audit events, {{ m.totals.ops_events }} ops events.</p>
+<div class="grid">
+<section class="card" aria-labelledby="o1"><h2 id="o1">Cases by state</h2>{{ dict_table('Cases by workflow state', m.cases_by_state, 'State') }}</section>
+<section class="card" aria-labelledby="o2"><h2 id="o2">Outcomes</h2>{{ dict_table('Cases by outcome', m.cases_by_outcome, 'Outcome') }}</section>
+<section class="card" aria-labelledby="o3"><h2 id="o3">Approvals</h2>
+<dl class="kv"><dt>Pending</dt><dd>{{ m.approvals.pending }}</dd><dt>Oldest pending</dt><dd>{{ m.approvals.oldest_pending_age_s }} s</dd><dt>Decided</dt><dd>{{ m.approvals.decided }} (avg {{ m.approvals.avg_decision_latency_s }} s)</dd></dl>
+{{ dict_table('Approvals by status', m.approvals.by_status, 'Status') }}</section>
+<section class="card" aria-labelledby="o4"><h2 id="o4">Policy outcomes</h2>{{ dict_table('Policy decisions', m.policy_outcomes, 'Decision') }}{{ dict_table('Control events (abstentions, escalations, refusals, forbidden attempts…)', m.control_events, 'Event') }}</section>
+<section class="card" aria-labelledby="o5"><h2 id="o5">Executions</h2>{{ dict_table('Execution results', m.executions, 'Status') }}{{ dict_table('Idempotency ledger', m.ledger, 'Status') }}
+<p>Uncertain outcomes awaiting reconciliation: <strong>{{ m.uncertain_outcomes }}</strong>{% if m.uncertain_outcomes %} {{ badge('NEEDS RECONCILIATION', 'danger') }}{% endif %}</p></section>
+<section class="card wide" aria-labelledby="o6"><h2 id="o6">Customer-system dependencies</h2>
+<div class="scroll"><table><caption>Calls, failures and retries per dependency</caption><thead><tr><th scope="col">Dependency</th><th scope="col">Calls</th><th scope="col">Failed</th><th scope="col">Retries</th><th scope="col">Circuit breaker (live)</th></tr></thead><tbody>
+{% for api, d in m.dependencies.items() %}<tr><th scope="row">{{ api }}</th><td>{{ d.calls }}</td><td>{{ d.failed }}</td><td>{{ d.retries }}</td><td>{{ breakers.get(api, 'closed') }}</td></tr>{% else %}<tr><td colspan="5">No dependency calls yet.</td></tr>{% endfor %}</tbody></table></div>
+{% if m.dependency_errors %}<ul>{% for e in m.dependency_errors %}<li>{{ e.api }}: {{ e.code }} × {{ e.count }}</li>{% endfor %}</ul>{% endif %}
+{% if m.circuit_breakers %}<ul>{% for api, b in m.circuit_breakers.items() %}<li>{{ api }}: last recorded breaker state <strong>{{ b.state }}</strong> since {{ b.since }}</li>{% endfor %}</ul>{% endif %}</section>
+<section class="card" aria-labelledby="o7"><h2 id="o7">Retrieval</h2>
+<div class="scroll"><table><caption>Retrieval runs by strategy</caption><thead><tr><th scope="col">Strategy</th><th scope="col">Runs</th><th scope="col">Fallbacks</th></tr></thead><tbody>{% for s, d in m.retrieval.items() %}<tr><th scope="row">{{ s }}</th><td>{{ d.runs }}</td><td>{{ d.fallbacks }}</td></tr>{% else %}<tr><td colspan="3">No retrieval yet.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="card" aria-labelledby="o8"><h2 id="o8">Model / provider</h2>
+<dl class="kv"><dt>Calls</dt><dd>{{ m.model.calls }}</dd><dt>Average latency</dt><dd>{{ m.model.avg_latency_ms }} ms</dd><dt>Tokens (prompt / completion)</dt><dd>{{ m.model.prompt_tokens }} / {{ m.model.completion_tokens }}</dd><dt>Repair retries</dt><dd>{{ m.model.retries }}</dd></dl>
+{{ dict_table('Provider failures by kind', m.model.failures_by_kind, 'Kind') }}
+<p class="small">The model is a deterministic stand-in (RuleCaseModel), not an LLM, unless a real provider is configured and recorded. Provider failures and token counts are real events of whichever provider ran.</p></section>
+<section class="card wide" aria-labelledby="o9"><h2 id="o9">State durations and open work</h2>
+<div class="scroll"><table><caption>Time spent per state (from transition timestamps)</caption><thead><tr><th scope="col">State</th><th scope="col">Transitions</th><th scope="col">Average (s)</th><th scope="col">Max (s)</th></tr></thead><tbody>{% for s, d in m.state_durations_s.items() %}<tr><th scope="row">{{ s }}</th><td>{{ d.transitions }}</td><td>{{ d.avg }}</td><td>{{ d.max }}</td></tr>{% else %}<tr><td colspan="4">No completed transitions.</td></tr>{% endfor %}</tbody></table></div>
+<div class="scroll"><table><caption>Open (non-terminal) cases</caption><thead><tr><th scope="col">State</th><th scope="col">Cases</th><th scope="col">Oldest (s)</th></tr></thead><tbody>{% for s, d in m.open_cases.items() %}<tr><th scope="row">{{ s }}</th><td>{{ d.count }}</td><td>{{ d.oldest_age_s }}</td></tr>{% else %}<tr><td colspan="3">No open cases.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="card wide" aria-labelledby="o10"><h2 id="o10">Recovery worker</h2>{{ dict_table('Recovery events', m.recovery, 'Event') }}<p>Stuck cases (attempt budget used, parked for a human): <strong>{{ m.stuck_cases }}</strong>{% if m.stuck_cases %} {{ badge('ATTENTION', 'warn') }}{% endif %}</p></section>
+</div>
+{% endblock %}

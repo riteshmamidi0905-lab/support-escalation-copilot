@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Demo cases{% endblock %}
+{% block main %}
+<h1>Demo cases</h1>
+<p>Each button opens a <strong>real case</strong> through the real workflow on the synthetic Meridian environment. Only the model and the customer-system faults are scripted, and each demo says so. A demo where the system refuses, abstains or admits uncertainty is a success. Demo mode is explicitly enabled; the obedient model in demo C must never run in a real deployment.</p>
+<div class="grid">
+{% for d in demos %}
+<section class="card" aria-labelledby="d-{{ d.demo_id }}">
+  <h2 id="d-{{ d.demo_id }}">{{ d.demo_id }}. {{ d.title }}</h2>
+  <p>{{ d.story }}</p><p><strong>Watch for:</strong> {{ d.watch }}</p><p class="small">Scripted: {{ d.scripted }}</p>
+  <form method="post" action="/demo/{{ d.demo_id }}/start"><input type="hidden" name="csrf" value="{{ csrf }}"><button type="submit">Start demo {{ d.demo_id }}</button></form>
+</section>
+{% endfor %}
+</div>
+{% endblock %}

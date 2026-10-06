@@ -110,7 +110,7 @@ def audit_roles(db_admin_dsn: str) -> list[str]:
                 probs.append(f"{role}: can CREATE in a schema")
         # tenant tables must have RLS enabled AND forced
         for name, en, force in c.execute("SELECT relname, relrowsecurity, relforcerowsecurity FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='copilot' AND relname = ANY(%s)",
-                                         (["accounts", "account_contacts", "contracts", "integrations", "tickets", "ticket_history", "incident_accounts", "cases", "approvals", "idempotency_records", "case_artifacts", "audit_events", "case_runs", "case_transitions"],)).fetchall():
+                                         (["accounts", "account_contacts", "contracts", "integrations", "tickets", "ticket_history", "incident_accounts", "cases", "approvals", "idempotency_records", "case_artifacts", "audit_events", "case_runs", "case_transitions", "ops_events"],)).fetchall():
             if not (en and force):
                 probs.append(f"copilot.{name}: RLS enabled={en} forced={force}")
         # the app role may execute exactly one function
@@ -130,7 +130,7 @@ EXPECTED_PRIVILEGES = {                     # role -> {table: exact set of table
     "copilot_intake": {"tickets": {"SELECT"}, "cases": {"SELECT", "INSERT"}},
     # M3 control service (trusted, never model-facing). The audit log is insert/select only; the app role has NO privilege on control tables.
     "copilot_control": {"approvals": {"SELECT", "INSERT", "UPDATE"}, "idempotency_records": {"SELECT", "INSERT", "UPDATE"}, "case_artifacts": {"SELECT", "INSERT"}, "audit_events": {"SELECT", "INSERT"},
-                        "case_runs": {"SELECT", "INSERT", "UPDATE"}, "case_transitions": {"SELECT", "INSERT"}, "workflow_edges": {"SELECT"}},
+                        "case_runs": {"SELECT", "INSERT", "UPDATE"}, "case_transitions": {"SELECT", "INSERT"}, "workflow_edges": {"SELECT"}, "ops_events": {"SELECT", "INSERT"}},
 }
 
 

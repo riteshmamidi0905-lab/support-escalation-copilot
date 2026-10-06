@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% from "base.html" import badge %}
+{% block title %}Approvals{% endblock %}
+{% block main %}
+<h1>Approval queue</h1>
+<p class="small">Pending requests in the accounts you are granted. You can decide only those that need <strong>{{ ident.role }}</strong>; the server checks that again when you submit.</p>
+<div class="scroll"><table><caption>{{ rows|length }} pending</caption>
+<thead><tr><th scope="col">Approval</th><th scope="col">Case</th><th scope="col">Account</th><th scope="col">Action</th><th scope="col">Needs role</th><th scope="col">Waiting</th><th scope="col">Expires</th></tr></thead>
+<tbody>
+{% for r in rows %}<tr><th scope="row"><code>{{ r.approval_id }}</code></th><td><a href="/cases/{{ r.case_id }}#approval">{{ r.case_id }}</a></td><td>{{ r.account_id }}</td><td>{{ r.action_type }}</td>
+<td>{{ r.required_role }} {% if r.mine %}{{ badge('YOURS', 'ok') }}{% endif %}</td><td>{{ (r.age_s // 60) }} min {{ r.age_s % 60 }} s</td><td>{{ r.expires }}</td></tr>
+{% else %}<tr><td colspan="7">Nothing is waiting for a decision.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

@@ -137,6 +137,8 @@ class ApprovalService:
             refuse("SELF_APPROVAL")
         if approver.role != a.required_role:
             refuse("WRONG_ROLE", f"requires {a.required_role}")
+        if not approver.covers(a.account_id):                    # entitlement: the approver must be granted this account (signed grants), not just hold the role
+            refuse("ACCOUNT_NOT_GRANTED")
         with self.pool.connection() as c, c.transaction():
             r = c.execute(_SQL_GET_LOCK, (approval_id,)).fetchone()
             cur = _row(r)
@@ -188,6 +190,17 @@ class ApprovalService:
         if a.approver_role != action.required_role or a.approver_role != a.required_role:
             raise ApprovalError("ROLE_MISMATCH")
         return a
+
+    def void_pending(self, approval_id: str, reason: str, actor: dict[str, Any], correlation: dict[str, Any] | None = None) -> bool:
+        """Void a PENDING approval because the action it was bound to has been replaced (amended). Recorded as expired-by-supersession; a decided approval is never touched (it is final)."""
+        now = self.clock.now()
+        with self.pool.connection() as c, c.transaction():
+            r = c.execute("UPDATE copilot.approvals SET status='expired', decided_at=%s, decision_reason=%s WHERE approval_id=%s AND status='pending' RETURNING case_id, account_id, action_id, action_hash",
+                          (now, scrub(reason)[:300], approval_id)).fetchone()
+        if r is None:
+            return False
+        self.audit.append("approval_expired", r[0], r[1], actor, {**(correlation or {}), "approval_id": approval_id, "action_id": r[2], "action_hash": r[3]}, {"reasons": ["SUPERSEDED_BY_AMENDED_ACTION"]})
+        return True
 
     def expire_due(self) -> list[str]:
         """Undecided past expiry => expired (= denied). Returns the ids that were expired."""

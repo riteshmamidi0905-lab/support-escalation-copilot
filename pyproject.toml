@@ -15,6 +15,7 @@ dependencies = [
   "jsonschema>=4.21",
   "rfc3339-validator>=0.1.4",     # makes the 'date-time' format actually enforced
   "psycopg[binary,pool]>=3.1",
+  "jinja2>=3.1",                  # server-rendered operator UI (autoescaping on)
 ]
 
 [project.optional-dependencies]
@@ -23,6 +24,9 @@ dev = ["pytest>=8", "ruff>=0.5", "pgserver>=0.1.4; platform_system != 'Windows'"
 
 [tool.setuptools.packages.find]
 include = ["copilot*"]
+
+[tool.setuptools.package-data]
+"copilot.app" = ["templates/*.html", "static/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -46,6 +50,7 @@ ignore = ["S101"]            # asserts are the point of a test suite
 "copilot/db/*.py" = ["E501"]
 "copilot/invariants.py" = ["E501"]
 "copilot/workflow/*.py" = ["E501", "E701", "E731"]
+"copilot/app/*.py" = ["E501", "E701", "E731", "S608"]
 "copilot/control/*.py" = ["E501", "E701", "S608"]    # S608: false positives on constant column lists; every value is a bound parameter
 "copilot/retrieval/*.py" = ["E501", "S311"]      # S311: the bootstrap CI uses a SEEDED non-cryptographic RNG on purpose
 "copilot/scope.py" = ["E501"]    # canary secrets and f-string SQL are deliberate in adversarial tests

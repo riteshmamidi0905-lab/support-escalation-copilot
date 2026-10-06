@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block main %}
+<h1>Sign in (simulated)</h1>
+<p>There is no real authentication in this demonstration. Choose a simulated person; the server issues a signed identity with that person's role and account grants. Everything you can see or do is decided from that identity on the server.</p>
+<div class="grid">
+{% for p in personas %}
+<section class="card persona" aria-labelledby="p-{{ p.persona_id|replace('.', '-') }}">
+  <h2 id="p-{{ p.persona_id|replace('.', '-') }}">{{ p.display }}</h2>
+  <div><code>{{ p.persona_id }}</code> · role <strong>{{ p.role }}</strong></div>
+  <div class="small">Accounts: {{ 'all accounts' if '*' in p.accounts else p.accounts|join(', ') }}</div>
+  <div class="small">{{ p.note }}</div>
+  <form method="post" action="/login"><input type="hidden" name="persona" value="{{ p.persona_id }}"><button type="submit">Sign in as {{ p.display }}</button></form>
+</section>
+{% endfor %}
+</div>
+{% endblock %}

@@ -83,35 +83,57 @@ class TicketingAPI(_Api):
 class GuardedClient:
     """Bounded retries on transient failures/timeouts, a permanent failure is not retried, and N consecutive failed calls open a breaker that fails fast."""
 
-    def __init__(self, attempts: int = 3, breaker_after: int = 6, sleep: Callable[[float], None] = lambda s: None, clock=None, cooldown_s: float = 30.0):
-        self.attempts, self.breaker_after, self.sleep, self.clock, self.cooldown_s = attempts, breaker_after, sleep, clock, cooldown_s
+    def __init__(self, attempts: int = 3, breaker_after: int = 6, sleep: Callable[[float], None] = lambda s: None, clock=None, cooldown_s: float = 30.0, observer: Callable[..., None] | None = None):
+        self.attempts, self.breaker_after, self.sleep, self.clock, self.cooldown_s, self.observer = attempts, breaker_after, sleep, clock, cooldown_s, observer
+        self._state: dict[str, str] = {}
         self._consecutive: dict[str, int] = {}
         self._opened_at: dict[str, Any] = {}
 
-    def call(self, api: _Api, fn: Callable[..., Any], *args: Any) -> Any:
+    def _note(self, api: str, state: str, ctx: dict | None) -> None:
+        if self._state.get(api, "closed") != state:
+            self._state[api] = state
+            if self.observer:
+                self.observer("breaker_state", api=api, state=state, **(ctx or {}))
+
+    def breaker_state(self, api: str) -> str:
+        return self._state.get(api, "closed")
+
+    def call(self, api: _Api, fn: Callable[..., Any], *args: Any, ctx: dict | None = None) -> Any:
+        """`ctx`: correlation ids (case_id, account_id, run_id, request_id) attached to the telemetry this call produces."""
+        obs = self.observer or (lambda *a, **k: None)
         if self._consecutive.get(api.name, 0) >= self.breaker_after:
             t0 = self._opened_at.get(api.name)
             if self.clock is None or t0 is None or (self.clock.now() - t0).total_seconds() < self.cooldown_s:
+                obs("dependency_call", api=api.name, ok=False, attempts=0, code="BREAKER_OPEN", **(ctx or {}))
                 raise ExternalUnavailable(api.name, "BREAKER_OPEN")
             self._consecutive[api.name] = self.breaker_after - 1             # half-open: one trial call; a failure re-opens the breaker at once
+            self._note(api.name, "half_open", ctx)
         last = "UNAVAILABLE"
         for i in range(self.attempts):
             try:
                 out = fn(*args)
                 self._consecutive[api.name] = 0
+                self._note(api.name, "closed", ctx)
+                obs("dependency_call", api=api.name, ok=True, attempts=i + 1, code=None, **(ctx or {}))
                 return out
             except NotFound:
                 self._consecutive[api.name] = 0
+                self._note(api.name, "closed", ctx)
+                obs("dependency_call", api=api.name, ok=True, attempts=i + 1, code="NOT_FOUND", **(ctx or {}))
                 raise
             except PermanentError:
                 self._consecutive[api.name] = self._consecutive.get(api.name, 0) + 1
                 if self._consecutive[api.name] >= self.breaker_after and self.clock is not None:
                     self._opened_at[api.name] = self.clock.now()
+                    self._note(api.name, "open", ctx)
+                obs("dependency_call", api=api.name, ok=False, attempts=i + 1, code="REJECTED", **(ctx or {}))
                 raise ExternalUnavailable(api.name, "REJECTED") from None
             except (TransientError, CallTimeout) as e:
                 last = "TIMEOUT" if isinstance(e, CallTimeout) else "SERVER_ERROR"
                 self._consecutive[api.name] = self._consecutive.get(api.name, 0) + 1
                 if self._consecutive[api.name] >= self.breaker_after and self.clock is not None:
                     self._opened_at[api.name] = self.clock.now()
+                    self._note(api.name, "open", ctx)
                 self.sleep(0.05 * 2 ** i)
+        obs("dependency_call", api=api.name, ok=False, attempts=self.attempts, code=last + "_RETRIES_EXHAUSTED", **(ctx or {}))
         raise ExternalUnavailable(api.name, last + "_RETRIES_EXHAUSTED")

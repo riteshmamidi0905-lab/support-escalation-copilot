@@ -4,6 +4,7 @@ Only structured conclusions are kept (never raw model text, never hidden reasoni
 from __future__ import annotations
 
 import json
+import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
@@ -28,10 +29,11 @@ class StageOutcome:
 
 
 class ModelStage:
-    def __init__(self, provider: ModelProvider, tracer: Tracer | None = None, budget: Budget | None = None, sleep: Callable[[float], None] = lambda s: None, semantic_repairs: int = 1):
+    def __init__(self, provider: ModelProvider, tracer: Tracer | None = None, budget: Budget | None = None, sleep: Callable[[float], None] = lambda s: None, semantic_repairs: int = 1, invocation_id: str | None = None):
         self.provider, self.tracer, self.budget, self.sleep, self.semantic_repairs = provider, tracer or Tracer(), budget or Budget(max_steps=12, max_tokens=60000), sleep, semantic_repairs
         self.used_tokens = 0
         self.calls = 0
+        self.invocation_id = invocation_id
 
     def messages(self, stage: str, instructions: str, context: dict[str, Any]) -> list[Message]:
         return [Message("system", f"{BASE_SYSTEM}\nSTAGE:{stage}\n{instructions}"), Message("user", "CONTEXT_JSON:\n" + json.dumps(context, sort_keys=True, default=str))]
@@ -42,9 +44,12 @@ class ModelStage:
         for _round in range(self.semantic_repairs + 1):
             if self.budget.exceeded(self.calls, self.used_tokens):
                 return self._done(stage, StageOutcome(data, problems, repairs, "MODEL_BUDGET_EXCEEDED", self.used_tokens))
+            t0 = time.perf_counter()
             try:
                 data, usage, r = retry_call(lambda m=msgs: generate_structured(self.provider, m, schema, max_repairs=2), attempts=3, sleep=self.sleep)
+                self.tracer.emit("model_call", invocation_id=self.invocation_id, stage=stage, ok=True, duration_ms=round((time.perf_counter() - t0) * 1000, 3), prompt_tokens=usage.prompt_tokens, completion_tokens=usage.completion_tokens, repairs=r)
             except ProviderError as e:
+                self.tracer.emit("model_call", invocation_id=self.invocation_id, stage=stage, ok=False, duration_ms=round((time.perf_counter() - t0) * 1000, 3), error_kind=e.kind)
                 code = "MODEL_OUTPUT_INVALID" if e.kind in ("structured", "malformed") else ("MODEL_TIMEOUT" if "timeout" in str(e).lower() or "timed out" in str(e).lower() else "MODEL_UNAVAILABLE")
                 return self._done(stage, StageOutcome(None, [], repairs, code, self.used_tokens))
             self.calls += 1
@@ -58,7 +63,7 @@ class ModelStage:
         return self._done(stage, StageOutcome(data, problems, repairs, None, self.used_tokens))
 
     def _done(self, stage: str, o: StageOutcome) -> StageOutcome:
-        self.tracer.emit("model_stage", stage=stage, ok=o.error is None and not o.problems, repairs=o.repairs, error=o.error, problems=len(o.problems), tokens=o.tokens)
+        self.tracer.emit("model_stage", invocation_id=self.invocation_id, stage=stage, ok=o.error is None and not o.problems, repairs=o.repairs, error=o.error, problems=len(o.problems), tokens=o.tokens)
         return o
 
 

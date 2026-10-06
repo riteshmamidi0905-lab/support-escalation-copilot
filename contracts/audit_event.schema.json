@@ -71,7 +71,10 @@
         "stage_completed",
         "model_output_rejected",
         "verification_recorded",
-        "draft_rejected"
+        "draft_rejected",
+        "draft_reviewed",
+        "action_amended",
+        "audit_read_denied"
       ]
     },
     "payload": {
@@ -127,6 +130,12 @@
           ]
         },
         "idempotency_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "invocation_id": {
           "type": [
             "string",
             "null"

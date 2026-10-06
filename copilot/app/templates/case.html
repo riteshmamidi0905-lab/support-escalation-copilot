@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% from "base.html" import badge, life, verdict, state_badge %}
+{% block title %}{{ case_id }}{% endblock %}
+{% block main %}
+<p class="small"><a href="/cases">&larr; All cases</a> · <a href="/cases/{{ case_id }}/audit">Audit timeline and trace</a></p>
+<h1>{{ case_id }} · {{ v.ticket.subject }}</h1>
+<dl class="kv">
+  <dt>Account</dt><dd>{{ v.row.account_id }}</dd>
+  <dt>Ticket</dt><dd>{{ v.ticket.ticket_id }} · severity {{ v.ticket.severity if v.ticket.severity is defined else '—' }}</dd>
+  <dt>Workflow state</dt><dd>{{ state_badge(v.row.state) }} · version {{ v.row.version }}</dd>
+  <dt>Outcome</dt><dd>{{ v.outcome or '—' }}{% if v.disposition %} · disposition {{ v.disposition }}{% endif %}</dd>
+</dl>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+
+<div class="banner tone-{{ v.banner.tone }}" role="status"><strong>{{ v.banner.label }}</strong>{{ v.banner.text }}</div>
+
+<section class="card" aria-labelledby="h-flow"><h2 id="h-flow">Workflow timeline</h2>
+<ol class="timeline">{% for t in v.timeline %}<li class="{{ 'current' if t.current else 'done' if t.done else 'skipped' if t.skipped else '' }}">{{ t.state }}{% if t.current %} (now){% elif t.skipped %} (not needed){% endif %}{% if t.at %}<br><span class="small">{{ t.at }}</span>{% endif %}</li>{% endfor %}</ol>
+<p class="small">Each step is a durable, versioned transition. A restart resumes from the stored state; nothing repeats a side effect.</p></section>
+
+<section class="card" aria-labelledby="h-ticket"><h2 id="h-ticket">Ticket (untrusted customer text)</h2>
+<div class="quote">{{ v.ticket.body }}</div>
+{% if v.ticket.redactions %}<p class="small">{{ badge('REDACTED', 'warn') }} {{ v.ticket.redactions }} secret-like value(s) were removed before storage. They never reach the model, logs or audit.</p>{% endif %}
+<p class="small">Treated as data, never as instructions. Anything inside it that tries to direct the system is ignored by the controls, whatever the model does.</p></section>
+
+{% if v.degraded %}<section class="card tone-warn" aria-labelledby="h-deg"><h2 id="h-deg">Degraded: what stopped</h2><p>{{ (v.degraded.reason or '')|why }}</p><p>Stage: {{ v.degraded.stage or '—' }}. The system did not guess: no diagnosis or action was fabricated, and a human takes over.</p></section>{% endif %}
+
+<section class="card" aria-labelledby="h-ver"><h2 id="h-ver">Live verification</h2>
+<p>Status: <strong>{{ v.verification.status or '—' }}</strong>{% if v.verification.status == 'unverified' %} — {{ badge('UNVERIFIED', 'warn') }} {{ (v.verification.unverified_reasons or [])|join(', ') }}. Actions are disabled until a human re-checks.{% elif v.verification.status == 'not_required' %} (no integration state was needed){% endif %}</p>
+{% if v.verification.checks %}<div class="scroll"><table><caption>Read-only checks of customer systems</caption><thead><tr><th scope="col">Integration</th><th scope="col">Source</th><th scope="col">Result</th></tr></thead><tbody>
+{% for c in v.verification.checks %}<tr><td>{{ c.integration_id }}</td><td>{{ c.source }}</td><td>{% if c.ok %}{{ badge('OK', 'ok') }} {{ c.result }}{% else %}{{ badge('FAILED', 'danger') }} {{ c.error }}{% endif %}</td></tr>{% endfor %}</tbody></table></div>{% endif %}</section>
+
+<section class="card" aria-labelledby="h-ev"><h2 id="h-ev">Evidence and citations</h2>
+<p>Retrieval: <strong>{{ v.retrieval.outcome }}</strong> via <strong>{{ v.retrieval.strategy or 'none' }}</strong>{% if v.retrieval.fallback_reason %} {{ badge('FALLBACK', 'warn') }} {{ v.retrieval.fallback_reason }}{% endif %}.
+{% if v.retrieval.outcome == 'CONFLICTING_AUTHORITATIVE_EVIDENCE' %} {{ badge('CONFLICT', 'danger') }} Two or more active documents disagree.{% endif %}</p>
+{% for e in v.evidence %}
+<article class="card" aria-labelledby="ev-{{ e.handle }}">
+  <h3 id="ev-{{ e.handle }}">{{ e.handle }} · {{ e.title }}{% if e.section %} › {{ e.section }}{% endif %}</h3>
+  <p>{{ life(e.status) }} {{ verdict(e.verdict) }}{% if e.flags %} {{ badge('INSTRUCTION-LIKE TEXT', 'danger') }}{% endif %}{% if e.conflicts_with %} {{ badge('CONFLICTS WITH ' ~ (e.conflicts_with|join(', ')), 'danger') }}{% endif %}{% if e.duplicates %} {{ badge('DUPLICATE OF ' ~ (e.duplicates|join(', ')), 'info') }}{% endif %}</p>
+  <dl class="kv"><dt>Citation</dt><dd><code>{{ e.citation }}</code></dd><dt>Document</dt><dd>{{ e.doc_id }} version {{ e.version }}{% if e.owner %} · owner {{ e.owner }}{% endif %}</dd>
+  {% if e.effective_from %}<dt>Effective from</dt><dd>{{ e.effective_from }}{% if e.supersedes %} · supersedes {{ e.supersedes }}{% endif %}</dd>{% endif %}
+  {% if e.note %}<dt>Applicability note</dt><dd>{{ e.note }} <span class="small">(advisory; the model's opinion, not a decision)</span></dd>{% endif %}</dl>
+  <div class="quote">{{ e.text_short }}{% if e.text|length > e.text_short|length %}…{% endif %}</div>
+</article>
+{% else %}<p>No evidence was retrieved.</p>{% endfor %}
+{% if v.excluded %}<details><summary>{{ v.excluded|length }} document(s) excluded by governance (not used)</summary><div class="scroll"><table><caption>Excluded documents</caption><thead><tr><th scope="col">Document</th><th scope="col">Why</th></tr></thead><tbody>
+{% for x in v.excluded %}<tr><td>{{ x.doc_id if x.doc_id is defined else x }}{% if x.version is defined %}@{{ x.version }}{% endif %}</td><td>{{ x.reason if x.reason is defined else '' }}</td></tr>{% endfor %}</tbody></table></div></details>{% endif %}
+</section>
+
+<section class="card" aria-labelledby="h-diag"><h2 id="h-diag">Diagnosis (advisory)</h2>
+<p>Model disposition: <strong>{{ v.disposition_model or '—' }}</strong> · uncertainty: <strong>{{ v.uncertainty or '—' }}</strong>{% if v.uncertainty == 'high' %} {{ badge('UNCERTAIN', 'warn') }}{% endif %}</p>
+{% if v.rationale %}<p><strong>Stated rationale:</strong> {{ v.rationale }}</p>{% endif %}
+<p class="small">This is the model's structured output, shown as advisory. Policy, evidence sufficiency and approvals are decided separately by deterministic code. The system stores no hidden reasoning.</p>
+<h3>Hypotheses</h3>
+{% if v.hypotheses %}<ul>{% for h in v.hypotheses %}<li>{{ h.statement }} <span class="small">(confidence: {{ h.confidence }}; supports {{ h.supporting|join(', ') or 'none' }}; contradicted by {{ h.contradicting|join(', ') or 'none' }})</span></li>{% endfor %}</ul>{% else %}<p>None recorded.</p>{% endif %}
+<h3>Contradictions</h3>
+{% if v.contradictions %}<ul>{% for c in v.contradictions %}<li>{{ badge('CONTRADICTION', 'danger') }} {% if c.documents %}Documents disagree: {{ c.documents|join(' vs ') if c.documents is iterable and c.documents is not string else c.documents }}{% else %}{{ c.handle }}: {{ c.note }}{% endif %}</li>{% endfor %}</ul>{% else %}<p>None found.</p>{% endif %}
+<h3>Missing evidence</h3>
+{% if v.missing %}<ul>{% for m in v.missing %}<li>{{ badge('MISSING', 'warn') }} {{ m }}</li>{% endfor %}</ul>{% else %}<p>Nothing recorded as missing.</p>{% endif %}
+</section>
+
+<section class="card" aria-labelledby="h-act"><h2 id="h-act">Proposed actions, policy and approval</h2>
+<p class="small">The model proposes. A deterministic policy engine decides allow / require approval / refuse. Only an approved, unchanged action can be executed, once. This page has no "run" button for any action.</p>
+{% for a in v.actions %}
+<article class="card" id="action-{{ a.action_id }}" aria-labelledby="act-{{ a.action_id }}">
+  <h3 id="act-{{ a.action_id }}">{{ a.type }} · <code>{{ a.action_id }}</code></h3>
+  <p>Policy decision: <strong>{{ a.decision or 'none' }}</strong> · Evidence sufficiency: <strong>{{ a.sufficiency or '—' }}</strong> · Needs role: <strong>{{ a.role }}</strong> · Status: {{ badge(a.status, 'info') }}</p>
+  {% if a.reasons %}<ul>{% for r in a.reasons %}<li><code>{{ r.code }}</code> — {{ r.text }}</li>{% endfor %}</ul>{% endif %}
+  {% if a.missing_facts %}<p>Missing facts: {{ a.missing_facts|join(', ') }}</p>{% endif %}
+  {% if a.limitations %}<p class="small">Limitations: {{ a.limitations|join('; ') }}</p>{% endif %}
+  <p><strong>Model's stated rationale:</strong> {{ a.rationale }}</p>
+  <p>Cites: {% for c in a.cited %}{{ c.ref }}{% if c.ev %} (<a href="#ev-{{ c.ev.handle }}">{{ c.ev.handle }}</a>){% endif %}{% if not loop.last %}, {% endif %}{% else %}nothing{% endfor %}</p>
+  <details{% if a.approval and a.approval.can_decide %} open{% endif %}><summary>Exact action as it will be executed (canonical)</summary><pre>{{ a.raw_json }}</pre></details>
+  {% if a.amended_from %}<p>{{ badge('AMENDED', 'warn') }} Amended by <strong>{{ a.amended_by }}</strong> from <code>{{ a.amended_from }}</code>. The earlier approval is void; this action needs a NEW approval.</p>{% endif %}
+  {% if a.approval %}{% set ap = a.approval %}
+  <div id="approval"><h4>Approval <code>{{ ap.approval_id }}</code> — {{ badge(ap.status|upper, 'ok' if ap.status == 'approved' else 'danger' if ap.status in ('denied','expired') else 'info') }}</h4>
+  <dl class="kv"><dt>Requested by</dt><dd>{{ ap.requester }} at {{ ap.created }}</dd><dt>Required role</dt><dd>{{ ap.role }}</dd>
+  <dt>Action hash</dt><dd><code>{{ ap.hash }}</code> <span class="small">(the approval binds to exactly this action; any change needs a new approval)</span></dd>
+  {% if ap.status == 'pending' %}<dt>Expires</dt><dd>{{ ap.expires }}{% if ap.remaining_s is not none %} ({{ ap.remaining_s // 60 }} min left){% endif %}</dd>{% endif %}
+  {% if ap.approver %}<dt>Decided by</dt><dd>{{ ap.approver }} at {{ ap.decided }}{% if ap.reason %} — “{{ ap.reason }}”{% endif %}</dd>{% endif %}</dl>
+  <details><summary>What the approver was shown (evidence shown at request time)</summary><pre>{{ ap.shown }}</pre></details>
+  {% if ap.status == 'pending' %}
+    {% if ap.can_decide %}
+    <form class="inline" method="post" action="/cases/{{ case_id }}/approvals/{{ ap.approval_id }}/decide"><input type="hidden" name="csrf" value="{{ csrf }}">
+      <label for="reason-{{ ap.approval_id }}">Reason (recorded in the audit log)<input id="reason-{{ ap.approval_id }}" name="reason" maxlength="300" autocomplete="off"></label>
+      <button type="submit" name="verdict" value="approve">Approve exactly this action</button><button type="submit" name="verdict" value="deny" class="danger">Deny</button></form>
+    {% else %}<p class="small">You cannot decide this one: it needs the <strong>{{ ap.role }}</strong> role and a grant for this account, and the requester or the person who amended the action cannot approve it. (You are {{ ap.viewer_role or 'not signed in' }}.) The server enforces this again on submit.</p>{% endif %}
+    {% if ident.role == 'tier2_engineer' and a.type in ('request_sla_credit','trigger_resync','escalate_engineering') and v.row.state == 'REVIEW' %}
+    <details><summary>Amend this action (needs a new approval)</summary>
+      <p class="small">Changing the action voids the approval above and re-runs policy. The amended action must be approved again by the required role, and you cannot approve your own amendment.</p>
+      <form class="inline" method="post" action="/cases/{{ case_id }}/actions/{{ a.action_id }}/amend"><input type="hidden" name="csrf" value="{{ csrf }}">
+        {% if a.type == 'request_sla_credit' %}<label for="p-pct-{{ loop.index }}">Percent<input id="p-pct-{{ loop.index }}" name="p_percent" inputmode="decimal" value="{{ a.params.percent }}"></label><label for="p-rsn-{{ loop.index }}">Reason<input id="p-rsn-{{ loop.index }}" name="p_reason" value="{{ a.params.reason }}"></label>
+        {% elif a.type == 'trigger_resync' %}<label for="p-br-{{ loop.index }}">Blast radius<input id="p-br-{{ loop.index }}" name="p_blast_radius" value="{{ a.params.blast_radius }}"></label>
+        {% else %}<label for="p-sev-{{ loop.index }}">Severity<input id="p-sev-{{ loop.index }}" name="p_severity" value="{{ a.params.severity }}"></label><label for="p-sum-{{ loop.index }}">Summary<input id="p-sum-{{ loop.index }}" name="p_summary" value="{{ a.params.summary }}"></label>{% endif %}
+        <button type="submit" class="secondary">Amend and request new approval</button></form></details>
+    {% endif %}
+  {% endif %}
+  </div>{% endif %}
+</article>
+{% else %}<p>No action was proposed.</p>{% endfor %}
+{% if v.superseded %}<h3>Superseded approvals (void)</h3><ul>{% for s in v.superseded %}<li>{{ badge('VOID', 'warn') }} <code>{{ s.approval_id }}</code> was voided because the action changed (replaced by <code>{{ s.superseded_by }}</code>). It can no longer authorize anything.<details><summary>The action that was approved-for</summary><pre>{{ s.action_json }}</pre></details></li>{% endfor %}</ul>{% endif %}
+{% if v.rejected %}<h3>Proposals dropped before policy</h3><div class="scroll"><table><caption>Rejected proposals (never executed)</caption><thead><tr><th scope="col">Type</th><th scope="col">Why</th></tr></thead><tbody>
+{% for r in v.rejected %}<tr><td>{{ r.action_type if r.action_type is defined else r.type if r.type is defined else '—' }}</td><td>{% for c in (r.reasons if r.reasons is defined else [r.code if r.code is defined else '']) %}<code>{{ c }}</code> {{ c|why }} {% endfor %}</td></tr>{% endfor %}</tbody></table></div>{% endif %}
+</section>
+
+<section class="card" aria-labelledby="h-exec"><h2 id="h-exec">Execution results</h2>
+{% for e in v.executions %}<article class="card" id="exec-{{ e.action_id }}"><h3>{{ e.type }} · <code>{{ e.action_id }}</code> — {{ badge(e.status, 'ok' if e.status in ('SUCCEEDED','REPLAYED','RECONCILED_APPLIED','EXECUTED_AFTER_RECONCILIATION') else 'danger' if e.status in ('UNCERTAIN','FAILED_PERMANENT','FAILED_TRANSIENT') else 'info') }}</h3>
+  {% if e.why %}<ul>{% for w in e.why %}<li>{{ w }}</li>{% endfor %}</ul>{% endif %}{% if e.effect %}<pre>{{ e.effect }}</pre>{% endif %}
+  {% if e.status == 'UNCERTAIN' %}<div class="banner tone-danger" role="alert"><strong>OUTCOME UNKNOWN</strong>The customer system did not confirm. The system did not retry, because a retry could apply the change twice. Check the customer system, then record what you found.</div>
+    <form class="inline" method="post" action="/cases/{{ case_id }}/actions/{{ e.action_id }}/reconcile"><input type="hidden" name="csrf" value="{{ csrf }}">
+      <label for="rc-o-{{ loop.index }}">What did you find?<select id="rc-o-{{ loop.index }}" name="outcome"><option value="applied">The change WAS applied</option><option value="not_applied">The change was NOT applied</option></select></label>
+      <label for="rc-n-{{ loop.index }}">What you checked (required)<input id="rc-n-{{ loop.index }}" name="note" maxlength="200" required></label><button type="submit">Record reconciliation</button></form>{% endif %}
+  {% if e.reconciled_by %}<p class="small">Reconciled by {{ e.reconciled_by }}: {{ e.note }}</p>{% endif %}</article>
+{% else %}<p>Nothing has been executed{% if v.row.state == 'REVIEW' %} — the case is waiting for an approval{% endif %}.</p>{% endfor %}</section>
+
+<section class="card" aria-labelledby="h-draft"><h2 id="h-draft">Draft reply (internal; never sent by this system)</h2>
+{% if v.draft and v.draft.text %}
+  {% set rv = v.draft.review or {} %}
+  <div class="banner tone-{{ 'ok' if rv.status == 'reviewed' else 'warn' }}" role="status"><strong>{{ 'REVIEWED BY ' ~ rv.by if rv.status == 'reviewed' else 'UNREVIEWED DRAFT' }}</strong>{% if rv.status != 'reviewed' %}A human must read and take ownership of this text before anyone uses it. It was written by a model and may contain mistakes.{% else %}Reviewed at {{ rv.at }}{% endif %}</div>
+  {% if v.draft_stale %}<p class="banner tone-warn" role="status"><strong>THE CASE CHANGED AFTER THIS DRAFT WAS WRITTEN</strong>The uncertain write was reconciled by a human after the draft was produced. Re-read the draft against the current case before using any of it.</p>{% endif %}
+  <div class="quote">{{ v.draft.text }}</div>
+  <p class="small">Cites: {{ v.draft.cited|join(', ') }}. Review level: <strong>{{ rv.level }}</strong>. Grounding checks passed (numbers, identifiers and effect claims are verified against the evidence and the case file; this reduces but does not remove the risk of a convincing wrong draft).</p>
+  {% if rv.flags %}<p>{{ badge('ELEVATED REVIEW', 'danger') }} Risk flags: {{ rv.flags|join(', ') }}</p>{% endif %}
+  {% if rv.status != 'reviewed' and ident.role == 'tier2_engineer' %}
+  <form method="post" action="/cases/{{ case_id }}/draft/review"><input type="hidden" name="csrf" value="{{ csrf }}">
+    {% if rv.flags %}<fieldset><legend>Acknowledge each risk before marking this draft reviewed</legend>{% for fl in rv.flags %}<label for="ack-{{ fl }}" class="check"><input type="checkbox" id="ack-{{ fl }}" name="ack" value="{{ fl }}"> I have checked: {{ fl|replace('_',' ')|lower }}</label>{% endfor %}</fieldset>{% endif %}
+    <button type="submit">Mark draft as reviewed</button></form>{% endif %}
+  {% if v.draft.limitations %}<details><summary>Limitations stated with the draft</summary><ul>{% for l in v.draft.limitations %}<li>{{ l }}</li>{% endfor %}</ul></details>{% endif %}
+{% elif v.draft %}<p>{{ badge('NO DRAFT', 'warn') }} {{ (v.draft.error or '')|why }} The draft was rejected by deterministic checks; a human writes the reply.</p>
+{% else %}<p>No draft has been produced yet.</p>{% endif %}</section>
+
+<section class="card" aria-labelledby="h-note"><h2 id="h-note">Internal note</h2>{% if v.note %}<div class="quote">{{ v.note }}</div>{% else %}<p>No note yet.</p>{% endif %}</section>
+
+{% if v.reason %}<section class="card" aria-labelledby="h-reason"><h2 id="h-reason">Why: {{ v.reason.outcome }}</h2><ul>{% for c in v.reason.codes %}<li><code>{{ c }}</code> — {{ c|why }}</li>{% endfor %}</ul>{% if v.reason.constraints %}<p>Constraints: {{ v.reason.constraints|join(', ') }}</p>{% endif %}</section>{% endif %}
+
+<section class="card" aria-labelledby="h-lim"><h2 id="h-lim">Limitations</h2><ul>{% for l in v.limitations %}<li>{{ l }}</li>{% endfor %}</ul></section>
+
+<section class="card" aria-labelledby="h-aud"><h2 id="h-aud">Audit references</h2>
+<div class="scroll"><table><caption>Latest audit events (tamper-evident hash chain; <a href="/cases/{{ case_id }}/audit">full timeline</a>)</caption><thead><tr><th scope="col">#</th><th scope="col">Event</th><th scope="col">Actor</th><th scope="col">Hash</th></tr></thead><tbody>
+{% for a in v.audit %}<tr><td>{{ a.seq }}</td><td>{{ a.type }}</td><td>{{ a.actor }}</td><td><code>{{ a.hash }}</code></td></tr>{% else %}<tr><td colspan="4">No audit events visible.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

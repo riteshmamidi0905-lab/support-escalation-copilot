@@ -52,6 +52,17 @@ class CaseMachine:
         with self.pool.connection() as c, c.transaction():
             c.execute("UPDATE copilot.case_runs SET file = jsonb_set(file, %s, %s::jsonb, true), updated_at = %s WHERE case_id = %s", ([key], Jsonb(_jsonable(value)), self.clock.now(), case_id))
 
+    def set_disposition(self, case_id: str, disposition: str) -> None:
+        """Annotate a case's disposition without moving its state (e.g. after a human reconciled an uncertain outcome). The database guard still forbids any identity/state/version change."""
+        with self.pool.connection() as c, c.transaction():
+            c.execute("UPDATE copilot.case_runs SET disposition = %s, updated_at = %s WHERE case_id = %s", (disposition, self.clock.now(), case_id))
+
+    def transitions_detailed(self, case_id: str) -> list[dict[str, Any]]:
+        with self.pool.connection() as c:
+            r = c.execute("SELECT from_state, to_state, version, ts FROM copilot.case_transitions WHERE case_id = %s ORDER BY version", (case_id,)).fetchall()
+            c.rollback()
+        return [{"from": a, "to": b, "version": v, "ts": t} for a, b, v, t in r]
+
     def advance(self, case_id: str, expected_state: str, dst: str, inputs: dict[str, Any] | None = None, actor: dict[str, Any] | None = None, correlation: dict[str, Any] | None = None) -> dict[str, Any]:
         """Move a case along ONE legal edge. Fails closed: unknown/illegal edge, stale expected state, missing inputs, failed guard. Nothing else can change a case's state."""
         inputs = inputs or {}

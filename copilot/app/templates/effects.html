@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Customer systems{% endblock %}
+{% block main %}
+<h1>Customer systems (mock) — what actually happened on their side</h1>
+<p>These are deterministic mock customer systems. This page shows the effects they really applied, independent of what the copilot believes. It is the ground truth for "exactly one effect" and for uncertain writes. Only your granted accounts are shown.</p>
+<div class="scroll"><table><caption>Calls received vs effects applied</caption><thead><tr><th scope="col">System</th><th scope="col">Calls received</th></tr></thead><tbody>
+{% for k, v in calls.items() %}<tr><th scope="row">{{ k }}</th><td>{{ v }}</td></tr>{% endfor %}</tbody></table></div>
+<div class="scroll"><table><caption>{{ rows|length }} applied effect(s)</caption><thead><tr><th scope="col">System</th><th scope="col">Reference</th><th scope="col">Account</th><th scope="col">Request id (idempotency key)</th><th scope="col">Detail</th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{ r.system }}</td><td><code>{{ r.ref }}</code></td><td>{{ r.account }}</td><td><code>{{ r.request_id }}</code></td><td>{{ r.detail }}</td></tr>
+{% else %}<tr><td colspan="5">No effect has been applied on the customer systems.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "base.html" import badge %}
+{% block title %}Audit {{ case_id }}{% endblock %}
+{% block main %}
+<p class="small"><a href="/cases/{{ case_id }}">&larr; Back to {{ case_id }}</a></p>
+<h1>Audit timeline · {{ case_id }}</h1>
+<p>Every consequential step is an append-only, hash-chained event. You can read only the events of accounts you are granted; events of other accounts are never returned, counted or hinted at.</p>
+<section class="card" aria-labelledby="h-trace"><h2 id="h-trace">Correlation: request → model invocation → action → approval → execution → audit</h2>
+<div class="scroll"><table><caption>One row per action</caption><thead><tr><th scope="col">Action</th><th scope="col">Requests</th><th scope="col">Model invocations</th><th scope="col">Approvals</th><th scope="col">Audit events</th></tr></thead><tbody>
+{% for a in trace.actions %}<tr><th scope="row"><code>{{ a.action_id }}</code></th><td>{{ a.request_ids|join(', ') or '—' }}</td><td>{{ a.invocation_ids|join(', ') or '—' }}</td><td>{{ a.approval_ids|join(', ') or '—' }}</td><td>{{ a.audit_types|join(' → ') }}</td></tr>{% else %}<tr><td colspan="5">No action-level events.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="card" aria-labelledby="h-ev"><h2 id="h-ev">Events ({{ events|length }})</h2>
+{% for e in events %}<article class="card" id="seq-{{ e.seq }}"><h3>#{{ e.seq }} · {{ e.type }}</h3>
+<p class="small">{{ e.ts }} · actor <strong>{{ e.actor.kind }}:{{ e.actor.id }}</strong>{% if e.actor.role %} ({{ e.actor.role }}){% endif %} · hash <code>{{ e.hash[:16] }}</code> · prev <code>{{ (e.prev_hash or 'genesis')[:16] }}</code></p>
+{% if e.correlation %}<p class="small">{% for k, val in e.correlation.items() %}{{ k }}=<code>{{ val }}</code> {% endfor %}</p>{% endif %}
+<details><summary>Payload</summary><pre>{{ e.pretty }}</pre></details></article>{% endfor %}</section>
+<section class="card" aria-labelledby="h-ops"><h2 id="h-ops">Operational events for this case ({{ trace.ops|length }})</h2>
+<div class="scroll"><table><caption>Telemetry (no prompts, no secrets, no model reasoning)</caption><thead><tr><th scope="col">Time</th><th scope="col">Kind</th><th scope="col">Duration (ms)</th><th scope="col">Details</th></tr></thead><tbody>
+{% for o in trace.ops %}<tr><td>{{ o.ts|ts }}</td><td>{{ o.kind }}</td><td>{{ o.duration_ms if o.duration_ms is not none else '' }}</td><td><code>{{ o.attrs }}</code></td></tr>{% else %}<tr><td colspan="4">None.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

@@ -158,7 +158,7 @@ class RuleCaseModel(ModelProvider):
         if ctx["conflict_handles"]:
             ordered = sorted([e for e in ev if e["handle"] in ctx["conflict_handles"]], key=lambda e: [-int(x) for x in e["version"].split(".")])
             names = ", ".join(e["doc_id"] + " v" + e["version"] for e in ordered)
-            txt = (f"Thanks for your question about '{subj}'. Our documentation currently holds {len(ordered)} active versions that disagree ({names}); "
+            txt = (f"Thanks for your question about '{subj}'. Our documentation currently holds several active versions that disagree ({names}); "
                    f"the newest is v{ordered[0]['version']}. An engineer will confirm which applies before we give you a number.")
             return {"draft": txt, "cited_evidence": [e["handle"] for e in ordered], "limitations": ["conflicting active documents; newest version stated, needs confirmation"]}
         verdict = {a["evidence"]: a["verdict"] for a in ctx.get("applicability", [])}
@@ -167,10 +167,18 @@ class RuleCaseModel(ModelProvider):
         if outcome == "ANSWER" and good:
             e = good[0]
             first = re.split(r"(?<=[.!?])\s", _unwrap(e["text"]).strip().split("\n\n")[-1] if "\n\n" in _unwrap(e["text"]) else _unwrap(e["text"]))[0][:300]
-            return {"draft": f"Thanks for contacting us about '{subj}'. According to our runbook '{e['title']}' (v{e['version']}): {first}", "cited_evidence": [e["handle"]], "limitations": ["draft for engineer review"]}
+            hedge = " An engineer will confirm this applies to your situation before we proceed." if set(ctx.get("review_flags", [])) & {"CONFLICTING_EVIDENCE", "STALE_EVIDENCE", "HIGH_UNCERTAINTY"} else ""
+            return {"draft": f"Thanks for contacting us about '{subj}'. According to our runbook '{e['title']}' (v{e['version']}): {first}{hedge}", "cited_evidence": [e["handle"]], "limitations": ["draft for engineer review"]}
         msg = {"REFUSE": "We are not able to action this request as written. A support engineer will follow up.", "INSUFFICIENT_EVIDENCE": "We could not find documentation that answers this yet; an engineer will investigate and may ask for more details.",
                "CLARIFY": "Could you tell us which feature or integration is affected and what you see?", "ESCALATE": "We have raised this with engineering and will update you.",
                "APPROVAL": "We have prepared a fix that needs an internal approval; we will confirm once it is applied."}.get(outcome, "A support engineer will follow up.")
+        by_disp = {"EXECUTED": "The approved change has been carried out on our side; we will confirm the result once we have verified it.",
+                   "DENIED": "The proposed change was not approved, so nothing was changed. An engineer will follow up.",
+                   "EXPIRED": "The proposed change was not approved in time, so nothing was changed. An engineer will follow up.",
+                   "OUTCOME_UNCERTAIN": "We could not yet confirm whether the change took effect. An engineer is checking and will confirm.",
+                   "EXECUTION_FAILED": "The change could not be completed. An engineer will follow up."}
+        if outcome in ("APPROVAL", "ESCALATE") and ctx.get("disposition") in by_disp:
+            msg = by_disp[ctx["disposition"]]
         return {"draft": f"Hello, regarding '{subj}': {msg}", "cited_evidence": [], "limitations": ["draft for engineer review"]}
 
 

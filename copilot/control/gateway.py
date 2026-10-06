@@ -83,8 +83,8 @@ class ControlGateway:
         return decide(action, facts)
 
     # ---- propose ---------------------------------------------------------------------------------------------------------------------------
-    def propose(self, raw: Any, scope: Scope, requester: Identity, *, run_id: str | None = None, request_id: str | None = None, knowledge: str | None = None) -> Result:
-        corr = {"run_id": run_id, "request_id": request_id}
+    def propose(self, raw: Any, scope: Scope, requester: Identity, *, run_id: str | None = None, request_id: str | None = None, knowledge: str | None = None, invocation_id: str | None = None) -> Result:
+        corr = {"run_id": run_id, "request_id": request_id, "invocation_id": invocation_id}
         action, bad = self._prelude(raw, scope, requester, corr)
         if bad:
             return bad

@@ -1,0 +1,33 @@
+{% macro badge(text, tone='info') %}<span class="badge tone-{{ tone }}">{{ text }}</span>{% endmacro %}
+{% macro life(status) %}{% if status == 'active' %}{{ badge('ACTIVE', 'ok') }}{% elif status == 'superseded' %}{{ badge('SUPERSEDED', 'warn') }}{% elif status == 'draft' %}{{ badge('DRAFT DOC', 'warn') }}{% else %}{{ badge(status|upper, 'info') }}{% endif %}{% endmacro %}
+{% macro verdict(v) %}{% if v == 'applies' %}{{ badge('APPLIES', 'ok') }}{% elif v == 'partially_applies' %}{{ badge('PARTIALLY APPLIES', 'info') }}{% elif v == 'does_not_apply' %}{{ badge('DOES NOT APPLY', 'warn') }}{% elif v == 'stale' %}{{ badge('STALE', 'warn') }}{% elif v == 'contradicted' %}{{ badge('CONTRADICTED', 'danger') }}{% elif v == 'contains_instructions' %}{{ badge('CONTAINS INSTRUCTIONS', 'danger') }}{% else %}{{ badge('NOT ASSESSED', 'info') }}{% endif %}{% endmacro %}
+{% macro state_badge(s) %}{% if s in ('CLOSED',) %}{{ badge(s, 'ok') }}{% elif s in ('REFUSED','ABSTAINED','HANDED_OFF') %}{{ badge(s, 'warn') }}{% elif s == 'FAILED' %}{{ badge(s, 'danger') }}{% else %}{{ badge(s, 'info') }}{% endif %}{% endmacro %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Cases{% endblock %} · Support Escalation Copilot</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+<header class="top" role="banner">
+  <div class="brand"><strong>Support Escalation Copilot</strong><span class="tag">fictional customer (Meridian Freight Systems) · synthetic data · simulated sign-in</span></div>
+  {% if ident %}
+  <nav aria-label="Primary"><ul>
+    <li><a href="/cases">Cases</a></li><li><a href="/approvals">Approvals</a></li>
+    {% if global_view %}<li><a href="/ops">Operations</a></li>{% endif %}
+    {% if demo %}<li><a href="/effects">Customer systems</a></li><li><a href="/demo">Demo cases</a></li>{% endif %}
+  </ul></nav>
+  <div class="who"><span>Signed in as <strong>{{ ident.id }}</strong> · {{ ident.role }} · accounts: {{ 'all' if '*' in ident.accounts else ident.accounts|join(', ') }}</span>
+    <form method="post" action="/logout"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="secondary" type="submit">Sign out</button></form></div>
+  {% endif %}
+</header>
+<main id="main">
+{% if flash %}<p class="flash" role="status">{{ flash }}</p>{% endif %}
+{% block main %}{% endblock %}
+</main>
+<footer>The system drafts and proposes; it never sends customer e-mail. Deterministic controls and humans decide. Browser-side checks are courtesy only: every action is authorized again on the server.</footer>
+</body>
+</html>

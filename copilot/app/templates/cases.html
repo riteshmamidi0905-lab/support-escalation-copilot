@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% from "base.html" import state_badge, badge %}
+{% block title %}Cases{% endblock %}
+{% block main %}
+<h1>Cases</h1>
+<p class="small">Only cases in accounts you are granted are listed. Filter: <a href="/cases">all</a> · <a href="/cases?state=REVIEW">waiting for approval</a> · <a href="/cases?state=HANDED_OFF">handed off</a> · <a href="/cases?state=ABSTAINED">abstained</a> · <a href="/cases?state=REFUSED">refused</a> · <a href="/cases?state=CLOSED">closed</a> · <a href="/cases?state=FAILED">failed</a></p>
+<div class="scroll"><table>
+<caption>{{ cases|length }} case(s)</caption>
+<thead><tr><th scope="col">Case</th><th scope="col">Account</th><th scope="col">Ticket</th><th scope="col">State</th><th scope="col">Outcome</th><th scope="col">Disposition</th><th scope="col">Updated</th></tr></thead>
+<tbody>
+{% for c in cases %}
+<tr><th scope="row"><a href="/cases/{{ c.case_id }}">{{ c.case_id }}</a></th><td>{{ c.account_id }}</td><td>{{ c.ticket_id }}</td><td>{{ state_badge(c.state) }}</td><td>{{ c.outcome or '—' }}</td><td>{{ c.disposition or '—' }}</td><td>{{ c.updated_at|ts }}</td></tr>
+{% else %}<tr><td colspan="7">No cases yet. {% if demo %}Open one from <a href="/demo">Demo cases</a>.{% endif %}</td></tr>
+{% endfor %}
+</tbody></table></div>
+{% endblock %}

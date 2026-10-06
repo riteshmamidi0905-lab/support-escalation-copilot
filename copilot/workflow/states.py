@@ -30,7 +30,7 @@ def _has(*keys):
 
 
 def _approvals(f):
-    return [a for a in f.get("approvals", [])]
+    return [a for a in f.get("approvals", []) if a.get("status") != "superseded"]
 
 
 def _plan_needs_review(f, _i):

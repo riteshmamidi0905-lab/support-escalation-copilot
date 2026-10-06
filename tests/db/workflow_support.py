@@ -2,8 +2,12 @@
 import secrets
 
 import psycopg
+from agent.trace import Tracer
 
 from copilot import contracts as C
+from copilot.control.access import Access
+from copilot.control.metrics import Metrics
+from copilot.control.ops import OpsRecorder
 from copilot.retrieval import embed
 from copilot.workflow import externals as X
 from copilot.workflow.machine import CaseMachine
@@ -21,7 +25,10 @@ class WorkflowWorld(World):
         self.status_api = X.StatusAPI(self.integrations, status_faults)
         self.carrier_api = X.CarrierAPI(self.integrations, carrier_faults)
         self.ticketing = X.TicketingAPI(self.tickets_all, ticketing_faults)
-        self.client = X.GuardedClient(clock=self.clock)
+        self.ops = OpsRecorder(self.control_pool, self.clock)
+        self.client = X.GuardedClient(clock=self.clock, observer=self.ops.record)
+        self.access = Access(self.control_pool, self.authority, self.audit)
+        self.metrics = Metrics(self.control_pool, self.clock)
         self.provider = provider or RuleCaseModel()
         self.machine = CaseMachine(self.control_pool, self.audit, self.clock)
         self.retrieval = RetrievalService(env.pool, LayeredEmbedder(), embed.Reranker())
@@ -29,7 +36,12 @@ class WorkflowWorld(World):
 
     def deps(self, provider=None) -> Deps:
         return Deps(app_pool=self.env.pool, guard=self.env.guard, intake=self.env.intake, gateway=self.gateway, approvals=self.approvals, audit=self.audit, machine=self.machine, retrieval=self.retrieval,
-                    ticketing=self.ticketing, status_api=self.status_api, carrier_api=self.carrier_api, client=self.client, provider=provider or self.provider, agent_identity=self.agent, clock=self.clock)
+                    ticketing=self.ticketing, status_api=self.status_api, carrier_api=self.carrier_api, client=self.client, provider=provider or self.provider, agent_identity=self.agent, clock=self.clock, ops=self.ops,
+                    tracer_factory=lambda cid, inv, acc, req: Tracer(run_id=cid, listeners=[self.ops.tracer_listener(cid, acc, "RUN-" + cid, inv, req)]))
+
+    def worker(self, name="worker-1", **kw):
+        from copilot.workflow.recovery import RecoveryWorker
+        return RecoveryWorker(self.control_pool, lambda cid: self.new_runner(), self.clock, name, self.ops, **kw)
 
     def new_runner(self, provider=None, crash_points=None) -> CaseRunner:
         return CaseRunner(self.deps(provider), crash_points)
@@ -48,6 +60,10 @@ class WorkflowWorld(World):
     def routine_ticket(self):
         """An S14 ticket whose account has no open tracking/gateway incident (RBK-0027 then says: refresh the route cache, no escalation)."""
         return next(t for t in self.scenario_tickets("S14") if not self.open_incident_components(self.ticket(t)["account_id"]) & {"tracking", "carrier_gateway"})
+
+    def routine_tickets(self, n=None):
+        out = [t for t in self.scenario_tickets("S14") if not self.open_incident_components(self.ticket(t)["account_id"]) & {"tracking", "carrier_gateway"}]
+        return out[:n] if n else out
 
     def resync_ticket(self):
         """An S4 ticket on which a re-sync can be proposed: carrier feed in an account without a gateway incident."""
