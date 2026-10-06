@@ -3,9 +3,9 @@ PY ?= python
 setup:            ## editable install with dev tools
 	$(PY) -m pip install -e ".[dev]"
 lint:
-	ruff check .
+	$(PY) -m ruff check .
 test:             ## everything that needs no database
-	pytest -q
+	$(PY) -m pytest -q
 test-db:          ## database tests against an ephemeral local Postgres (pgserver, includes pgvector)
 	$(PY) scripts/with_local_pg.py $(PY) -m pytest -q
 db-up:            ## Postgres+pgvector via Docker (needs POSTGRES_PASSWORD, see .env.example)
