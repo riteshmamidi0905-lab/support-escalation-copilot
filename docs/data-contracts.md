@@ -45,3 +45,6 @@ Author the 40 tickets and labels *before* looking at any retrieval output; two p
 
 ## M4 contract additions
 `contracts/case_file.schema.json` (the durable case file the M5 UI will display); audit event types `state_transition`, `stage_completed`, `model_output_rejected`, `verification_recorded`, `draft_rejected`. Model output schemas live in `copilot/workflow/schemas.py` (Diagnosis, ProposedActions, DraftReply). Nothing was loosened.
+
+## M5 contract additions
+`contracts/audit_event.schema.json`: correlation gained `invocation_id` (the model invocation that produced an action); event types `draft_reviewed`, `action_amended`, `audit_read_denied` were added. Nothing was loosened. Migration `009_operations.sql` adds recovery columns to `case_runs` (`lease_owner`, `lease_expires_at`, `next_attempt_at`, `attempts`, `last_error`) and the append-only `ops_events` table (`kind`, correlation ids, `duration_ms`, scrubbed `attrs`; not hash-chained). The case file schema is unchanged: the UI reads the durable case file, and the draft's `review` block (status, level, flags, acknowledgements) lives in the stored draft record. The signed identity gained signed account grants (`Identity.accounts`).

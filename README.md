@@ -4,14 +4,21 @@ A **forward-deployed-engineering** project: a support-escalation copilot for a *
 
 It is a case workflow, not a chatbot: given a ticket it assembles tenant-scoped evidence, proposes a diagnosis with citations, drafts a reply and an action plan, and executes only what a human approves — and it is designed to refuse, request approval, escalate or say "insufficient evidence" in specified situations.
 
-**Status: M4 — end-to-end case workflow.** The case state machine (intake → scope → retrieve → verify → diagnose → plan → review → execute → draft → close) runs on the frozen agent runtime inside each stage; model output is structured, untrusted and checked by a trust boundary, and every action still passes the M3 policy/approval/idempotency control plane. S1–S16 run as real case executions with a **scripted stand-in model (not an LLM)**; see [`docs/m4-scenarios.md`](docs/m4-scenarios.md), [`docs/m4-injection.md`](docs/m4-injection.md) and [ADR-0015](docs/adr/0015-case-workflow-and-model-trust-boundary.md). **No real-model evaluation has been run.** There is still no UI, no deployment, **no performance or business metric**; identities and customer systems are mocks. See [`docs/real-vs-simulated.md`](docs/real-vs-simulated.md).
+**Status: M5 — operator experience, observability and real-model readiness.** A server-rendered operator UI (no JavaScript) shows each case end to end — evidence with provenance, diagnosis, contradictions, policy decisions, the exact action an approver is asked to approve, execution results, the audit trail — and every read and action is authorized again on the server (the browser is not trusted). Demo entry points A–F run real cases on synthetic data. Observability is derived from real events; a PostgreSQL recovery worker resumes cases safely; drafts are checked and always need human review. **The model is still a deterministic stand-in, not an LLM, and real-model evaluation has NOT been executed** (no local runtime; protocol frozen). See [`docs/m5-results.md`](docs/m5-results.md).
 
 ## Four absolute invariants
 1. No gated action without approval. 2. No cross-tenant data exposure. 3. No customer email is ever sent. 4. No secret appears in logs.
 Tests *attempt* to violate them ([attack catalogue](docs/threat-model.md)).
 
 ## Read in this order
-[`docs/spec.md`](docs/spec.md) (approved specification) · [`docs/architecture.md`](docs/architecture.md) · [`docs/adr/`](docs/adr/README.md) · [`docs/threat-model.md`](docs/threat-model.md) · [`docs/tenant-isolation.md`](docs/tenant-isolation.md) · [`docs/data-contracts.md`](docs/data-contracts.md) · [`docs/test-strategy.md`](docs/test-strategy.md) · [`docs/evaluation-methodology.md`](docs/evaluation-methodology.md) · [`docs/risks.md`](docs/risks.md) · [`docs/milestones.md`](docs/milestones.md)
+[`docs/spec.md`](docs/spec.md) (approved specification) · [`docs/architecture.md`](docs/architecture.md) · [`docs/adr/`](docs/adr/README.md) · [`docs/threat-model.md`](docs/threat-model.md) · [`docs/tenant-isolation.md`](docs/tenant-isolation.md) · [`docs/data-contracts.md`](docs/data-contracts.md) · [`docs/test-strategy.md`](docs/test-strategy.md) · [`docs/evaluation-methodology.md`](docs/evaluation-methodology.md) · [`docs/risks.md`](docs/risks.md) · [`docs/milestones.md`](docs/milestones.md) · M5: [`docs/m5-results.md`](docs/m5-results.md) · [`docs/m5-demos.md`](docs/m5-demos.md) · [`docs/m5-browser-verification.md`](docs/m5-browser-verification.md) · [`docs/m5-draft-steering.md`](docs/m5-draft-steering.md) · [`docs/m5-real-model-readiness.md`](docs/m5-real-model-readiness.md) · [`docs/real-vs-simulated.md`](docs/real-vs-simulated.md)
+
+## Try the operator UI (synthetic data, simulated sign-in)
+```bash
+make setup
+python scripts/with_local_pg.py python scripts/run_demo_server.py     # then open http://127.0.0.1:8765/login
+```
+Pick a persona (Lee/Tier-2, Omar/manager, Rina/on-call SRE, Sam/unrelated tenant, Ria/auditor) and open a demo case from *Demo cases* ([`docs/m5-demos.md`](docs/m5-demos.md)).
 
 ## Develop
 ```bash

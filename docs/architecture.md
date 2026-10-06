@@ -26,8 +26,10 @@ Target architecture. Implemented so far (M1): contracts, the synthetic generator
 | `copilot.retrieval` | FTS, vector, hybrid strategies + eval | M2 |
 | `copilot.tools`, `copilot.policy`, `copilot.approvals`, `copilot.audit` | typed tools, role-aware policy, approval workflow, audit | M3 |
 | `copilot.case` | workflow, diagnosis, plan, drafts | M4 |
-| `copilot.mocks`, `copilot.observability` | fault-injectable systems, traces/metrics | M5 |
-| `copilot.ui` + Compose + runbook | operational UI, deployment | M6 |
+| `copilot.control.{mocks,ops,metrics,access}` | fault-injectable systems; append-only ops events; metrics derived from real tables; server-side read authorization | M3 / **M5 (done)** |
+| `copilot.workflow.{recovery,grounding}` | PostgreSQL lease recovery worker; deterministic draft grounding checks | **M5 (done)** |
+| `copilot.app` | operator UI (WSGI + Jinja2, no JavaScript), approval/amend/review/reconcile actions, demo entry points | **M5 (done)** |
+| Compose + runbook + deployment | | M6 |
 
 ## Boundaries that matter
 - **Runtime boundary:** `agent.*` (frozen) is imported, never modified. Gaps are logged in `risks.md` and raised for approval.
