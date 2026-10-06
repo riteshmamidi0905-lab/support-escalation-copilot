@@ -1,4 +1,4 @@
-# Development database only (M0). The application services arrive in later milestones.
+# Development database only: PostgreSQL 16 + pgvector. The application is deliberately NOT containerised (docs/getting-started.md); this file is exercised by CI (`compose` job).
 # Image: PostgreSQL 16 with pgvector. Credentials are throw-away development values from the environment, never real secrets.
 services:
   db:

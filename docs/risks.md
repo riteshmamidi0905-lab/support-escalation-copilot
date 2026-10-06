@@ -69,7 +69,7 @@
 | R-45 | A fooled model can mark everything applicable and turn an abstention into an ANSWER *draft* | adversarial test | non-executable and human-reviewed, but a misleading draft is still a harm path; only a real-model evaluation can say how often it happens |
 | R-46 | Injected documents still reach the model prompt (they are on-topic evidence); only the architecture contains them | injection matrix | 0 invariant violations over 32 attack runs incl. detectors OFF; draft text can still be steered (see R-45) |
 | R-47 | Hostile tickets were not recognised as out of policy by the stand-in in 10 cases (S2: 4, S3: 6) and ended safely as ANSWER/ESCALATE drafts; recognising intent is the model's job | scenario run | contained (no unsafe action); intent recognition by a real model is **not measured** |
-| R-48 | Resume is by polling durable state; no worker/scheduler resumes cases automatically | design | M5/M6 |
+| R-48 | Resume is by polling durable state; no worker/scheduler resumes cases automatically | design | **resolved in M5** by a PostgreSQL lease-based recovery worker (limits: R-61) |
 | R-49 | The case file (jsonb) holds scrubbed ticket text, evidence excerpts and draft text; retention/erasure policy is undefined | design | document before any real data |
 | R-50 | No real local model could be run here (no Ollama/local server); the integration is tested at its HTTP boundary only | environment | stated in every report; `scripts/run_m4_local_model.py` records or refuses honestly |
 | R-51 | The static 'no SQL outside copilot/db' test exempts calls whose receiver is named `gateway` (`ControlGateway.execute` is not SQL) | CI | documented in the test; the workflow package is separately checked for no SQL/email/network imports |

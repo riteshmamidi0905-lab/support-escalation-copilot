@@ -22,7 +22,7 @@ M0–M3 built the tenant boundary, retrieval, typed actions, deterministic polic
 
 ## Consequences
 - The control plane's authority is unchanged; M3 tests, attacks and policy are untouched (one false-positive fix to e-mail masking, see risks).
-- Resume is by polling the durable state; there is no scheduler yet (M5/M6).
+- Resume is by polling the durable state; there is no scheduler yet. *(Update, M5: a PostgreSQL lease-based recovery worker now resumes cases; see ADR-0016.)*
 - Semantic applicability and refusal of hostile intent depend on the model; the deterministic architecture only bounds the consequences. How well a real model does is **not measured** here.
 
 ## Alternatives

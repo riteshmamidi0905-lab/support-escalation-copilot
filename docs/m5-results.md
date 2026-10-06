@@ -48,7 +48,7 @@ A real-model evaluation under the frozen protocol (needs a runtime and a machine
 ## Reproduce
 ```bash
 make setup
-python scripts/with_local_pg.py pytest -q                         # 459 tests (1 documented xfail)
+python scripts/with_local_pg.py pytest -q                         # the full suite (1 documented xfail; counts: reports/m6/release-evidence.json)
 python scripts/with_local_pg.py python scripts/run_demo_server.py # operator UI on :8765
 python scripts/with_local_pg.py python scripts/mutation_check_m5.py
 python scripts/probe_local_runtime.py ; python scripts/with_local_pg.py python scripts/measure_prompt_budget.py

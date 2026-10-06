@@ -1,4 +1,4 @@
-# What is real, what is simulated, what is only designed (M5)
+# What is real, what is simulated, what is only designed (as of the M6 release)
 
 | Item | Status |
 |---|---|
@@ -6,7 +6,7 @@
 | Committed dataset `data/meridian-seed-20260101` and its manifest/SHA-256s | **real files**, regenerated and compared in CI |
 | PostgreSQL schema, migrations, roles, FORCE'd RLS, signed scope function | **implemented and tested against real PostgreSQL** |
 | Fixed query catalogue, ScopeGuard, scoped sessions, pool reset, trusted intake, loader | **implemented and tested** |
-| Tenant-isolation, retrieval and control-plane attack tests (61 of 68 catalogued attacks executable) | **implemented**; mutation-tested (M1 defences; M2 retrieval defences via `scripts/mutation_check_m2.py`) |
+| Tenant-isolation, retrieval, control-plane, workflow and operator-surface attack tests (all 92 catalogued attacks have executable tests; counts in `reports/m6/release-evidence.json`) | **implemented**; mutation-tested (M1 defences; M2 retrieval defences via `scripts/mutation_check_m2.py`) |
 | Clean-database rebuild (migrate → bootstrap → generate → validate → load → sweep) | **implemented**; run in tests, CI and the Compose job |
 | Retrieval: chunker, FTS (A), pgvector (B), RRF hybrid (C), cross-encoder rerank (D), lifecycle/duplicate/conflict governance, structured evidence + JSON contract | **implemented and measured** (see below) |
 | Embeddings | **real**: BAAI/bge-small-en-v1.5 (quantised ONNX, pinned revision) computed locally; committed hash-keyed cache replays them. The plumbing embedder is **non-semantic**, used only in infrastructure tests, refused by the benchmark |
@@ -34,7 +34,9 @@
 | Recovery worker (PostgreSQL leases, `SKIP LOCKED`, back-off, parking) | **implemented; tested with concurrent workers** and workers that ignore leases; not tested under real network partitions or multi-host |
 | Draft grounding checks | **implemented**; evaluation is on a hand-written corpus by the rules' author (development result); **misleading-but-grounded drafts are not detected** (0/10) |
 | `ConfiguredProvider`, frozen real-model protocol, probe, measured prompt sizes | **implemented / measured** (token figures are estimates); **no real model was run** |
-| Deployment (Compose app image, runbook), real identity provider | designed / **not built** (M6) |
+| Docker Compose | provides **only the PostgreSQL + pgvector database**; verified in **CI** (including the demo walk-through), **not executed locally** (no Docker on the development machine). The application is deliberately not containerised |
+| Deployment, runbook for operations, real identity provider, TLS | **not built**; the project has never been deployed (see `security.md`, "What a real deployment would have to change") |
+| Public claims manifest (`content/public-claims.json`) and CI checks that keep README, evaluation and interview docs in step with recorded evidence | **implemented** (M6) |
 | Retrieval quality (hand-labelled held-out), abstention, conflicts, lifecycle, latency/resources on one laptop | **measured** (`docs/m2-results.md`); descriptive, small n |
 | Real-model (LLM) behaviour, task completion, business metrics | **nothing measured** |
 | Approval/refusal/idempotency behaviour of the control plane | **demonstrated by deterministic tests and the clean-database run** (`docs/m3-scenarios.md`): a property of the controls, not a performance metric |

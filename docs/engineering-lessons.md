@@ -1,0 +1,30 @@
+# What went wrong during development, and what changed
+
+These are real findings from building and testing this project, kept because each one changed a decision or a test. They are not embarrassments; they are how the evidence got honest. Every row points at its evidence
+(risk ids are in [`risks.md`](risks.md), which holds all 67 findings).
+
+| What went wrong | How it was found | What changed |
+|---|---|---|
+| **PostgreSQL full-text search does not match `resync` to `re-sync`**, so lexical retrieval misses an obvious variant (R-3) | the M0 environment spike *failed* | recorded as a finding rather than "fixed" in the query; kept as the lexical baseline and measured in M2: bare `resync` finds nothing lexically (rank none), vector finds it (rank 1); a mutation test guards that the baseline is not quietly improved |
+| **The synthetic development set overstated retrieval quality** (Hit@1 0.86-0.97 on dev vs 0.60-0.80 on the hand-labelled held-out set) (R-22) | the first held-out run | headline numbers are held-out only; dev is used for parameters; every report says the dev set flatters (it is templated and labelled by the same generator) |
+| **Similarity confidence does not tell you evidence is missing**: abstention thresholds separated answerable from unanswerable almost perfectly on dev (AUC 0.95-1.0) and barely at all on free-language held-out tickets (0.55-0.66); 36-55% of unanswerable tickets still got "evidence" (R-17) | held-out benchmark | evidence sufficiency is judged from content and policy, never from similarity; retrieval's "no sufficient evidence" is only a necessary signal (ADR-0013 §5) |
+| **The reranker did not earn its cost**: no ranking gain over plain vector (MRR@10 0.84 vs 0.87) for ~107 ms and a 347 MB model; its better abstention on dev did not transfer | benchmark | not adopted; hybrid fusion and rerank stay selectable and measured, not default (ADR-0013) |
+| **Conflict detection ran after abstention, contradicting the frozen protocol**: a known conflict between active runbooks could be hidden (TCK-8018) (R-24, R-27) | held-out failure analysis | corrected architecturally in M3 (conflicts first); the published M2 tables were *not* rewritten, the corrected order was re-run and its cost disclosed (vector governed success 0.88 → 0.84, false conflicts 0 → 0.04) |
+| **A false conflict hid the relevant document**: conflict-first returned only the conflicting pair for an unrelated ticket (TCK-0064) (R-41) | S8 scenario | the workflow keeps the other best active matches next to conflict members; M2/M3 retrieval left unchanged |
+| **The circuit breaker never closed again**: a status API that recovered stayed "unavailable" (R-42) | the S11 scenario | half-open after a cool-down on an injected clock; tested |
+| **The e-mail masker treated a citation as an address**: `RBK-0019@2.0` was masked in case files (R-40) | the first end-to-end case file | the TLD must be alphabetic; real addresses are still masked; earlier tests untouched |
+| **A privilege bug was invisible to the tests**: an excess `GRANT` changed no test result because other controls masked it (R-10) | mutation testing | exact-match privilege audit with a positive control |
+| **A defence existed in two places but was tested in one**: the operator layer's field whitelist was only exercised through the web layer's own filter | the first M5 mutation run (1 survivor of 28) | a direct test at the operator layer; all mutations now killed |
+| **A test helper picked random ticket ids from a pool of 9,000** and collided once in CI (R-67); earlier, role passwords being cluster-wide broke a CI run that passed locally (R-35) | CI | per-process counter ids; every bootstrap restores the shared passwords |
+| **The dashboard gate trusted a grant alone**: a Tier-2 engineer with an all-accounts grant could open the global operations view; an agent token was accepted as a session cookie (R-52, R-53) | my own M5 tests | global views need the auditor role *and* the grant; only human identities are sessions; mutation-checked |
+| **Redaction is pattern based**: a bare unlabelled token is stored as typed (R-54) | a canary test with an unrealistic format | pinned as a documented residual with a test, not "fixed" with false-positive-prone heuristics |
+| **Drafts said the wrong thing after the case moved on**: "needs approval" after the action ran; stale after a human reconciled (R-55); the dashboard counted a voided approval as a timeout (R-56); long hashes overflowed a phone screen (R-57) | the manual browser pass | disposition-aware drafts, a "case changed after this draft" notice, `superseded` status, wrapping rules; seven defects in total |
+| **Deterministic grounding checks failed against rephrasing**: 20/20 steered drafts caught, 0/8 rephrasings, 0/10 misleading-but-grounded (R-58) | the adversarial draft evaluation | the weakness is preserved and published; the control is mandatory itemised human review; no claim that the draft stage is safe |
+| **The stand-in model's heuristics were iterated while looking at the scenario results** (R-43) | self-audit | S1-S16 match rates are labelled development results about orchestration, never model accuracy |
+
+## Patterns worth keeping
+- **Record before fixing.** Several "fixes" were deliberately *not* made (the lexical miss, the held-out failures, the draft residual) because hiding the finding would have destroyed the evidence.
+- **Freeze, then measure.** The held-out set, the retrieval protocol and the real-model protocol were hashed before scoring; the one time the implementation contradicted the frozen protocol it was corrected and the cost published.
+- **Break your own defences.** Mutation checks found a masked privilege bug and an untested layer; the first run of a new check is allowed to fail.
+- **Layers are only worth what each is tested for.** A defence that two layers share can look tested when only one is.
+- **A passing local run is not CI.** Two CI-only failures (cluster-wide role passwords, a random id collision) were real harness defects.

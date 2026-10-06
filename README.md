@@ -1,33 +1,149 @@
-# support-escalation-copilot
+# Support Escalation Copilot
 
-A **forward-deployed-engineering** project: a support-escalation copilot for a **fictional** B2B software vendor, **Meridian Freight Systems**. All customers, accounts, tickets, runbooks, incidents and integrations are synthetic and generated reproducibly. Nothing here is real company data.
+[![ci](https://github.com/riteshmamidi0905-lab/support-escalation-copilot/actions/workflows/ci.yml/badge.svg)](https://github.com/riteshmamidi0905-lab/support-escalation-copilot/actions/workflows/ci.yml)
 
-It is a case workflow, not a chatbot: given a ticket it assembles tenant-scoped evidence, proposes a diagnosis with citations, drafts a reply and an action plan, and executes only what a human approves — and it is designed to refuse, request approval, escalate or say "insufficient evidence" in specified situations.
+**Support Escalation Copilot is a production-oriented reference implementation of an approval-gated AI case workflow for a fictional B2B SaaS support organization.**
+It shows how to let a model help with the reading, reconciling and drafting in a support escalation while the things that can hurt a customer (acting, approving, crossing tenants, sending e-mail, leaking secrets) stay in deterministic code and in human hands.
 
-**Status: M5 — operator experience, observability and real-model readiness.** A server-rendered operator UI (no JavaScript) shows each case end to end — evidence with provenance, diagnosis, contradictions, policy decisions, the exact action an approver is asked to approve, execution results, the audit trail — and every read and action is authorized again on the server (the browser is not trusted). Demo entry points A–F run real cases on synthetic data. Observability is derived from real events; a PostgreSQL recovery worker resumes cases safely; drafts are checked and always need human review. **The model is still a deterministic stand-in, not an LLM, and real-model evaluation has NOT been executed** (no local runtime; protocol frozen). See [`docs/m5-results.md`](docs/m5-results.md).
+> **Read this first.** The customer, *Meridian Freight Systems*, is **fictional** and all data is **synthetic**. This is a reference implementation: it has never been deployed, has no real customers, and has no production use. The workflow's
+> model is a **deterministic stand-in (`RuleCaseModel`), not an LLM**, and **real-model evaluation has not been executed**. Sign-in, customer systems and human reviewers are simulated. [What is real and what is not](docs/real-vs-simulated.md).
 
-## Four absolute invariants
-1. No gated action without approval. 2. No cross-tenant data exposure. 3. No customer email is ever sent. 4. No secret appears in logs.
-Tests *attempt* to violate them ([attack catalogue](docs/threat-model.md)).
+## The problem
+Meridian sells dock scheduling, shipment tracking and carrier integrations to enterprise customers. Its Tier-2 support engineers handle the escalations nobody else could close. For each one they read a ticket, hunt through runbooks (some stale, some contradicting each other),
+query the ops database, check integration health, decide a remedy (reply, config change, re-sync a carrier feed, SLA credit, engineering escalation), then ask a manager or an on-call SRE for approval in chat, pasting the evidence by hand.
+The costs are engineer hours, SLA breaches, and **expensive mistakes**: re-syncing a feed twice, granting a credit outside policy, or looking at the wrong customer's data. A model can speed up the reading and drafting, and is also exactly the component you cannot trust with the consequences.
 
-## Read in this order
-[`docs/spec.md`](docs/spec.md) (approved specification) · [`docs/architecture.md`](docs/architecture.md) · [`docs/adr/`](docs/adr/README.md) · [`docs/threat-model.md`](docs/threat-model.md) · [`docs/tenant-isolation.md`](docs/tenant-isolation.md) · [`docs/data-contracts.md`](docs/data-contracts.md) · [`docs/test-strategy.md`](docs/test-strategy.md) · [`docs/evaluation-methodology.md`](docs/evaluation-methodology.md) · [`docs/risks.md`](docs/risks.md) · [`docs/milestones.md`](docs/milestones.md) · M5: [`docs/m5-results.md`](docs/m5-results.md) · [`docs/m5-demos.md`](docs/m5-demos.md) · [`docs/m5-browser-verification.md`](docs/m5-browser-verification.md) · [`docs/m5-draft-steering.md`](docs/m5-draft-steering.md) · [`docs/m5-real-model-readiness.md`](docs/m5-real-model-readiness.md) · [`docs/real-vs-simulated.md`](docs/real-vs-simulated.md)
+## What the system does
+Given a ticket it assembles tenant-scoped **evidence with provenance**, records a **diagnosis** with citations and what is missing or contradictory, proposes **typed actions**, and drafts a reply and an internal note. It then **stops**: a deterministic policy
+decides what is allowed, a person with the exact role approves the exact action (or denies it), the control plane executes it **once**, and everything is audited. It is designed to refuse, abstain, escalate and admit uncertainty, and those are treated as successes.
+It never sends e-mail to a customer: there is no code path that can.
 
-## Try the operator UI (synthetic data, simulated sign-in)
+## Short demo
 ```bash
-make setup
-python scripts/with_local_pg.py python scripts/run_demo_server.py     # then open http://127.0.0.1:8765/login
+git clone https://github.com/riteshmamidi0905-lab/support-escalation-copilot.git && cd support-escalation-copilot
+python -m venv .venv && . .venv/bin/activate && make setup
+make demo        # operator UI at http://127.0.0.1:8765/login  (embedded PostgreSQL, no Docker)
 ```
-Pick a persona (Lee/Tier-2, Omar/manager, Rina/on-call SRE, Sam/unrelated tenant, Ria/auditor) and open a demo case from *Demo cases* ([`docs/m5-demos.md`](docs/m5-demos.md)).
+Six deterministic scenarios (routine, approval-gated re-sync, **prompt-injection containment**, insufficient and conflicting evidence, **uncertain execution**, degraded dependency) are walked through in [`docs/demo-walkthrough.md`](docs/demo-walkthrough.md); `make demo-smoke` runs the same walk-through over HTTP and checks 21 outcomes.
 
-## Develop
-```bash
-python -m venv .venv && . .venv/bin/activate
-make setup          # editable install incl. the pinned agent runtime (ai-agent-from-scratch @ 231b186)
-make lint test      # no database needed
-make test-db        # ephemeral local PostgreSQL with pgvector (no Docker needed)
-make generate       # regenerate the committed dataset (same seed => identical bytes)
-make rebuild        # clean database: migrate, bootstrap, generate, validate, load, tenant sweep (needs the COPILOT_* env vars, see .env.example)
-# or with Docker:  cp .env.example .env && make db-up
+| What an approver sees | A case that admits it is uncertain |
+|---|---|
+| [![approval panel](docs/m5/screenshots/04-approval-panel-exact-action.jpg)](docs/m5/screenshots/04-approval-panel-exact-action.jpg) | [![uncertain outcome](docs/m5/screenshots/10-uncertain-outcome-banner.jpg)](docs/m5/screenshots/10-uncertain-outcome-banner.jpg) |
+
+## Why an agent, and what it may not do
+An agent is appropriate where the work is reading and reconciling messy evidence and writing it up; it is not appropriate where the work is deciding who may do what. So the workflow is **fixed** (not free-form planning) and the model works *inside* stages, returning structured conclusions only.
+
+| The model can | The model cannot |
+|---|---|
+| propose a diagnosis: hypotheses, cited evidence handles, what is missing, a disposition suggestion | choose the tenant, the approver, the required role, the approval expiry, or the workflow state |
+| propose typed actions with parameters, and draft text | invent an action type: the vocabulary is five typed actions (two propose-only, three human-gated); a privileged field makes its output invalid |
+| mark evidence as applicable or not (advisory) | decide whether an action is allowed or evidence is sufficient: deterministic policy does, using trusted facts |
+| | send anything to a customer, run SQL, approve its own action, or read another account |
+
+## Architecture
+```mermaid
+flowchart TB
+    OP["Operator browser<br/>simulated sign-in"]:::untrusted
+    TXT["Ticket and runbook text<br/>untrusted data"]:::untrusted
+    subgraph APP["Operator app: copilot.app"]
+        WEB["UI and JSON API<br/>signed session, CSRF, strict CSP"]
+        ACC["Server-side authorization<br/>signed grants, uniform 404"]
+        WEB --> ACC
+    end
+    subgraph WF["Case workflow: copilot.workflow"]
+        RUN["Case runner and state machine<br/>durable, versioned transitions"]
+        REC["Recovery worker<br/>PostgreSQL leases"]
+        REC --> RUN
+    end
+    EVID["Evidence: pgvector + lifecycle governance<br/>facts via fixed queries under signed scope"]
+    MODEL["Model provider<br/>RuleCaseModel stand-in, not an LLM"]:::untrusted
+    TRUST["Trust boundary<br/>schema, citation and grounding checks"]
+    subgraph CP["Control plane: copilot.control"]
+        GW["Gateway<br/>validate, approval check, idempotent execute"]
+        POL["Policy engine<br/>facts and rules only"]
+        APR["Approval service<br/>role, tenant, hash, expiry"]
+        LED["Idempotency ledger"]
+        GW --> POL
+        GW --> APR
+        GW --> LED
+    end
+    CUST["Customer systems<br/>deterministic mocks with fault injection"]:::simulated
+    PG[("PostgreSQL 16 + pgvector<br/>tenant tables with forced RLS<br/>control tables, audit log, ops events")]
+    OP --> WEB
+    ACC --> RUN
+    TXT --> RUN
+    RUN -->|"read evidence"| EVID
+    RUN -->|"stage prompt"| MODEL
+    MODEL -->|"untrusted output"| TRUST
+    TRUST -->|"validated proposals"| GW
+    ACC -->|"approve or deny"| APR
+    GW -->|"approved, once"| CUST
+    RUN -->|"read-only checks"| CUST
+    EVID -.-> PG
+    CP -.->|"audit, approvals, ledger"| PG
+    RUN -.->|"case file, telemetry"| PG
+    classDef untrusted fill:#fde4e4,stroke:#9b1c1c,color:#111
+    classDef simulated fill:#fff2d6,stroke:#6b4300,color:#111
+    style APP fill:#e3f4e8,stroke:#0d4d22
+    style WF fill:#e3f4e8,stroke:#0d4d22
+    style CP fill:#e3f4e8,stroke:#0d4d22
 ```
-The agent runtime is a dependency pinned to a commit and **never modified** here.
+
+More diagrams in [`docs/architecture.md`](docs/architecture.md): trust boundaries, the full case lifecycle (`NEW → INTAKE → SCOPE → RETRIEVE → VERIFY → DIAGNOSE → PLAN → REVIEW → EXECUTE → DRAFT → terminal state`), and where the implementation differs from the original spec.
+
+## How the pieces work
+- **Case lifecycle.** A durable state machine; transitions are versioned and the legal edges are also enforced by a database trigger; each stage persists before it advances, so a crash resumes safely.
+- **Trust boundaries.** Ticket text, retrieved documents, model output, browser requests and customer-system replies are untrusted data. A deterministic boundary (redaction, schema/citation/grounding checks, signed identity, CSRF, role and grant checks, policy, approval hash) is the only way anything crosses. [Diagram](docs/architecture.md#2-trust-boundaries).
+- **Retrieval and evidence.** pgvector search plus lifecycle governance: superseded and draft documents are excluded, near-duplicates collapsed, conflicting active documents surfaced instead of silently resolved; a lexical fallback exists. Vector beat the hybrid and rerank designs on a frozen held-out set, and similarity confidence was shown **not** to detect missing evidence. [ADR-0013](docs/adr/0013-retrieval-architecture.md), [results](docs/m2-results.md).
+- **Typed actions.** Five actions; the dangerous ones are forbidden *by name* so there is nothing to call. No action sends e-mail. [`copilot/control/actions.py`](copilot/control/actions.py).
+- **Policy.** A deterministic engine over trusted facts (cooldowns, open incidents, contract credit limits); no model confidence or retrieval score is an input, and retrieval can only make it more cautious. It is re-evaluated from fresh facts at execution. [ADR-0014](docs/adr/0014-policy-approvals-idempotency-audit.md).
+- **Approvals.** Bound to the exact canonical action (hash), the exact role (no hierarchy), tenant and case, with an expiry where timeout means denial; the requester and the amender cannot approve; amending voids the old approval.
+- **Idempotency and reconciliation.** A deterministic key per write and a ledger; replays return the original result; a timeout *after* the effect is recorded **UNCERTAIN** and never retried blindly: a human reconciles it.
+- **Tenant isolation.** Forced row-level security keyed to a signed, short-lived scope that only trusted intake mints, a fixed query catalogue, least-privilege roles; operator reads are authorised by signed account grants and a foreign case returns the same 404 as a missing one. [`docs/tenant-isolation.md`](docs/tenant-isolation.md).
+- **Prompt-injection containment.** Not by detection. Injected text can reach the model, but the model has no write capability, the gateway has no input from model text, approvals need a human and drafts cannot be sent. Never "solved": a steered *draft* is still possible ([residual risks](docs/security.md#residual-risks-stated-not-hidden)).
+- **Recovery.** A PostgreSQL lease-based worker resumes cases from durable state; tests with concurrent workers, including workers that ignore the lease, produce one effect per approved action.
+- **Observability.** An append-only event stream and metrics derived from real tables (an empty system shows zeros), correlated by request, model invocation, action, approval and execution ids; the operator UI exposes a per-case audit trace and a dashboard.
+
+## Evidence
+Every number below is generated from a recorded run and checked in CI. The workflow figures use the **stand-in model**, the retrieval figures a **single AI reviewer**, and the draft-steering result is a **development corpus**: read the *Limit* column. The evidence classes are never merged ([`docs/evaluation.md`](docs/evaluation.md)).
+
+<!-- claims:readme:begin -->
+<!-- claims:readme:end -->
+
+## Security
+Four invariants hold through the model path, the control plane, the database and the operator UI: **I1** no gated action without a valid approval · **I2** no cross-tenant data exposure · **I3** no customer e-mail is ever sent · **I4** no secret in logs, audit or control artifacts.
+Tests *attempt* to violate them (full catalogue: [`docs/threat-model.md`](docs/threat-model.md)). Public security model, representative attacks and **residual risks** (unlabelled-secret redaction, misleading grounded drafts, simulated authentication, operator reconciliation trust, no external audit anchor, deployment assumptions): [`docs/security.md`](docs/security.md).
+
+## Important failures discovered
+A masked privilege bug that only mutation testing exposed; a synthetic dev set that flattered every retrieval strategy; similarity thresholds that did not transfer; a conflict-before-abstention ordering that hid a known conflict; a circuit breaker that never recovered; a masker that treated citations as e-mail addresses; a CI-only test-id collision; deterministic grounding that missed every rephrasing. [`docs/engineering-lessons.md`](docs/engineering-lessons.md).
+
+## Limitations
+No real LLM was evaluated (the method is frozen for a future run) · the model is a rule-based stand-in tuned during development · sign-in, customer systems and reviewers are simulated · retrieval labels come from a single AI reviewer on 40 tickets · a misleading draft built from grounded words is undetectable by rules · unlabelled secrets pass redaction · not deployed, no real customers. [`docs/real-vs-simulated.md`](docs/real-vs-simulated.md), [`docs/risks.md`](docs/risks.md) (67 findings).
+
+## Local setup
+Python 3.11+, git, network for `pip`. No Docker, API key, paid service or model download is needed. Details, the Docker Compose path (verified in CI, not locally), configuration, teardown and reset: [`docs/getting-started.md`](docs/getting-started.md).
+```bash
+make setup && make lint && make test-db     # the full suite on an embedded PostgreSQL 16 + pgvector
+make demo-smoke                             # demos A-F over HTTP, 21 checks
+```
+
+## Repository structure
+```
+copilot/          application: app (operator UI), workflow (state machine, runner, trust boundary, recovery), control (policy, approvals, gateway, audit, ops), retrieval, db (migrations, roles, RLS), data (generator)
+contracts/        JSON Schemas: data, actions, audit events, case files, the public claims manifest
+data/             the committed synthetic dataset (seed 20260101), the hand-labelled held-out set (frozen), embedding caches
+tests/            unit, database, attack, workflow, operator-app and release-integrity tests
+scripts/          demo server and smoke test, benchmark, scenario runs, mutation checks, evidence collection, claims manifest
+docs/             architecture, ADRs, security, evaluation, threat model, risks, demos, per-milestone results
+reports/          machine-readable run outputs (point-in-time artefacts; provenance is kept)
+content/          public-claims.json: the verified claims, with sources and limits, for anything that quotes this repository
+```
+
+## Design decisions
+[ADR index](docs/adr/README.md). The ones that shaped the system: [fixed workflow, not free-form planning](docs/adr/0002-constrained-case-workflow.md) · [PostgreSQL row-level security](docs/adr/0004-postgres-rls-tenancy.md) · [signed trusted scope](docs/adr/0012-signed-trusted-scope.md) · [retrieval architecture](docs/adr/0013-retrieval-architecture.md) · [policy, approvals, idempotency, audit](docs/adr/0014-policy-approvals-idempotency-audit.md) · [case workflow and the model trust boundary](docs/adr/0015-case-workflow-and-model-trust-boundary.md) · [operator experience, observability, recovery](docs/adr/0016-operator-experience-observability-recovery.md).
+Original specification: [`docs/spec.md`](docs/spec.md). Approval/execution sequence: [`docs/architecture.md`](docs/architecture.md#4-approval-and-execution-sequence).
+
+## Also see
+[`docs/interview-guide.md`](docs/interview-guide.md) · [`docs/m5-results.md`](docs/m5-results.md) · [`docs/m5-browser-verification.md`](docs/m5-browser-verification.md) · [`docs/m5-draft-steering.md`](docs/m5-draft-steering.md) · [`docs/m5-real-model-readiness.md`](docs/m5-real-model-readiness.md) · [`docs/m6-repository-audit.md`](docs/m6-repository-audit.md) · [`docs/milestones.md`](docs/milestones.md)
+
+MIT licensed. The agent runtime this builds on is a separate dependency pinned to a commit and never modified here.

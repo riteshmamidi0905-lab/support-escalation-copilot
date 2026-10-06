@@ -1,6 +1,6 @@
 # ADR-0011: Minimal server-rendered operational UI
 
-**Status:** Accepted
+**Status:** Accepted. Refined by [ADR-0016](0016-operator-experience-observability-recovery.md): the decision stands; the implementation is a stdlib WSGI app with Jinja2 rather than FastAPI.
 
 ## Context
 The UI exists to show evidence → diagnosis → action → approval → execution → audit, not to be a design project.

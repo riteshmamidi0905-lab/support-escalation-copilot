@@ -22,6 +22,8 @@ Principle: **tests try to violate the invariants; they do not merely assert that
 | Real-model readiness (M5) | `ConfiguredProvider` against an OpenAI-protocol stub that misbehaves like real local models; frozen protocol hash-lock; probe | none / Postgres | CI |
 | Mutation checks (manual): M3 `scripts/mutation_check_m3.py`, M4 `scripts/mutation_check_m4.py` (20), M5 `scripts/mutation_check_m5.py` (28+2) | deliberately break each defence and require a failing test | Postgres | before each milestone report |
 | Browser verification (M5, manual) | real browser at desktop and 375 px: navigation, evidence, approve, deny, amend, reconcile, review, degraded, tenant isolation, audit, a11y script, contrast, console/network | browser | **not authoritative**: the automated tests are; screenshots in `docs/m5/screenshots` |
+| Release-integrity tests (M6) | public claims manifest validates against its schema; every claim names real artifacts and an ancestor commit; no stand-in or development result is offered for a CV; no `real_llm` claim without a recorded result; the evidence is current (clean tree at its commit, no code or tests changed since); generated blocks equal what the evidence produces; no action type can reach a customer; a few negation-aware overclaim checks | none | CI |
+| Demo walk-through (M6) | `scripts/demo_smoke.py`: demos A-F over real HTTP with 21 outcome checks | Postgres | CI (compose job, against the Compose database) and locally |
 | Real-model evaluation | local/hosted model on the same sets (frozen protocol `docs/m5-real-model-protocol.md`) | model | **never in CI**; separate evidence class; **not executed** |
 | Compose smoke | stack comes up healthy; end-to-end run | Docker | CI |
 

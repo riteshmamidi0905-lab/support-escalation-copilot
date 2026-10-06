@@ -11,12 +11,15 @@ jobs:
         python: ["3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0              # release-evidence tests check that the evidence commit is an ancestor and that no code changed since
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: pip
       - run: pip install -e ".[dev]"
       - run: ruff check .
+      - run: python scripts/check_links.py
       - run: python scripts/sync_threat_model.py && git diff --exit-code docs/threat-model.md
       - run: python scripts/render_m2_report.py && git diff --exit-code docs/m2-results.md
       - name: Dataset determinism across platforms (regenerates and compares with the committed files)
@@ -43,6 +46,8 @@ jobs:
       COPILOT_TEST_DATABASE_URL: postgresql://ci_admin:ci-only-throwaway@localhost:5432/copilot_test
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -85,6 +90,10 @@ jobs:
         env:
           COPILOT_TEST_DATABASE_URL: postgresql://copilot_admin:ci-only-throwaway@127.0.0.1:5433/copilot
         run: pytest tests/db -q -rs --junitxml=junit-compose.xml
+      - name: Demo walk-through A-F over real HTTP against the compose database (what docs/demo-walkthrough.md describes)
+        env:
+          COPILOT_DEMO_ADMIN_DSN: postgresql://copilot_admin:ci-only-throwaway@127.0.0.1:5433/copilot
+        run: python scripts/demo_smoke.py
       - name: Failing tests as annotations
         if: failure()
         run: python scripts/ci_annotate.py junit-compose.xml

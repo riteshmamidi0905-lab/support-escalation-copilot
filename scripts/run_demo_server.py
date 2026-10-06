@@ -1,4 +1,4 @@
-"""Run the operator UI locally on a CLEAN, synthetic Meridian environment with the deterministic demo entry points (A-E).
+"""Run the operator UI locally on a CLEAN, synthetic Meridian environment with the deterministic demo entry points (A-F).
 
     python scripts/with_local_pg.py python scripts/run_demo_server.py [--port 8765]
 
@@ -7,6 +7,7 @@ The model in use is the deterministic RuleCaseModel stand-in, NOT an LLM."""
 import argparse
 import os
 import secrets
+import signal
 import sys
 import threading
 from pathlib import Path
@@ -45,7 +46,19 @@ class Quiet(WSGIRequestHandler):
         sys.stderr.write(f"{self.command} {self.path.split(chr(63))[0]}\n")
 
 
+def require_database() -> str:
+    """The demo builds its own throw-away database on a PostgreSQL server you point it at (it needs CREATE DATABASE / CREATE ROLE rights): the embedded one from scripts/with_local_pg.py, or the Compose
+    database via COPILOT_DEMO_ADMIN_DSN. The database is dropped when the demo exits."""
+    dsn = os.environ.get("COPILOT_DEMO_ADMIN_DSN") or os.environ.get("COPILOT_TEST_DATABASE_URL")
+    if not dsn:
+        sys.exit("No PostgreSQL to build the demo on. Either run it through the embedded server:  python scripts/with_local_pg.py python scripts/run_demo_server.py\n"
+                 "or start the Compose database (make db-up) and set COPILOT_DEMO_ADMIN_DSN=postgresql://copilot_admin:<POSTGRES_PASSWORD>@127.0.0.1:5433/copilot")
+    os.environ["COPILOT_TEST_DATABASE_URL"] = dsn                         # bench_env's name for 'an admin DSN on a server I may create databases on'
+    return dsn
+
+
 def build_services():
+    require_database()
     env = bench_env.build()
     base = os.environ["COPILOT_TEST_DATABASE_URL"]
     control_dsn = dbadmin.role_dsn(base, "copilot_control", env.passwords["copilot_control"], env.dbname)
@@ -64,6 +77,7 @@ def main():
     ap.add_argument("--port", type=int, default=8765)
     ap.add_argument("--host", default="127.0.0.1")
     a = ap.parse_args()
+    signal.signal(signal.SIGTERM, lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))     # `kill` / `docker stop` also clean up
     svc, env = build_services()
     app = OperatorApp(svc)
     stop = threading.Event()
@@ -76,15 +90,20 @@ def main():
                 wk.tick()
             except Exception as e:                                         # noqa: BLE001
                 sys.stderr.write(f"recovery tick failed: {type(e).__name__}\n")
-    threading.Thread(target=background, daemon=True).start()
+    worker_thread = threading.Thread(target=background, daemon=True)
+    worker_thread.start()
     srv = make_server(a.host, a.port, app, server_class=Threaded, handler_class=Quiet)
     print(f"Operator UI on http://{a.host}:{a.port}/login  (synthetic data, simulated sign-in, stand-in model)  dataset={env.dataset}", flush=True)
     try:
         srv.serve_forever()
     except KeyboardInterrupt:
         pass
-    finally:
+    finally:                                                               # leave nothing behind: the demo database is dropped on exit (so a Compose database does not accumulate demo databases)
         stop.set()
+        worker_thread.join(timeout=10)
+        srv.server_close()
+        svc.control_pool.close()
+        bench_env.drop(env)
 
 
 if __name__ == "__main__":

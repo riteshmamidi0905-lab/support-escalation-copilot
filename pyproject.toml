@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "support-escalation-copilot"
-version = "0.0.1"          # M0: foundations only
+version = "0.6.0"          # M6 evidence release (reference implementation)
 description = "Support escalation copilot for a FICTIONAL B2B SaaS vendor (Meridian Freight Systems): evidence, diagnosis, gated actions, audit."
 readme = "README.md"
 requires-python = ">=3.11"
