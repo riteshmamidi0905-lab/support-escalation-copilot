@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://support-escalation-copilot.example/contracts/incident.schema.json",
+  "title": "Platform incident",
+  "description": "",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "incident_id": {
+      "type": "string",
+      "pattern": "^INC-[0-9]{4,6}$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "component": {
+      "enum": [
+        "scheduler",
+        "tracking",
+        "carrier_gateway",
+        "billing",
+        "public_api"
+      ]
+    },
+    "severity": {
+      "enum": [
+        "SEV1",
+        "SEV2",
+        "SEV3"
+      ]
+    },
+    "status": {
+      "enum": [
+        "open",
+        "monitoring",
+        "resolved"
+      ]
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resolved_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "affected_account_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^ACC-[0-9]{4,6}$"
+      }
+    },
+    "summary": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "incident_id",
+    "title",
+    "component",
+    "severity",
+    "status",
+    "started_at",
+    "resolved_at",
+    "affected_account_ids",
+    "summary"
+  ]
+}

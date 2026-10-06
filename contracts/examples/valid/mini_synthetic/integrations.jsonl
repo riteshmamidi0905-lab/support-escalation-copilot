@@ -1,0 +1,1 @@
+{"account_id": "ACC-0001", "endpoint_host": "feeds.brightwater.example", "integration_id": "INT-0001", "kind": "carrier_feed", "last_resync_at": null, "last_sync_at": "2026-03-02T08:45:00Z", "provider": "Northbound Freight Lines (fictional)", "status": "degraded", "sync_interval_minutes": 15}

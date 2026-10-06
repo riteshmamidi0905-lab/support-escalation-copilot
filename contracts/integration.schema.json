@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://support-escalation-copilot.example/contracts/integration.schema.json",
+  "title": "Integration configuration",
+  "description": "",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "integration_id": {
+      "type": "string",
+      "pattern": "^INT-[0-9]{4,6}$"
+    },
+    "account_id": {
+      "type": "string",
+      "pattern": "^ACC-[0-9]{4,6}$"
+    },
+    "kind": {
+      "enum": [
+        "carrier_feed",
+        "erp_webhook",
+        "edi_gateway",
+        "api_client"
+      ]
+    },
+    "provider": {
+      "type": "string",
+      "description": "Fictional provider name."
+    },
+    "sync_interval_minutes": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "endpoint_host": {
+      "type": "string",
+      "pattern": "\\.example(\\.test)?$"
+    },
+    "status": {
+      "enum": [
+        "healthy",
+        "degraded",
+        "failing",
+        "paused"
+      ]
+    },
+    "last_sync_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "last_resync_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "integration_id",
+    "account_id",
+    "kind",
+    "provider",
+    "sync_interval_minutes",
+    "endpoint_host",
+    "status",
+    "last_sync_at",
+    "last_resync_at"
+  ]
+}

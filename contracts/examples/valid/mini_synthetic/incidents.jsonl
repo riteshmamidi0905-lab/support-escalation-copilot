@@ -1,0 +1,1 @@
+{"affected_account_ids": ["ACC-0001"], "component": "carrier_gateway", "incident_id": "INC-0001", "resolved_at": "2026-02-20T14:00:00Z", "severity": "SEV3", "started_at": "2026-02-20T10:00:00Z", "status": "resolved", "summary": "Duplicate shipment events after gateway 4.2.0 rollout; fixed in 4.2.1.", "title": "Carrier gateway duplicate events"}

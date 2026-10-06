@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://support-escalation-copilot.example/contracts/audit_event.schema.json",
+  "title": "Audit event",
+  "description": "Append-only; hash chain makes tampering detectable. Payload never contains secrets or hidden reasoning.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "event_id": {
+      "type": "string"
+    },
+    "case_id": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "user",
+            "agent",
+            "system"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "type": {
+      "enum": [
+        "case_opened",
+        "evidence_retrieved",
+        "tool_called",
+        "hypothesis_recorded",
+        "action_proposed",
+        "approval_requested",
+        "approval_decided",
+        "approval_expired",
+        "action_executed",
+        "action_refused",
+        "escalated",
+        "abstained",
+        "injection_detected",
+        "isolation_violation_blocked",
+        "case_closed"
+      ]
+    },
+    "payload": {
+      "type": "object"
+    },
+    "prev_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "hash": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_id",
+    "case_id",
+    "ts",
+    "actor",
+    "type",
+    "payload",
+    "prev_hash",
+    "hash"
+  ]
+}

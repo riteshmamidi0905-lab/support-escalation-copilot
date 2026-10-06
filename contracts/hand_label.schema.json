@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://support-escalation-copilot.example/contracts/hand_label.schema.json",
+  "title": "Manually reviewed label",
+  "description": "Evidence class: hand_labelled. Held out: never used for tuning prompts, thresholds or retrieval parameters.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ticket_id": {
+      "type": "string",
+      "pattern": "^TCK-[0-9]{4,6}$"
+    },
+    "reviewer": {
+      "type": "string"
+    },
+    "reviewed_on": {
+      "type": "string",
+      "format": "date"
+    },
+    "rubric_version": {
+      "type": "string"
+    },
+    "expected_runbook_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^RBK-[0-9]{4,6}$"
+      }
+    },
+    "acceptable_outcomes": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "ANSWER",
+          "REFUSE",
+          "APPROVAL",
+          "ESCALATE",
+          "INSUFFICIENT_EVIDENCE",
+          "CLARIFY",
+          "DEGRADED"
+        ]
+      },
+      "minItems": 1
+    },
+    "notes": {
+      "type": "string"
+    },
+    "provenance": {
+      "const": "hand_reviewed"
+    },
+    "split": {
+      "const": "held_out"
+    }
+  },
+  "required": [
+    "ticket_id",
+    "reviewer",
+    "reviewed_on",
+    "rubric_version",
+    "expected_runbook_ids",
+    "acceptable_outcomes",
+    "notes",
+    "provenance",
+    "split"
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://support-escalation-copilot.example/contracts/account.schema.json",
+  "title": "Account",
+  "description": "A customer account of the fictional vendor. Tenant key for row-level security.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "account_id": {
+      "type": "string",
+      "pattern": "^ACC-[0-9]{4,6}$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Fictional company name."
+    },
+    "tier": {
+      "enum": [
+        "Standard",
+        "Premier",
+        "Enterprise"
+      ]
+    },
+    "region": {
+      "enum": [
+        "NA",
+        "EU",
+        "APAC"
+      ]
+    },
+    "onboarded_on": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "enum": [
+        "active",
+        "suspended",
+        "churned"
+      ]
+    },
+    "contacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "email"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "pattern": "^[a-z0-9._-]+@[a-z0-9-]+\\.example(\\.test)?$",
+            "description": "Synthetic addresses only: reserved .example / .example.test domains."
+          }
+        }
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "account_id",
+    "name",
+    "tier",
+    "region",
+    "onboarded_on",
+    "status",
+    "contacts"
+  ]
+}

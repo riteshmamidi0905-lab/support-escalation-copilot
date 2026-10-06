@@ -1,0 +1,314 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://support-escalation-copilot.example/contracts/action.schema.json",
+  "title": "Typed action proposal",
+  "description": "The ONLY write vocabulary the copilot may propose. 'send_customer_email' deliberately does not exist (invariant I3).",
+  "type": "object",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_id",
+        "case_id",
+        "requested_by",
+        "evidence_refs",
+        "idempotency_key",
+        "type",
+        "required_role",
+        "params"
+      ],
+      "properties": {
+        "action_id": {
+          "type": "string"
+        },
+        "case_id": {
+          "type": "string"
+        },
+        "requested_by": {
+          "enum": [
+            "agent"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "idempotency_key": {
+          "type": "string",
+          "minLength": 16
+        },
+        "type": {
+          "const": "draft_reply"
+        },
+        "required_role": {
+          "const": "tier2_engineer"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "body"
+          ],
+          "properties": {
+            "body": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_id",
+        "case_id",
+        "requested_by",
+        "evidence_refs",
+        "idempotency_key",
+        "type",
+        "required_role",
+        "params"
+      ],
+      "properties": {
+        "action_id": {
+          "type": "string"
+        },
+        "case_id": {
+          "type": "string"
+        },
+        "requested_by": {
+          "enum": [
+            "agent"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "idempotency_key": {
+          "type": "string",
+          "minLength": 16
+        },
+        "type": {
+          "const": "add_internal_note"
+        },
+        "required_role": {
+          "const": "tier2_engineer"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "text"
+          ],
+          "properties": {
+            "text": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_id",
+        "case_id",
+        "requested_by",
+        "evidence_refs",
+        "idempotency_key",
+        "type",
+        "required_role",
+        "params"
+      ],
+      "properties": {
+        "action_id": {
+          "type": "string"
+        },
+        "case_id": {
+          "type": "string"
+        },
+        "requested_by": {
+          "enum": [
+            "agent"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "idempotency_key": {
+          "type": "string",
+          "minLength": 16
+        },
+        "type": {
+          "const": "escalate_engineering"
+        },
+        "required_role": {
+          "const": "tier2_engineer"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "severity",
+            "summary",
+            "incident_id"
+          ],
+          "properties": {
+            "severity": {
+              "enum": [
+                "P1",
+                "P2"
+              ]
+            },
+            "summary": {
+              "type": "string"
+            },
+            "incident_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_id",
+        "case_id",
+        "requested_by",
+        "evidence_refs",
+        "idempotency_key",
+        "type",
+        "required_role",
+        "params"
+      ],
+      "properties": {
+        "action_id": {
+          "type": "string"
+        },
+        "case_id": {
+          "type": "string"
+        },
+        "requested_by": {
+          "enum": [
+            "agent"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "idempotency_key": {
+          "type": "string",
+          "minLength": 16
+        },
+        "type": {
+          "const": "request_sla_credit"
+        },
+        "required_role": {
+          "const": "support_manager"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "percent",
+            "reason"
+          ],
+          "properties": {
+            "percent": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 100
+            },
+            "reason": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_id",
+        "case_id",
+        "requested_by",
+        "evidence_refs",
+        "idempotency_key",
+        "type",
+        "required_role",
+        "params"
+      ],
+      "properties": {
+        "action_id": {
+          "type": "string"
+        },
+        "case_id": {
+          "type": "string"
+        },
+        "requested_by": {
+          "enum": [
+            "agent"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "idempotency_key": {
+          "type": "string",
+          "minLength": 16
+        },
+        "type": {
+          "const": "trigger_resync"
+        },
+        "required_role": {
+          "const": "on_call_sre"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "integration_id",
+            "blast_radius"
+          ],
+          "properties": {
+            "integration_id": {
+              "type": "string",
+              "pattern": "^INT-[0-9]{4,6}$"
+            },
+            "blast_radius": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

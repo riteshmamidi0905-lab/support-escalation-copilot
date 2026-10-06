@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "support-escalation-copilot"
+version = "0.0.1"          # M0: foundations only
+description = "Support escalation copilot for a FICTIONAL B2B SaaS vendor (Meridian Freight Systems): evidence, diagnosis, gated actions, audit."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+  # The frozen agent runtime, pinned to a verified commit. Never a branch, never a tag that can move.
+  "ai-agent-from-scratch @ git+https://github.com/riteshmamidi0905-lab/ai-agent-from-scratch.git@231b1866f88ac31339fbb2b87ffee88d75d5a573",
+  "jsonschema>=4.21",
+  "rfc3339-validator>=0.1.4",     # makes the 'date-time' format actually enforced
+  "psycopg[binary,pool]>=3.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5", "pgserver>=0.1.4; platform_system != 'Windows'"]   # pgserver = embedded Postgres for laptops without Docker
+
+[tool.setuptools.packages.find]
+include = ["copilot*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+  "db: needs a PostgreSQL (COPILOT_TEST_DATABASE_URL)",
+  "pgvector: needs the pgvector extension",
+  "invariant: attempts to violate one of the four absolute invariants",
+]
+
+[tool.ruff]
+line-length = 170
+target-version = "py311"
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "S", "UP"]
+ignore = ["S101"]            # asserts are the point of a test suite
+[tool.ruff.lint.per-file-ignores]
+"scripts/**" = ["E701", "E702", "E501", "S603", "S607"]
+"tests/**" = ["S105", "S106", "S608"]    # canary secrets and f-string SQL are deliberate in adversarial tests

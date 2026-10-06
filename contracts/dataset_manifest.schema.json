@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://support-escalation-copilot.example/contracts/dataset_manifest.schema.json",
+  "title": "Dataset manifest",
+  "description": "Every evaluation dataset declares its evidence class. Classes are never merged into one number.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "dataset_id": {
+      "type": "string"
+    },
+    "evidence_class": {
+      "enum": [
+        "synthetic_label",
+        "hand_labelled",
+        "deterministic_runtime",
+        "real_model"
+      ]
+    },
+    "fictional": {
+      "const": true
+    },
+    "customer": {
+      "const": "Meridian Freight Systems (fictional)"
+    },
+    "generator": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "seed": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "seed"
+      ],
+      "additionalProperties": false
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "created_on": {
+      "type": "string",
+      "format": "date"
+    },
+    "tuning_allowed": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "dataset_id",
+    "evidence_class",
+    "fictional",
+    "customer",
+    "generator",
+    "files",
+    "created_on",
+    "tuning_allowed"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "evidence_class": {
+            "const": "hand_labelled"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "tuning_allowed": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "evidence_class": {
+            "const": "synthetic_label"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "generator": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  ]
+}

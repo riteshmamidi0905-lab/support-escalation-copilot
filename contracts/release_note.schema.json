@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://support-escalation-copilot.example/contracts/release_note.schema.json",
+  "title": "Release note",
+  "description": "",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "release_id": {
+      "type": "string",
+      "pattern": "^REL-[0-9]{4,6}$"
+    },
+    "component": {
+      "enum": [
+        "scheduler",
+        "tracking",
+        "carrier_gateway",
+        "billing",
+        "public_api"
+      ]
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "released_at": {
+      "type": "string",
+      "format": "date"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "release_id",
+    "component",
+    "version",
+    "released_at",
+    "notes"
+  ]
+}

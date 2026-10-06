@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://support-escalation-copilot.example/contracts/runbook_doc.schema.json",
+  "title": "Runbook document version",
+  "description": "Every document carries version, status, effective date and provenance so contradictory evidence stays visible.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "doc_id": {
+      "type": "string",
+      "pattern": "^RBK-[0-9]{4,6}$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "product_area": {
+      "enum": [
+        "dock_scheduling",
+        "shipment_tracking",
+        "carrier_integrations",
+        "billing_invoicing",
+        "api_webhooks"
+      ]
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "status": {
+      "enum": [
+        "active",
+        "superseded",
+        "draft"
+      ]
+    },
+    "effective_from": {
+      "type": "string",
+      "format": "date"
+    },
+    "supersedes": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^RBK-[0-9]{4,6}$"
+    },
+    "owner": {
+      "type": "string"
+    },
+    "source_path": {
+      "type": "string",
+      "description": "Provenance: where this version came from in the (fictional) wiki."
+    },
+    "body_markdown": {
+      "type": "string"
+    },
+    "adversarial": {
+      "type": "boolean",
+      "description": "True if the body deliberately contains instruction-like text for security testing."
+    }
+  },
+  "required": [
+    "doc_id",
+    "title",
+    "product_area",
+    "version",
+    "status",
+    "effective_from",
+    "supersedes",
+    "owner",
+    "source_path",
+    "body_markdown",
+    "adversarial"
+  ]
+}

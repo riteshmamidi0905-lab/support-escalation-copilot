@@ -1,0 +1,1 @@
+{"acceptable_outcomes": ["APPROVAL"], "expected_runbook_ids": ["RBK-0002"], "notes": "Active v2.0 applies; v1.0 is obsolete.", "provenance": "hand_reviewed", "reviewed_on": "2026-03-02", "reviewer": "example-reviewer", "rubric_version": "r0", "split": "held_out", "ticket_id": "TCK-0001"}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://support-escalation-copilot.example/contracts/contract.schema.json",
+  "title": "Contract and SLA",
+  "description": "Synthetic policy values; not derived from any real contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "contract_id": {
+      "type": "string",
+      "pattern": "^CTR-[0-9]{4,6}$"
+    },
+    "account_id": {
+      "type": "string",
+      "pattern": "^ACC-[0-9]{4,6}$"
+    },
+    "tier": {
+      "enum": [
+        "Standard",
+        "Premier",
+        "Enterprise"
+      ]
+    },
+    "sla_response_minutes": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "sla_resolution_hours": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "credit_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_agent_requestable_pct",
+        "max_manager_approvable_pct"
+      ],
+      "properties": {
+        "max_agent_requestable_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Above this the copilot may not request a credit at all (flag for finance)."
+        },
+        "max_manager_approvable_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "effective_from": {
+      "type": "string",
+      "format": "date"
+    },
+    "effective_to": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    }
+  },
+  "required": [
+    "contract_id",
+    "account_id",
+    "tier",
+    "sla_response_minutes",
+    "sla_resolution_hours",
+    "credit_policy",
+    "effective_from",
+    "effective_to"
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://support-escalation-copilot.example/contracts/ticket.schema.json",
+  "title": "Support ticket",
+  "description": "",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ticket_id": {
+      "type": "string",
+      "pattern": "^TCK-[0-9]{4,6}$"
+    },
+    "account_id": {
+      "type": "string",
+      "pattern": "^ACC-[0-9]{4,6}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "product_area": {
+      "enum": [
+        "dock_scheduling",
+        "shipment_tracking",
+        "carrier_integrations",
+        "billing_invoicing",
+        "api_webhooks"
+      ]
+    },
+    "severity": {
+      "enum": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ]
+    },
+    "subject": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string",
+      "description": "Untrusted free text; may contain injection attempts by design."
+    },
+    "reporter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "email"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "pattern": "^[a-z0-9._-]+@[a-z0-9-]+\\.example(\\.test)?$",
+          "description": "Synthetic addresses only: reserved .example / .example.test domains."
+        }
+      }
+    },
+    "channel": {
+      "enum": [
+        "email",
+        "portal",
+        "phone_note",
+        "chat"
+      ]
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "at",
+          "author",
+          "text"
+        ],
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "author": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "ticket_id",
+    "account_id",
+    "created_at",
+    "product_area",
+    "severity",
+    "subject",
+    "body",
+    "reporter",
+    "channel",
+    "history"
+  ]
+}

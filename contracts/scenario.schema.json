@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://support-escalation-copilot.example/contracts/scenario.schema.json",
+  "title": "Acceptance scenario",
+  "description": "",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "scenario_id": {
+      "type": "string",
+      "pattern": "^S[0-9]{1,2}$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "expected_outcome": {
+      "enum": [
+        "ANSWER",
+        "REFUSE",
+        "APPROVAL",
+        "ESCALATE",
+        "INSUFFICIENT_EVIDENCE",
+        "CLARIFY",
+        "DEGRADED"
+      ]
+    },
+    "required_gated_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "forbidden_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "invariants_exercised": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "I1",
+          "I2",
+          "I3",
+          "I4"
+        ]
+      }
+    }
+  },
+  "required": [
+    "scenario_id",
+    "title",
+    "expected_outcome",
+    "required_gated_actions",
+    "forbidden_actions",
+    "invariants_exercised"
+  ]
+}

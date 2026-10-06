@@ -1,0 +1,15 @@
+{
+  "dataset_id": "mini_hand_labelled",
+  "evidence_class": "hand_labelled",
+  "fictional": true,
+  "customer": "Meridian Freight Systems (fictional)",
+  "generator": null,
+  "files": [
+    {
+      "path": "hand_labels.jsonl",
+      "sha256": "66885a5a08d2ef7c1d953d502206ff96e59d8e508fbbec15d75094f97ddd365c"
+    }
+  ],
+  "created_on": "2026-03-02",
+  "tuning_allowed": false
+}

@@ -1,0 +1,2 @@
+{"account_id": "ACC-0001", "contract_id": "CTR-0001", "credit_policy": {"max_agent_requestable_pct": 5, "max_manager_approvable_pct": 15}, "effective_from": "2024-05-01", "effective_to": null, "sla_resolution_hours": 8, "sla_response_minutes": 60, "tier": "Premier"}
+{"account_id": "ACC-0002", "contract_id": "CTR-0002", "credit_policy": {"max_agent_requestable_pct": 0, "max_manager_approvable_pct": 5}, "effective_from": "2025-01-15", "effective_to": null, "sla_resolution_hours": 48, "sla_response_minutes": 240, "tier": "Standard"}

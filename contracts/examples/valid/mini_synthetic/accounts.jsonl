@@ -1,0 +1,2 @@
+{"account_id": "ACC-0001", "contacts": [{"email": "dana.ortiz@brightwater.example", "name": "Dana Ortiz"}], "name": "Brightwater Cold Storage (fictional)", "onboarded_on": "2024-05-01", "region": "NA", "status": "active", "tier": "Premier"}
+{"account_id": "ACC-0002", "contacts": [{"email": "lee.marsh@kestrel.example", "name": "Lee Marsh"}], "name": "Kestrel Parcel Group (fictional)", "onboarded_on": "2025-01-15", "region": "EU", "status": "active", "tier": "Standard"}

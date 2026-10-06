@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://support-escalation-copilot.example/contracts/synthetic_label.schema.json",
+  "title": "Generator-derived label",
+  "description": "Evidence class: synthetic_label. Circular by construction (the generator knows its own answer); never reported as human-validated.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ticket_id": {
+      "type": "string",
+      "pattern": "^TCK-[0-9]{4,6}$"
+    },
+    "scenario_id": {
+      "type": "string",
+      "pattern": "^S[0-9]{1,2}$"
+    },
+    "root_cause_id": {
+      "type": "string"
+    },
+    "expected_runbook_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^RBK-[0-9]{4,6}$"
+      }
+    },
+    "expected_outcome": {
+      "enum": [
+        "ANSWER",
+        "REFUSE",
+        "APPROVAL",
+        "ESCALATE",
+        "INSUFFICIENT_EVIDENCE",
+        "CLARIFY",
+        "DEGRADED"
+      ]
+    },
+    "expected_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "provenance": {
+      "const": "generator"
+    },
+    "generator_version": {
+      "type": "string"
+    },
+    "seed": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "ticket_id",
+    "scenario_id",
+    "root_cause_id",
+    "expected_runbook_ids",
+    "expected_outcome",
+    "expected_actions",
+    "provenance",
+    "generator_version",
+    "seed"
+  ]
+}
