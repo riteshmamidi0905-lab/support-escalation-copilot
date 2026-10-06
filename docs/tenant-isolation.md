@@ -26,3 +26,6 @@ Passwords and the signing key come from the environment at bootstrap; no secret 
 
 ## Residual risks
 See ADR-0012: token replay within its short lifetime by someone who already has SQL execution; signing-key custody and rotation; intake role reach. M5 adds audit-query scoping (A-I2-10) and M2 retrieval scoping (A-I2-09).
+
+## Retrieval and tenancy (M2)
+Runbooks, chunks, tsvectors and embeddings are **global knowledge** with no tenant column and no tenant identifiers (A-I2-12/29 tests). Tenant evidence (open incidents, similar tickets of the case's own account) is read only through catalogue queries under the database-verified signed scope: `similar_account_tickets` has no account parameter at all, so no query text, vector or document id can select another tenant (A-I2-09, 25–28, 30). Hostile query text goes only into bound parameters of fixed statements (A-I2-26/27). The vector parameter is validated as exactly 384 finite floats before it is bound. The benchmark mints scopes only through the trusted intake path (hand tickets are inserted as ordinary ticket rows because a scope needs a case on a real ticket).

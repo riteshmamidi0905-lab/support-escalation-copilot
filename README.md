@@ -4,7 +4,7 @@ A **forward-deployed-engineering** project: a support-escalation copilot for a *
 
 It is a case workflow, not a chatbot: given a ticket it assembles tenant-scoped evidence, proposes a diagnosis with citations, drafts a reply and an action plan, and executes only what a human approves — and it is designed to refuse, request approval, escalate or say "insufficient evidence" in specified situations.
 
-**Status: M1 — synthetic customer environment + tenant boundary.** The deterministic Meridian dataset, the PostgreSQL schema with forced RLS and database-verified signed scope, and the adversarial isolation tests exist. There is no retrieval, agent workflow, approval service or UI yet, and **no performance result of any kind**. See [`docs/real-vs-simulated.md`](docs/real-vs-simulated.md).
+**Status: M2 — retrieval, evidence and evaluation.** Building on the M1 tenant boundary: four retrieval strategies (lexical, vector, hybrid, hybrid+rerank) over structure-aware runbook chunks, lifecycle/duplicate/conflict governance, a structured evidence contract, a frozen 40-ticket hand-labelled evaluation set (single AI reviewer — not independent human annotation) and a benchmark. Results and caveats: [`docs/m2-results.md`](docs/m2-results.md); decision: [ADR-0013](docs/adr/0013-retrieval-architecture.md). There is still no agent workflow, approval service, action execution or UI, **no real-model (LLM) evaluation**, and no business metric. See [`docs/real-vs-simulated.md`](docs/real-vs-simulated.md).
 
 ## Four absolute invariants
 1. No gated action without approval. 2. No cross-tenant data exposure. 3. No customer email is ever sent. 4. No secret appears in logs.

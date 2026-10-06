@@ -143,7 +143,13 @@ def main():
         res["terminology_probes"] = {"note": "diagnostic only, fixed before running; rank of the re-sync runbook family (RBK-0019 current / RBK-0026 obsolete copy) for a bare query; null = not in top 10", "ranks": probes}
         if a.live:
             res["latency"] = latency(env, rt, live_emb, reranker, [ticket_query(t["subject"], t["body"]) for t in hand_t])
-            res["resources"] = {"peak_rss_mb": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024 * 1024 if sys.platform == "darwin" else 1024), 1)}
+            import psycopg
+            with psycopg.connect(env.db_admin_dsn) as c:
+                sizes = {t: c.execute("SELECT pg_total_relation_size(%s)", (f"copilot.{t}",)).fetchone()[0] for t in ("runbook_chunks", "runbook_docs")}
+            snap = lambda repo, rev: sum(f.stat().st_size for f in Path(snapshot_download(repo, revision=rev, cache_dir=None)).rglob("*") if f.is_file())  # noqa: E731
+            from huggingface_hub import snapshot_download
+            res["resources"] = {"embedding_model_mb": round(snap(embed.EMBED_REPO, embed.EMBED_REVISION) / 1e6, 1), "reranker_mb": round(snap(embed.RERANK_REPO, embed.RERANK_REVISION) / 1e6, 1),
+                                "pg_total_bytes": sizes, "embedding_cache_file_mb": round((embed.CACHE_DIR / "embeddings.json").stat().st_size / 1e6, 2), "peak_rss_mb": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024 * 1024 if sys.platform == "darwin" else 1024), 1)}
             emb.save()
             reranker.save()
         outdir = ROOT / a.out

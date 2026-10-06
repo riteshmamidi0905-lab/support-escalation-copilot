@@ -1,0 +1,17 @@
+name: embedding-reproducibility
+# Manual: recomputes embeddings with the REAL pinned local model (downloads ~70 MB from Hugging Face) and checks them against the committed cache.
+# Not part of the normal CI because it needs the network and the model files; the normal CI replays the committed cache and never claims to have recomputed it.
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev,models]"
+      - run: python scripts/embed_cache.py verify

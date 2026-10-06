@@ -1,4 +1,4 @@
-.PHONY: setup lint test test-db db-up db-down check generate rebuild threat-model
+.PHONY: benchmark benchmark-live setup lint test test-db db-up db-down check generate rebuild threat-model
 PY ?= python
 setup:            ## editable install with dev tools
 	$(PY) -m pip install -e ".[dev]"
@@ -20,3 +20,7 @@ rebuild:          ## needs COPILOT_ADMIN_DSN and the passwords/secret (see .env.
 	$(PY) -m copilot.db.rebuild --dbname copilot_dev
 threat-model:     ## regenerate the attack tables from copilot/invariants.py
 	$(PY) scripts/sync_threat_model.py
+benchmark:        ## M2 retrieval benchmark from a clean database, replaying the committed embedding/rerank caches (no model needed)
+	$(PY) scripts/with_local_pg.py $(PY) scripts/run_benchmark.py --out reports/m2-replay
+benchmark-live:   ## same, but recomputes with the real local models (pip install -e ".[models]")
+	$(PY) scripts/with_local_pg.py $(PY) scripts/run_benchmark.py --live

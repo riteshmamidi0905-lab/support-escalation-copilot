@@ -4,6 +4,7 @@
    "summary": {
     "abstained_on_insufficient": 0.6286,
     "citation_precision": 0.996,
+    "confidence_auc_sufficient_vs_insufficient": 0.803,
     "conflict_detected_on_conflicting": null,
     "conflict_pair_returned_on_conflicting": null,
     "false_confidence_on_insufficient": 0.3714,
@@ -49,6 +50,7 @@
    "summary": {
     "abstained_on_insufficient": 1.0,
     "citation_precision": 0.7847,
+    "confidence_auc_sufficient_vs_insufficient": 0.973,
     "conflict_detected_on_conflicting": null,
     "conflict_pair_returned_on_conflicting": null,
     "false_confidence_on_insufficient": 0.0,
@@ -93,6 +95,7 @@
    "summary": {
     "abstained_on_insufficient": 1.0,
     "citation_precision": 0.8537,
+    "confidence_auc_sufficient_vs_insufficient": 0.998,
     "conflict_detected_on_conflicting": null,
     "conflict_pair_returned_on_conflicting": null,
     "false_confidence_on_insufficient": 0.0,
@@ -137,6 +140,7 @@
    "summary": {
     "abstained_on_insufficient": 0.8571,
     "citation_precision": 0.6828,
+    "confidence_auc_sufficient_vs_insufficient": 0.95,
     "conflict_detected_on_conflicting": null,
     "conflict_pair_returned_on_conflicting": null,
     "false_confidence_on_insufficient": 0.1429,
@@ -185,6 +189,7 @@
     "conflicting": {
      "abstained_on_insufficient": null,
      "citation_precision": null,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": 0.75,
      "conflict_pair_returned_on_conflicting": 0.75,
      "false_confidence_on_insufficient": null,
@@ -223,6 +228,7 @@
     "distractor": {
      "abstained_on_insufficient": 0.5,
      "citation_precision": 1.0,
+     "confidence_auc_sufficient_vs_insufficient": 0.75,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": 0.5,
@@ -263,6 +269,7 @@
     "evidence_gap": {
      "abstained_on_insufficient": 0.8333,
      "citation_precision": null,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": 0.1667,
@@ -301,6 +308,7 @@
     "injection_exposure": {
      "abstained_on_insufficient": 0.0,
      "citation_precision": null,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": 1.0,
@@ -337,6 +345,7 @@
     "near_duplicate": {
      "abstained_on_insufficient": null,
      "citation_precision": 1.0,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -375,6 +384,7 @@
     "routine": {
      "abstained_on_insufficient": null,
      "citation_precision": 1.0,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -413,6 +423,7 @@
     "stale": {
      "abstained_on_insufficient": null,
      "citation_precision": 1.0,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -451,6 +462,7 @@
     "terminology": {
      "abstained_on_insufficient": null,
      "citation_precision": 1.0,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -503,6 +515,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.98413,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 2,
@@ -546,6 +559,7 @@
       "RBK-0027"
      ],
      "cited_relevant": 1,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0027"
@@ -588,6 +602,7 @@
       "RBK-0012"
      ],
      "cited_relevant": 1,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0012"
@@ -627,6 +642,7 @@
       "RBK-0012"
      ],
      "cited_relevant": 1,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0012"
@@ -668,6 +684,7 @@
       "RBK-0004"
      ],
      "cited_relevant": 1,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0004"
@@ -707,6 +724,7 @@
       "RBK-0004"
      ],
      "cited_relevant": 1,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0004"
@@ -746,6 +764,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.98413,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -783,6 +802,7 @@
       "RBK-0053"
      ],
      "cited_relevant": 1,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0053"
@@ -824,6 +844,7 @@
       "RBK-0027"
      ],
      "cited_relevant": 1,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0027"
@@ -864,6 +885,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.96923,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -901,6 +923,7 @@
       "RBK-0019"
      ],
      "cited_relevant": 1,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019"
@@ -946,6 +969,7 @@
       "RBK-0019"
      ],
      "cited_relevant": 1,
+     "confidence": 0.99194,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019"
@@ -991,6 +1015,7 @@
       "RBK-0019"
      ],
      "cited_relevant": 1,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019"
@@ -1036,6 +1061,7 @@
       "RBK-0019"
      ],
      "cited_relevant": 1,
+     "confidence": 0.99194,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019"
@@ -1081,6 +1107,7 @@
       "RBK-0019"
      ],
      "cited_relevant": 1,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019"
@@ -1124,6 +1151,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.96212,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 6,
@@ -1165,6 +1193,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 1.0,
      "conflict_found": true,
      "evidence_docs": [
       "RBK-0015",
@@ -1201,6 +1230,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.98413,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -1234,6 +1264,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 1.0,
      "conflict_found": true,
      "evidence_docs": [
       "RBK-0023",
@@ -1272,6 +1303,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.99194,
      "conflict_found": true,
      "evidence_docs": [
       "RBK-0023",
@@ -1312,6 +1344,7 @@
       "RBK-0022"
      ],
      "cited_relevant": 1,
+     "confidence": 0.99194,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0022"
@@ -1357,6 +1390,7 @@
       "RBK-0022"
      ],
      "cited_relevant": 1,
+     "confidence": 0.99194,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0022"
@@ -1400,6 +1434,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.98413,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 3,
@@ -1442,6 +1477,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.96923,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 2,
@@ -1480,6 +1516,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.96923,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 3,
@@ -1519,6 +1556,7 @@
       "RBK-0057"
      ],
      "cited_relevant": 1,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0057"
@@ -1556,6 +1594,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.97656,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -1591,6 +1630,7 @@
       "RBK-0034"
      ],
      "cited_relevant": 1,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0034"
@@ -1633,6 +1673,7 @@
       "RBK-0052"
      ],
      "cited_relevant": 1,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0052"
@@ -1673,6 +1714,7 @@
       "RBK-0060"
      ],
      "cited_relevant": 0,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0060"
@@ -1718,6 +1760,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.98413,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -1757,6 +1800,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.97656,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -1792,6 +1836,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.95522,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -1827,6 +1872,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.97656,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -1864,6 +1910,7 @@
       "RBK-0054"
      ],
      "cited_relevant": 0,
+     "confidence": 0.99194,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0054"
@@ -1901,6 +1948,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.9685,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -1940,6 +1988,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.96212,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -1979,6 +2028,7 @@
       "RBK-0030"
      ],
      "cited_relevant": 0,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0030"
@@ -2026,6 +2076,7 @@
       "RBK-0035"
      ],
      "cited_relevant": 0,
+     "confidence": 0.99194,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0035"
@@ -2077,6 +2128,7 @@
       "RBK-0051"
      ],
      "cited_relevant": 0,
+     "confidence": 1.0,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0051"
@@ -2125,6 +2177,7 @@
    "summary": {
     "abstained_on_insufficient": 0.5455,
     "citation_precision": 1.0,
+    "confidence_auc_sufficient_vs_insufficient": 0.664,
     "conflict_detected_on_conflicting": 0.75,
     "conflict_pair_returned_on_conflicting": 0.75,
     "false_confidence_on_insufficient": 0.4545,
@@ -2173,6 +2226,7 @@
     "conflicting": {
      "abstained_on_insufficient": null,
      "citation_precision": null,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": 0.75,
      "conflict_pair_returned_on_conflicting": 0.75,
      "false_confidence_on_insufficient": null,
@@ -2211,6 +2265,7 @@
     "distractor": {
      "abstained_on_insufficient": 0.5,
      "citation_precision": 1.0,
+     "confidence_auc_sufficient_vs_insufficient": 0.5,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": 0.5,
@@ -2252,6 +2307,7 @@
     "evidence_gap": {
      "abstained_on_insufficient": 0.8333,
      "citation_precision": null,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": 0.1667,
@@ -2290,6 +2346,7 @@
     "injection_exposure": {
      "abstained_on_insufficient": 0.0,
      "citation_precision": null,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": 1.0,
@@ -2326,6 +2383,7 @@
     "near_duplicate": {
      "abstained_on_insufficient": null,
      "citation_precision": 1.0,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -2364,6 +2422,7 @@
     "routine": {
      "abstained_on_insufficient": null,
      "citation_precision": 1.0,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -2402,6 +2461,7 @@
     "stale": {
      "abstained_on_insufficient": null,
      "citation_precision": 0.6,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -2440,6 +2500,7 @@
     "terminology": {
      "abstained_on_insufficient": null,
      "citation_precision": 0.6,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -2492,6 +2553,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.01451,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 4,
@@ -2533,6 +2595,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.01291,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -2573,6 +2636,7 @@
       "RBK-0012"
      ],
      "cited_relevant": 1,
+     "confidence": 0.02293,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0012"
@@ -2610,6 +2674,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.01595,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -2647,6 +2712,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.01304,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -2684,6 +2750,7 @@
       "RBK-0004"
      ],
      "cited_relevant": 1,
+     "confidence": 0.03778,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0004"
@@ -2723,6 +2790,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.00447,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -2760,6 +2828,7 @@
       "RBK-0053"
      ],
      "cited_relevant": 1,
+     "confidence": 0.02583,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0053"
@@ -2799,6 +2868,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.00543,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -2837,6 +2907,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.00868,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 5,
@@ -2874,6 +2945,7 @@
       "RBK-0019"
      ],
      "cited_relevant": 1,
+     "confidence": 0.02364,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019"
@@ -2920,6 +2992,7 @@
       "RBK-0020"
      ],
      "cited_relevant": 1,
+     "confidence": 0.03948,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019",
@@ -2967,6 +3040,7 @@
       "RBK-0020"
      ],
      "cited_relevant": 1,
+     "confidence": 0.03552,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019",
@@ -3011,6 +3085,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.01418,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -3052,6 +3127,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.00868,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -3093,6 +3169,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.01104,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -3134,6 +3211,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.02545,
      "conflict_found": true,
      "evidence_docs": [
       "RBK-0015",
@@ -3170,6 +3248,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.01133,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -3203,6 +3282,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.04682,
      "conflict_found": true,
      "evidence_docs": [
       "RBK-0023",
@@ -3241,6 +3321,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.02702,
      "conflict_found": true,
      "evidence_docs": [
       "RBK-0023",
@@ -3281,6 +3362,7 @@
       "RBK-0022"
      ],
      "cited_relevant": 1,
+     "confidence": 0.02104,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0022"
@@ -3326,6 +3408,7 @@
       "RBK-0022"
      ],
      "cited_relevant": 1,
+     "confidence": 0.0266,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0022"
@@ -3369,6 +3452,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.01252,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 3,
@@ -3415,6 +3499,7 @@
       "RBK-0020"
      ],
      "cited_relevant": 1,
+     "confidence": 0.04104,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019",
@@ -3457,6 +3542,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.02043,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 5,
@@ -3496,6 +3582,7 @@
       "RBK-0057"
      ],
      "cited_relevant": 1,
+     "confidence": 0.03165,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0057"
@@ -3533,6 +3620,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.00998,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 3,
@@ -3566,6 +3654,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.01767,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -3606,6 +3695,7 @@
       "RBK-0052"
      ],
      "cited_relevant": 1,
+     "confidence": 0.02955,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0052"
@@ -3646,6 +3736,7 @@
       "RBK-0060"
      ],
      "cited_relevant": 0,
+     "confidence": 0.0228,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0060"
@@ -3691,6 +3782,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.01934,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -3730,6 +3822,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.01267,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -3765,6 +3858,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.00468,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -3800,6 +3894,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.00507,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -3835,6 +3930,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.00741,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -3870,6 +3966,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.01105,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -3912,6 +4009,7 @@
       "RBK-0019"
      ],
      "cited_relevant": 1,
+     "confidence": 0.02545,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0005",
@@ -3956,6 +4054,7 @@
       "RBK-0035"
      ],
      "cited_relevant": 0,
+     "confidence": 0.03223,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0030",
@@ -4008,6 +4107,7 @@
       "RBK-0051"
      ],
      "cited_relevant": 0,
+     "confidence": 0.02533,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0032",
@@ -4065,6 +4165,7 @@
       "RBK-0005"
      ],
      "cited_relevant": 0,
+     "confidence": 0.05066,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0051",
@@ -4117,6 +4218,7 @@
    "summary": {
     "abstained_on_insufficient": 0.5455,
     "citation_precision": 0.7333,
+    "confidence_auc_sufficient_vs_insufficient": 0.545,
     "conflict_detected_on_conflicting": 0.75,
     "conflict_pair_returned_on_conflicting": 0.75,
     "false_confidence_on_insufficient": 0.4545,
@@ -4165,6 +4267,7 @@
     "conflicting": {
      "abstained_on_insufficient": null,
      "citation_precision": null,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": 1.0,
      "conflict_pair_returned_on_conflicting": 1.0,
      "false_confidence_on_insufficient": null,
@@ -4201,6 +4304,7 @@
     "distractor": {
      "abstained_on_insufficient": 1.0,
      "citation_precision": 1.0,
+     "confidence_auc_sufficient_vs_insufficient": 0.5,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": 0.0,
@@ -4241,6 +4345,7 @@
     "evidence_gap": {
      "abstained_on_insufficient": 0.8333,
      "citation_precision": null,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": 0.1667,
@@ -4279,6 +4384,7 @@
     "injection_exposure": {
      "abstained_on_insufficient": 0.0,
      "citation_precision": null,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": 1.0,
@@ -4315,6 +4421,7 @@
     "near_duplicate": {
      "abstained_on_insufficient": null,
      "citation_precision": 1.0,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -4353,6 +4460,7 @@
     "routine": {
      "abstained_on_insufficient": null,
      "citation_precision": 1.0,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -4391,6 +4499,7 @@
     "stale": {
      "abstained_on_insufficient": null,
      "citation_precision": 0.6,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -4429,6 +4538,7 @@
     "terminology": {
      "abstained_on_insufficient": null,
      "citation_precision": 0.6,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -4481,6 +4591,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -1.51911,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -4524,6 +4635,7 @@
       "RBK-0027"
      ],
      "cited_relevant": 1,
+     "confidence": 0.18604,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0027"
@@ -4566,6 +4678,7 @@
       "RBK-0012"
      ],
      "cited_relevant": 1,
+     "confidence": 5.35957,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0012"
@@ -4603,6 +4716,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -3.33511,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -4640,6 +4754,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -2.40575,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -4677,6 +4792,7 @@
       "RBK-0004"
      ],
      "cited_relevant": 1,
+     "confidence": 4.92134,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0004"
@@ -4716,6 +4832,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -7.81033,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -4753,6 +4870,7 @@
       "RBK-0053"
      ],
      "cited_relevant": 1,
+     "confidence": 2.6647,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0053"
@@ -4792,6 +4910,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -1.94113,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -4830,6 +4949,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -8.782,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 3,
@@ -4867,6 +4987,7 @@
       "RBK-0019"
      ],
      "cited_relevant": 1,
+     "confidence": -0.25122,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019"
@@ -4913,6 +5034,7 @@
       "RBK-0020"
      ],
      "cited_relevant": 1,
+     "confidence": 6.00357,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019",
@@ -4960,6 +5082,7 @@
       "RBK-0020"
      ],
      "cited_relevant": 1,
+     "confidence": 5.36129,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019",
@@ -5004,6 +5127,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -4.3831,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -5045,6 +5169,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -6.34797,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 3,
@@ -5086,6 +5211,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -2.14035,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -5127,6 +5253,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 4.75352,
      "conflict_found": true,
      "evidence_docs": [
       "RBK-0015",
@@ -5163,6 +5290,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 1.69285,
      "conflict_found": true,
      "evidence_docs": [
       "RBK-0015",
@@ -5199,6 +5327,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 3.24206,
      "conflict_found": true,
      "evidence_docs": [
       "RBK-0023",
@@ -5237,6 +5366,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 5.11985,
      "conflict_found": true,
      "evidence_docs": [
       "RBK-0023",
@@ -5275,6 +5405,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -1.04695,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 2,
@@ -5318,6 +5449,7 @@
       "RBK-0022"
      ],
      "cited_relevant": 1,
+     "confidence": 1.36699,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0022"
@@ -5363,6 +5495,7 @@
       "RBK-0020"
      ],
      "cited_relevant": 1,
+     "confidence": 1.9145,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0020"
@@ -5411,6 +5544,7 @@
       "RBK-0031"
      ],
      "cited_relevant": 1,
+     "confidence": 6.97903,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0020",
@@ -5457,6 +5591,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -1.12864,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 3,
@@ -5496,6 +5631,7 @@
       "RBK-0031"
      ],
      "cited_relevant": 1,
+     "confidence": 2.81866,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0031"
@@ -5533,6 +5669,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -4.32193,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -5566,6 +5703,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -6.74529,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -5606,6 +5744,7 @@
       "RBK-0052"
      ],
      "cited_relevant": 1,
+     "confidence": 3.81389,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0052"
@@ -5644,6 +5783,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -0.79463,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -5683,6 +5823,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -2.69908,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -5722,6 +5863,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -9.32491,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -5757,6 +5899,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -8.6401,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -5792,6 +5935,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -10.95217,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -5827,6 +5971,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -8.41676,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -5862,6 +6007,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": -4.96136,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -5904,6 +6050,7 @@
       "RBK-0020"
      ],
      "cited_relevant": 1,
+     "confidence": 3.69791,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0007",
@@ -5948,6 +6095,7 @@
       "RBK-0032"
      ],
      "cited_relevant": 0,
+     "confidence": 5.00975,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0030",
@@ -6000,6 +6148,7 @@
       "RBK-0032"
      ],
      "cited_relevant": 0,
+     "confidence": -0.26127,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0051",
@@ -6055,6 +6204,7 @@
       "RBK-0051"
      ],
      "cited_relevant": 0,
+     "confidence": 4.74318,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0051"
@@ -6103,6 +6253,7 @@
    "summary": {
     "abstained_on_insufficient": 0.6364,
     "citation_precision": 0.75,
+    "confidence_auc_sufficient_vs_insufficient": 0.64,
     "conflict_detected_on_conflicting": 1.0,
     "conflict_pair_returned_on_conflicting": 1.0,
     "false_confidence_on_insufficient": 0.3636,
@@ -6150,6 +6301,7 @@
     "conflicting": {
      "abstained_on_insufficient": null,
      "citation_precision": null,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": 1.0,
      "conflict_pair_returned_on_conflicting": 1.0,
      "false_confidence_on_insufficient": null,
@@ -6186,6 +6338,7 @@
     "distractor": {
      "abstained_on_insufficient": 0.0,
      "citation_precision": 1.0,
+     "confidence_auc_sufficient_vs_insufficient": 0.5,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": 1.0,
@@ -6226,6 +6379,7 @@
     "evidence_gap": {
      "abstained_on_insufficient": 0.8333,
      "citation_precision": null,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": 0.1667,
@@ -6264,6 +6418,7 @@
     "injection_exposure": {
      "abstained_on_insufficient": 0.0,
      "citation_precision": null,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": 1.0,
@@ -6300,6 +6455,7 @@
     "near_duplicate": {
      "abstained_on_insufficient": null,
      "citation_precision": 0.6,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -6336,6 +6492,7 @@
     "routine": {
      "abstained_on_insufficient": null,
      "citation_precision": 0.9,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -6374,6 +6531,7 @@
     "stale": {
      "abstained_on_insufficient": null,
      "citation_precision": 0.4444,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -6410,6 +6568,7 @@
     "terminology": {
      "abstained_on_insufficient": null,
      "citation_precision": 0.4167,
+     "confidence_auc_sufficient_vs_insufficient": null,
      "conflict_detected_on_conflicting": null,
      "conflict_pair_returned_on_conflicting": null,
      "false_confidence_on_insufficient": null,
@@ -6465,6 +6624,7 @@
       "RBK-0007"
      ],
      "cited_relevant": 1,
+     "confidence": 0.75798,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0038",
@@ -6515,6 +6675,7 @@
       "RBK-0027"
      ],
      "cited_relevant": 1,
+     "confidence": 0.77664,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0027"
@@ -6557,6 +6718,7 @@
       "RBK-0012"
      ],
      "cited_relevant": 1,
+     "confidence": 0.83885,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0012"
@@ -6596,6 +6758,7 @@
       "RBK-0012"
      ],
      "cited_relevant": 1,
+     "confidence": 0.75838,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0012"
@@ -6637,6 +6800,7 @@
       "RBK-0004"
      ],
      "cited_relevant": 1,
+     "confidence": 0.76728,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0004"
@@ -6676,6 +6840,7 @@
       "RBK-0004"
      ],
      "cited_relevant": 1,
+     "confidence": 0.79699,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0004"
@@ -6715,6 +6880,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.69613,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -6752,6 +6918,7 @@
       "RBK-0053"
      ],
      "cited_relevant": 1,
+     "confidence": 0.78008,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0053"
@@ -6793,6 +6960,7 @@
       "RBK-0027"
      ],
      "cited_relevant": 1,
+     "confidence": 0.738,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0027"
@@ -6835,6 +7003,7 @@
       "RBK-0011"
      ],
      "cited_relevant": 1,
+     "confidence": 0.71624,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0011"
@@ -6876,6 +7045,7 @@
       "RBK-0057"
      ],
      "cited_relevant": 1,
+     "confidence": 0.82285,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019",
@@ -6925,6 +7095,7 @@
       "RBK-0057"
      ],
      "cited_relevant": 1,
+     "confidence": 0.84833,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019",
@@ -6974,6 +7145,7 @@
       "RBK-0057"
      ],
      "cited_relevant": 1,
+     "confidence": 0.81418,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019",
@@ -7021,6 +7193,7 @@
       "RBK-0019"
      ],
      "cited_relevant": 1,
+     "confidence": 0.75923,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019"
@@ -7064,6 +7237,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.69572,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -7108,6 +7282,7 @@
       "RBK-0019"
      ],
      "cited_relevant": 1,
+     "confidence": 0.71583,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0020",
@@ -7152,6 +7327,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.88343,
      "conflict_found": true,
      "evidence_docs": [
       "RBK-0015",
@@ -7188,6 +7364,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.85199,
      "conflict_found": true,
      "evidence_docs": [
       "RBK-0015",
@@ -7224,6 +7401,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.85638,
      "conflict_found": true,
      "evidence_docs": [
       "RBK-0023",
@@ -7262,6 +7440,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.82515,
      "conflict_found": true,
      "evidence_docs": [
       "RBK-0023",
@@ -7303,6 +7482,7 @@
       "RBK-0014"
      ],
      "cited_relevant": 1,
+     "confidence": 0.82207,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0022",
@@ -7351,6 +7531,7 @@
       "RBK-0014"
      ],
      "cited_relevant": 1,
+     "confidence": 0.83124,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0022",
@@ -7398,6 +7579,7 @@
       "RBK-0020"
      ],
      "cited_relevant": 1,
+     "confidence": 0.76939,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0020"
@@ -7446,6 +7628,7 @@
       "RBK-0019"
      ],
      "cited_relevant": 1,
+     "confidence": 0.78049,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0020",
@@ -7496,6 +7679,7 @@
       "RBK-0019"
      ],
      "cited_relevant": 1,
+     "confidence": 0.78155,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0007",
@@ -7539,6 +7723,7 @@
       "RBK-0057"
      ],
      "cited_relevant": 1,
+     "confidence": 0.80524,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0057"
@@ -7578,6 +7763,7 @@
       "RBK-0050"
      ],
      "cited_relevant": 1,
+     "confidence": 0.71047,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0050"
@@ -7613,6 +7799,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.68604,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": 1,
@@ -7653,6 +7840,7 @@
       "RBK-0052"
      ],
      "cited_relevant": 1,
+     "confidence": 0.8115,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0052"
@@ -7693,6 +7881,7 @@
       "RBK-0060"
      ],
      "cited_relevant": 0,
+     "confidence": 0.71956,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0060"
@@ -7740,6 +7929,7 @@
       "RBK-0014"
      ],
      "cited_relevant": 0,
+     "confidence": 0.71546,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0014"
@@ -7785,6 +7975,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.70086,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -7820,6 +8011,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.63339,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -7855,6 +8047,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.61958,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -7890,6 +8083,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.62959,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -7925,6 +8119,7 @@
     {
      "cited": [],
      "cited_relevant": 0,
+     "confidence": 0.65978,
      "conflict_found": false,
      "evidence_docs": [],
      "first_rank": null,
@@ -7968,6 +8163,7 @@
       "RBK-0020"
      ],
      "cited_relevant": 1,
+     "confidence": 0.77307,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0019",
@@ -8019,6 +8215,7 @@
       "RBK-0051"
      ],
      "cited_relevant": 0,
+     "confidence": 0.86649,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0030",
@@ -8071,6 +8268,7 @@
       "RBK-0032"
      ],
      "cited_relevant": 0,
+     "confidence": 0.85544,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0035",
@@ -8128,6 +8326,7 @@
       "RBK-0053"
      ],
      "cited_relevant": 0,
+     "confidence": 0.81405,
      "conflict_found": false,
      "evidence_docs": [
       "RBK-0051",
@@ -8178,6 +8377,7 @@
    "summary": {
     "abstained_on_insufficient": 0.4545,
     "citation_precision": 0.5946,
+    "confidence_auc_sufficient_vs_insufficient": 0.658,
     "conflict_detected_on_conflicting": 1.0,
     "conflict_pair_returned_on_conflicting": 1.0,
     "false_confidence_on_insufficient": 0.5455,
@@ -8225,17 +8425,17 @@
   "hybrid": {
    "db_and_governance_ms_median": 0.5,
    "n": 200,
-   "p95": 0.56
+   "p95": 0.59
   },
   "lexical": {
    "db_and_governance_ms_median": 0.22,
    "n": 200,
-   "p95": 0.36
+   "p95": 0.27
   },
   "query_embedding_ms": {
-   "median": 7.59,
+   "median": 7.5,
    "n": 200,
-   "p95": 10.27
+   "p95": 10.38
   },
   "rerank": {
    "db_and_governance_ms_median": 0.53,
@@ -8243,14 +8443,14 @@
    "p95": 0.59
   },
   "rerank_20_passages_ms": {
-   "median": 108.33,
+   "median": 108.57,
    "n": 40,
-   "p95": 131.83
+   "p95": 131.12
   },
   "vector": {
    "db_and_governance_ms_median": 0.29,
    "n": 200,
-   "p95": 0.33
+   "p95": 0.32
   }
  },
  "meta": {
@@ -8271,7 +8471,7 @@
    "data/hand-labelled-v1/manifest.json": "2a5990ba2fc7aff39c880bc7d52e1fcb72030cdcc54fe1c9086adf7bc7e62570",
    "docs/eval-protocol.md": "b796ca1aa34868c90ea5dbd4c2f22f300f23a9f5fda64f266765065e0ed8f786"
   },
-  "git_sha": "f0a5c2d0f634262cb05a6bc32933e755d3eb11aa",
+  "git_sha": "f5e1076f9507b0f357db1b36e27ba555ef7f13df",
   "heldout_tickets": 40,
   "labeller": "single AI reviewer (Claude); not independent human annotation",
   "mode": "live",
@@ -8290,7 +8490,14 @@
   }
  },
  "resources": {
-  "peak_rss_mb": 480.8
+  "embedding_cache_file_mb": 1.46,
+  "embedding_model_mb": 67.4,
+  "peak_rss_mb": 491.5,
+  "pg_total_bytes": {
+   "runbook_chunks": 286720,
+   "runbook_docs": 131072
+  },
+  "reranker_mb": 346.8
  },
  "tenant_evidence": {
   "incident_recall": 1.0,

@@ -28,6 +28,7 @@ class BenchEnv:
     pg_version: str = ""
     pgvector_version: str = ""
     intake: object = None
+    db_admin_dsn: str = ""
 
 
 def build(embedder=None, seed: int = 20260101) -> BenchEnv:
@@ -58,7 +59,7 @@ def build(embedder=None, seed: int = 20260101) -> BenchEnv:
         c.cursor().executemany("INSERT INTO copilot.tickets VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", [(t["ticket_id"], t["account_id"], t["created_at"], t["product_area"], t["severity"], t["subject"], t["body"],
                                t["reporter"]["name"], t["reporter"]["email"], t["channel"]) for t in C.read_jsonl(hand / "hand_tickets.jsonl")])
     intake = Intake(dbadmin.role_dsn(dsn, "copilot_intake", pw["copilot_intake"], dbname), signer)
-    return BenchEnv(dbname, dsn, make_pool(dbadmin.role_dsn(dsn, "copilot_app", pw["copilot_app"], dbname), 1, 2), ds, counts, signer, ScopeGuard(signer), pgv, vv, intake)
+    return BenchEnv(dbname, dsn, make_pool(dbadmin.role_dsn(dsn, "copilot_app", pw["copilot_app"], dbname), 1, 2), ds, counts, signer, ScopeGuard(signer), pgv, vv, intake, db_admin)
 
 
 def drop(env: BenchEnv):

@@ -48,6 +48,7 @@ def score_ticket(lab: dict, raw: list[dict], result: dict, reg: Registry) -> dic
         "raw_top3": ranked_ids[:3],
         "evidence_docs": [e["doc_id"] for e in result["evidence"]],
         "incident_recall": None,
+        "confidence": result["top_confidence"],
     }
 
 
@@ -78,10 +79,21 @@ def summarise(rows: list[dict]) -> dict[str, Any]:
         "governed_superseded_or_draft_count": sum(1 for r in rows if {"superseded", "draft"} & set(r["governed_forbidden_reasons"])),
         "governed_adversarial_returned": sum(1 for r in rows if "adversarial" in r["governed_forbidden_reasons"]),
         "raw_top5_has_injected_doc": sum(1 for r in rows if r["raw_top5_has_adversarial"]),
+        "confidence_auc_sufficient_vs_insufficient": auc(rows),
         "outcomes": dict(Counter(r["outcome"] for r in rows)),
         "outcome_by_sufficiency": {s: dict(Counter(r["outcome"] for r in rows if r["sufficiency"] == s)) for s in ("sufficient", "insufficient", "conflicting")},
     }
     return out
+
+
+def auc(rows: list[dict]) -> float | None:
+    """Threshold-free separability of the strategy's top confidence: P(conf(sufficient) > conf(insufficient)), ties = 0.5. 0.5 = no signal, 1.0 = perfect."""
+    ninf = float("-inf")
+    pos = [r["confidence"] if r["confidence"] is not None else ninf for r in rows if r["sufficiency"] == "sufficient"]
+    neg = [r["confidence"] if r["confidence"] is not None else ninf for r in rows if r["sufficiency"] == "insufficient"]
+    if not pos or not neg:
+        return None
+    return round(sum((p > n) + 0.5 * (p == n) for p in pos for n in neg) / (len(pos) * len(neg)), 3)
 
 
 def by_slice(rows: list[dict]) -> dict[str, dict]:

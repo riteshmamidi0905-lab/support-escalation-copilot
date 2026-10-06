@@ -24,3 +24,17 @@
 | R-14 | The intake role can read the ticket→account mapping for all tickets | design | trusted, never model-facing; module-boundary test; deployment uses separate credentials |
 | R-15 | `test_sql_boundary` found two places building SQL by string concatenation/formatting (loader TRUNCATE, rebuild digest) | static check | replaced with `psycopg.sql.Identifier` composition; the exemption was removed |
 | R-16 | A test fixture that inserted a hostile ticket polluted the shared environment and broke later tests | test failures | cleanup in `finally`; shared-environment hygiene is now a convention |
+
+## New findings during M2
+| ID | Finding | How found | Handling |
+|---|---|---|---|
+| R-17 | Similarity-based abstention does not transfer from templated dev tickets to free-language tickets (confidence AUC 0.95–1.0 on dev, 0.55–0.66 held-out); 36–55% of unanswerable held-out tickets still received evidence | held-out benchmark | ADR-0013 §5: sufficiency must be judged from content in M3/M4; thresholds are recorded but uncalibrated |
+| R-18 | Injected-instruction runbooks are on-topic for natural queries ("operations notes", "maintenance mode") and are returned as evidence by every strategy | adversarial retrieval tests | retrieval is inert (data-only schema, read-only role, no egress); policy enforcement against model-following is M3/M4 and **not yet demonstrated** |
+| R-19 | The generator's "conflict" topic (double-booking) has identical text in both active versions, so it is a duplicate, not a conflict | corpus review | governance is number-aware: only the retry-count and slot-length pairs are real conflicts; recorded in tests |
+| R-20 | Near-duplicate grouping ignored a "(copy)" title suffix (one of three identical rate-limit runbooks was not collapsed) | unit test after the first held-out run | fixed; dev re-tuned (unchanged); first-run results kept (`reports/m2/results-first-run.json`) and disclosed |
+| R-21 | The hand-labelled set is one AI reviewer who also designed the corpus tooling; two passes were in the same session, not a day apart | self-audit | stated in RUBRIC.md and every report; not removable without a human reviewer |
+| R-22 | Held-out reveals dev inflation (Hit@1 0.86–0.97 dev vs 0.60–0.80 held-out) | benchmark | headline numbers are held-out only; dev is for parameters |
+| R-23 | `ts_rank`/cosine/RRF/cross-encoder confidences have different scales and shift with ticket length | threshold analysis | per-strategy thresholds; no cross-strategy threshold claims |
+| R-24 | Abstain-before-conflict can hide a conflict (TCK-8018 for lexical and hybrid) | held-out failure analysis | documented; not changed post hoc |
+| R-25 | Coverage gap: M2 proves retrieval is inert, not that a model/approval workflow ignores injected text | scoping | A-I1-07 and A-I2-07 stay planned for M4 |
+| R-26 | Chunking is trivial on this corpus (60 docs → 60 chunks): long-document chunk boundaries, section citations and ANN behaviour are untested | results review | stated; unit tests cover multi-section chunking |

@@ -18,6 +18,7 @@ jobs:
       - run: pip install -e ".[dev]"
       - run: ruff check .
       - run: python scripts/sync_threat_model.py && git diff --exit-code docs/threat-model.md
+      - run: python scripts/render_m2_report.py && git diff --exit-code docs/m2-results.md
       - name: Dataset determinism across platforms (regenerates and compares with the committed files)
         run: |
           python -m copilot.data.cli generate --seed 20260101 --out /tmp/regen

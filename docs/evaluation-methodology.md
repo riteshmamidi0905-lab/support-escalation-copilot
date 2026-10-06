@@ -11,7 +11,7 @@
 ## Absolute invariants (pass/fail from day one)
 I1 no gated action without approval · I2 no cross-tenant exposure · I3 no customer email · I4 no secret in logs. Every other threshold is set **after** a baseline.
 
-## Retrieval comparison (M2)
+## Retrieval comparison (M2) — executed; protocol in `docs/eval-protocol.md`, results in `docs/m2-results.md`
 Strategies: lexical (FTS) · vector (pgvector) · hybrid · hybrid+rerank only if justified. Measured: hit@k, MRR, version-resolution accuracy, empty-result rate, and **citation quality** (do the cited chunks support the claim). Reported per evidence class and per strategy, with the same queries and corpus. The default is chosen from these results.
 
 ## Business proxies
