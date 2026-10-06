@@ -8425,7 +8425,7 @@
   "hybrid": {
    "db_and_governance_ms_median": 0.5,
    "n": 200,
-   "p95": 0.59
+   "p95": 0.56
   },
   "lexical": {
    "db_and_governance_ms_median": 0.22,
@@ -8433,9 +8433,9 @@
    "p95": 0.27
   },
   "query_embedding_ms": {
-   "median": 7.5,
+   "median": 7.7,
    "n": 200,
-   "p95": 10.38
+   "p95": 10.4
   },
   "rerank": {
    "db_and_governance_ms_median": 0.53,
@@ -8443,9 +8443,9 @@
    "p95": 0.59
   },
   "rerank_20_passages_ms": {
-   "median": 108.57,
+   "median": 107.38,
    "n": 40,
-   "p95": 131.12
+   "p95": 136.49
   },
   "vector": {
    "db_and_governance_ms_median": 0.29,
@@ -8455,7 +8455,7 @@
  },
  "meta": {
   "chunks": 60,
-  "clean_db_build_seconds": 0.2,
+  "clean_db_build_seconds": 0.21,
   "cpu": "arm",
   "dataset_manifest_sha256": "9c9eb08b939dec537695ef40cf526f9b8f8ec491b02582f829baba651981ad9a",
   "dev_tickets": 300,
@@ -8471,7 +8471,7 @@
    "data/hand-labelled-v1/manifest.json": "2a5990ba2fc7aff39c880bc7d52e1fcb72030cdcc54fe1c9086adf7bc7e62570",
    "docs/eval-protocol.md": "b796ca1aa34868c90ea5dbd4c2f22f300f23a9f5fda64f266765065e0ed8f786"
   },
-  "git_sha": "f5e1076f9507b0f357db1b36e27ba555ef7f13df",
+  "git_sha": "3b5dccb1047412856c8bde35299d85ffdb2d384b",
   "heldout_tickets": 40,
   "labeller": "single AI reviewer (Claude); not independent human annotation",
   "mode": "live",
@@ -8492,7 +8492,7 @@
  "resources": {
   "embedding_cache_file_mb": 1.46,
   "embedding_model_mb": 67.4,
-  "peak_rss_mb": 491.5,
+  "peak_rss_mb": 440.1,
   "pg_total_bytes": {
    "runbook_chunks": 286720,
    "runbook_docs": 131072
