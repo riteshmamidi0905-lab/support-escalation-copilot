@@ -1,0 +1,8 @@
+{
+  "dataset": "meridian-seed-20260101",
+  "file_sha256": {
+    "accounts.jsonl": "d73bec2df57c91ad611f28664abb51f67e119a642e9bae484e0d2f707d4d137b",
+    "incidents.jsonl": "78277f29e79bbc91bb4cdcce1701e5d7e24c7a53bac9636c96576cb80530c97f",
+    "runbooks.jsonl": "e7a8660a20d18ce66b72daaed7c5d1f6604d6b81a7e73159948fa148f14cc074"
+  }
+}

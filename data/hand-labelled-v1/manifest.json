@@ -1,0 +1,19 @@
+{
+  "created_on": "2026-03-02",
+  "customer": "Meridian Freight Systems (fictional)",
+  "dataset_id": "hand-labelled-v1",
+  "evidence_class": "hand_labelled",
+  "fictional": true,
+  "files": [
+    {
+      "path": "hand_labels.jsonl",
+      "sha256": "662e1bedcaae2fbf017cf652a295398e75f1aa4149bad4a96cde637fa504f519"
+    },
+    {
+      "path": "hand_tickets.jsonl",
+      "sha256": "c5b2bd54ecc409e61b373523c02741d1521a1c8e1146d496af70b03b103afc3f"
+    }
+  ],
+  "generator": null,
+  "tuning_allowed": false
+}

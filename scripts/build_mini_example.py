@@ -42,6 +42,6 @@ def manifest(d, cls, files, gen, tuning):
          "files": [{"path": f, "sha256": hashlib.sha256((d / f).read_bytes()).hexdigest()} for f in sorted(files)], "created_on": "2026-03-02", "tuning_allowed": tuning}
     (d / "manifest.json").write_text(json.dumps(m, indent=2) + "\n")
 manifest(ds, "synthetic_label", list(tables), {"name": "mini-example", "version": "mini-0", "seed": 1}, True)
-write(hand, "hand_labels.jsonl", [{"ticket_id": "TCK-0001", "reviewer": "example-reviewer", "reviewed_on": "2026-03-02", "rubric_version": "r0", "expected_runbook_ids": ["RBK-0002"], "acceptable_outcomes": ["APPROVAL"], "notes": "Active v2.0 applies; v1.0 is obsolete.", "provenance": "hand_reviewed", "split": "held_out"}])
+write(hand, "hand_labels.jsonl", [{"ticket_id": "TCK-0001", "reviewer": "example-reviewer", "reviewed_on": "2026-03-02", "rubric_version": "r0", "expected_runbook_ids": ["RBK-0002"], "acceptable_outcomes": ["APPROVAL"], "notes": "Active v2.0 applies; v1.0 is obsolete.", "provenance": "hand_reviewed", "split": "held_out", "primary_slice": "stale", "evidence_sufficiency": "sufficient", "relevant_docs": [{"doc_id": "RBK-0002", "role": "authoritative"}], "must_not_retrieve": [{"doc_id": "RBK-0001", "reason": "superseded"}], "conflicting_doc_ids": [], "incident_evidence": [], "extra_tags": []}])
 manifest(hand, "hand_labelled", ["hand_labels.jsonl"], None, False)
 print("built", ds, hand)

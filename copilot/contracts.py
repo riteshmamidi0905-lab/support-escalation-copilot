@@ -199,16 +199,35 @@ def validate_dataset(dataset: Path) -> Report:
 
 
 def validate_hand_labels(hand_dir: Path, dataset: Path) -> Report:
-    """Hand labels live in their own directory/manifest, reference tickets that exist, and must be marked non-tunable."""
+    """Hand labels live in their own directory/manifest, reference documents that exist, and must be marked non-tunable.
+    Tickets are either in the dataset (mini fixtures) or authored separately in hand_tickets.jsonl (the real hand-labelled set: tickets written by
+    the reviewer, not drawn from generator templates). Label consistency rules are checked here; whether a label is *correct* is the reviewer's judgement."""
     rep = Report()
     m = validate_manifest(hand_dir, rep, "hand_labelled")
     p = hand_dir / "hand_labels.jsonl"
     if not p.exists():
         rep.add(f"{hand_dir.name}: missing hand_labels.jsonl")
         return rep
+    accounts = {r["account_id"] for r in read_jsonl(dataset / "accounts.jsonl")}
     tickets = {r["ticket_id"] for r in read_jsonl(dataset / "tickets.jsonl")}
-    docs = {r["doc_id"] for r in read_jsonl(dataset / "runbooks.jsonl")}
-    seen: set[str] = set()
+    own = hand_dir / "hand_tickets.jsonl"
+    if own.exists():
+        own_rows = read_jsonl(own)
+        seen_t: Set[str] = set()
+        for i, r in enumerate(own_rows, 1):
+            for e in validate_record("ticket", r):
+                rep.add(f"hand_tickets.jsonl:{i}: {e}")
+            for e in synthetic_marker_problems(r, f"hand_tickets.jsonl:{i}"):
+                rep.add(e)
+            if r.get("ticket_id") in tickets or r.get("ticket_id") in seen_t:
+                rep.add(f"hand_tickets.jsonl:{i}: ticket id {r.get('ticket_id')} collides with a generated or duplicate ticket")
+            seen_t.add(r.get("ticket_id"))
+            if r.get("account_id") not in accounts:
+                rep.add(f"hand_tickets.jsonl:{i}: unknown account {r.get('account_id')}")
+        tickets = tickets | seen_t
+    docs = {r["doc_id"]: r for r in read_jsonl(dataset / "runbooks.jsonl")}
+    incidents = {r["incident_id"] for r in read_jsonl(dataset / "incidents.jsonl")}
+    seen: Set[str] = set()
     for i, r in enumerate(read_jsonl(p), 1):
         for e in validate_record("hand_label", r):
             rep.add(f"hand_labels.jsonl:{i}: {e}")
@@ -221,6 +240,30 @@ def validate_hand_labels(hand_dir: Path, dataset: Path) -> Report:
         for d in r.get("expected_runbook_ids", []):
             if d not in docs:
                 rep.add(f"hand_labels.jsonl:{i}: unknown runbook {d}")
+        rel = [x["doc_id"] for x in r.get("relevant_docs", [])]
+        auth = sorted(x["doc_id"] for x in r.get("relevant_docs", []) if x["role"] == "authoritative")
+        if sorted(r.get("expected_runbook_ids", [])) != auth:
+            rep.add(f"hand_labels.jsonl:{i}: expected_runbook_ids must equal the authoritative relevant_docs")
+        for d in rel + [x["doc_id"] for x in r.get("must_not_retrieve", [])] + r.get("conflicting_doc_ids", []):
+            if d not in docs:
+                rep.add(f"hand_labels.jsonl:{i}: unknown runbook {d}")
+        if set(rel) & {x["doc_id"] for x in r.get("must_not_retrieve", [])}:
+            rep.add(f"hand_labels.jsonl:{i}: a document cannot be both relevant and must-not-retrieve")
+        for x in r.get("relevant_docs", []):
+            if x["role"] == "authoritative" and x["doc_id"] in docs and docs[x["doc_id"]]["status"] != "active":
+                rep.add(f"hand_labels.jsonl:{i}: authoritative document {x['doc_id']} is {docs[x['doc_id']]['status']}")
+        suff = r.get("evidence_sufficiency")
+        if suff == "insufficient" and auth:
+            rep.add(f"hand_labels.jsonl:{i}: insufficient evidence but authoritative documents listed")
+        if suff == "sufficient" and not auth:
+            rep.add(f"hand_labels.jsonl:{i}: sufficient evidence needs at least one authoritative document")
+        if suff == "conflicting" and len(r.get("conflicting_doc_ids", [])) < 2:
+            rep.add(f"hand_labels.jsonl:{i}: conflicting evidence needs at least two conflicting documents")
+        if suff != "conflicting" and r.get("conflicting_doc_ids"):
+            rep.add(f"hand_labels.jsonl:{i}: conflicting_doc_ids set but sufficiency is {suff}")
+        for inc in r.get("incident_evidence", []):
+            if inc not in incidents:
+                rep.add(f"hand_labels.jsonl:{i}: unknown incident {inc}")
     if m is not None and m.get("tuning_allowed") is not False:
         rep.add("hand-labelled manifest must have tuning_allowed=false")
     return rep

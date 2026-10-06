@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://support-escalation-copilot.example/contracts/hand_label.schema.json",
   "title": "Manually reviewed label",
-  "description": "Evidence class: hand_labelled. Held out: never used for tuning prompts, thresholds or retrieval parameters.",
+  "description": "Evidence class: hand_labelled. Held out: never used for tuning prompts, thresholds or retrieval parameters. Labels are written against the runbook corpus of ONE named dataset (seed + file hashes in the manifest). The reviewer field states honestly who/what labelled it.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -50,6 +50,97 @@
     },
     "split": {
       "const": "held_out"
+    },
+    "primary_slice": {
+      "enum": [
+        "routine",
+        "terminology",
+        "conflicting",
+        "stale",
+        "near_duplicate",
+        "distractor",
+        "evidence_gap",
+        "injection_exposure"
+      ]
+    },
+    "evidence_sufficiency": {
+      "enum": [
+        "sufficient",
+        "insufficient",
+        "conflicting"
+      ],
+      "description": "sufficient: the corpus answers the question; insufficient: it does not; conflicting: two authoritative documents disagree on a material fact."
+    },
+    "relevant_docs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "doc_id",
+          "role"
+        ],
+        "properties": {
+          "doc_id": {
+            "type": "string",
+            "pattern": "^RBK-[0-9]{4,6}$"
+          },
+          "role": {
+            "enum": [
+              "authoritative",
+              "supporting"
+            ]
+          }
+        }
+      }
+    },
+    "must_not_retrieve": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "doc_id",
+          "reason"
+        ],
+        "properties": {
+          "doc_id": {
+            "type": "string",
+            "pattern": "^RBK-[0-9]{4,6}$"
+          },
+          "reason": {
+            "enum": [
+              "superseded",
+              "draft",
+              "adversarial",
+              "lookalike_without_answer",
+              "wrong_topic"
+            ]
+          }
+        }
+      },
+      "description": "Documents that must not appear as authoritative evidence for this query (obsolete, draft, adversarial, look-alike)."
+    },
+    "conflicting_doc_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^RBK-[0-9]{4,6}$"
+      }
+    },
+    "incident_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^INC-[0-9]{4,6}$"
+      },
+      "description": "Open incidents affecting THIS account and relevant to the ticket's component."
+    },
+    "extra_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [
@@ -61,6 +152,13 @@
     "acceptable_outcomes",
     "notes",
     "provenance",
-    "split"
+    "split",
+    "primary_slice",
+    "evidence_sufficiency",
+    "relevant_docs",
+    "must_not_retrieve",
+    "conflicting_doc_ids",
+    "incident_evidence",
+    "extra_tags"
   ]
 }
