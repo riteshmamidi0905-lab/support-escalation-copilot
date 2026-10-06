@@ -6,6 +6,7 @@ the draft-steering result and the retrieval / real-model status from the committ
 The historical M3/M4 reports and docs are NOT overwritten: the scenario scripts are given a scratch directory. Takes ~25 minutes with the mutation checks (they deliberately break source files and
 restore them; do not edit sources while it runs). If the working tree is dirty the result says so."""
 import argparse
+import ast
 import json
 import platform
 import re
@@ -29,7 +30,7 @@ def git(*a):
     return run(["git", *a]).stdout.strip()
 
 
-GENERATED = [":!README.md", ":!docs/evaluation.md", ":!content", ":!reports/m6"]      # outputs of this very process; everything else must be committed before collecting
+GENERATED = [":!README.md", ":!docs/evaluation.md", ":!docs/interview-guide.md", ":!content", ":!reports/m6"]      # outputs of this very process; everything else must be committed before collecting
 
 
 def dirty() -> bool:
@@ -96,6 +97,15 @@ def committed_reports() -> dict:
 PARTS = ("pytest", "scenarios", "mutation")
 
 
+def protected_paths() -> tuple[str, ...]:
+    """The code the evidence describes, read from the release test (single definition): a change under these paths makes recorded evidence stale."""
+    tree = ast.parse((ROOT / "tests" / "test_release_claims.py").read_text())
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(getattr(t, "id", "") == "PROTECTED" for t in node.targets):
+            return tuple(ast.literal_eval(node.value))
+    raise SystemExit("PROTECTED not found in tests/test_release_claims.py")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", default=",".join(PARTS), help="comma list of parts to (re)collect, merged into the existing evidence file: " + ", ".join(PARTS))
@@ -107,7 +117,10 @@ def main() -> int:
     sha = git("rev-parse", "HEAD")
     ev = json.loads(out.read_text()) if out.exists() and parts != set(PARTS) else {}
     if ev and ev.get("code_sha") != sha:
-        raise SystemExit("the existing evidence was collected at another commit: collect every part again (no --only)")
+        stale = [f for f in git("diff", "--name-only", ev["code_sha"], sha).splitlines() if f.startswith(protected_paths())]
+        if stale:
+            raise SystemExit(f"code the evidence describes changed since {ev['code_sha'][:10]} ({stale[:3]}): collect every part again (no --only)")
+        sha = ev["code_sha"]                                     # only documentation / tooling changed: the other parts still describe that commit
     ev.update({"code_sha": sha, "tree_dirty": dirty(), "generated_at": datetime.now(UTC).isoformat(timespec="seconds"), "machine": {"platform": platform.platform(), "python": platform.python_version()},
                "note": "every number below comes from a run of the scripts named in docs/evaluation.md; the model in every workflow figure is the deterministic stand-in RuleCaseModel, not an LLM"})
     with tempfile.TemporaryDirectory() as t:

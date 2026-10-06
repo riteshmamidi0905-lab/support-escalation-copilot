@@ -57,7 +57,7 @@ def claims(ev: dict) -> list[dict]:
     rm = ev["real_model"]
     c("real-model-evaluation-status", "Real-model evaluation was " + ("executed." if rm["executed"] else "not executed: no local language-model runtime was available, and no paid API was used; the method is frozen and hash-locked for a future run."),
       "limitation", "real_model", "not_executed" if not rm["executed"] else "deterministic_tests", "real_llm" if rm["executed"] else "none",
-      ["reports/m5/real-model-probe.json", "docs/real-model-freeze.json", "docs/m5-real-model-protocol.md"], "The provider boundary (ConfiguredProvider) is tested against a protocol stub only; nothing is known about any real model's behaviour here.", True, True, True,
+      ["reports/m5/real-model-probe.json", "docs/real-model-freeze.json", "docs/m5-real-model-protocol.md"], "The provider boundary (ConfiguredProvider) is tested against a protocol stub only; nothing is known about any real model's behaviour here.", True, True, False,
       {"executed": rm["executed"]})
 
     # ---- architecture properties (each enforced by named tests) -------------------------------------------------------------------------------------
