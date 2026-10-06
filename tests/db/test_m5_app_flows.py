@@ -211,6 +211,23 @@ def test_amendment_is_limited_to_tier2_to_review_state_to_editable_fields_and_to
         assert w.browser("support_manager", cacc).post(f"/cases/{ccid}/approvals/{cact['approval_id']}/decide", {"verdict": "approve"}).status == 409
 
 
+def test_amendment_cannot_retarget_an_action_even_if_the_web_layer_were_bypassed(w):                                # A-I1-30
+    """Defence in depth: the web form only forwards editable fields, and the operator layer refuses everything else on its own."""
+    import pytest as _pytest
+
+    from copilot.app.operator import OperatorActions, OperatorError
+    cid = w.open_case(w.picks["resync"])
+    acc = w.account_of(w.picks["resync"])
+    act = next(a["action_id"] for a in w.case_state(cid)["file"]["plan"]["actions"] if a["status"] == "awaiting_approval")
+    before = w.case_state(cid)["file"]["plan"]
+    ops, ident = OperatorActions(w.svc), w.person("tier2_engineer", acc, name="tier2.lee")
+    for field in ("integration_id", "idempotency_key", "required_role", "account_id", "type", "action_id", "case_id", "requested_by"):
+        with _pytest.raises(OperatorError) as e:
+            ops.amend(ident, cid, act, {field: "INT-0001"}, "REQ-testtest")
+        assert e.value.code == "FIELD_NOT_EDITABLE", field
+    assert w.case_state(cid)["file"]["plan"] == before and w.effects() == 0 and [a for a in w.case_state(cid)["file"]["approvals"] if a["status"] == "awaiting_approval"]
+
+
 # ---- degraded states are explained, never guessed ------------------------------------------------------------------------------------------------------
 def test_demo_f_status_api_outage_shows_unverified_and_degraded_and_disables_actions(w):                              # A-I1-26
     c, cid = start_demo(w, "F")

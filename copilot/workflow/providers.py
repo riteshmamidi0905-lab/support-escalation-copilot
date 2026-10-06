@@ -5,11 +5,14 @@
 * `FaultyModel`: wraps any provider and makes it misbehave in specified ways (malformed JSON, hallucinated/forbidden actions, extra privileged fields, bad citations, obedience to injected
   instructions, secret echo, timeouts, outage, inconsistent output). The system must stay safe under every one.
 * `local_provider(...)`: the approved local-model path through the frozen runtime's OpenAI-compatible provider (Ollama, vLLM, LM Studio). Not required by CI.
+* `ConfiguredProvider(...)`: the same path with what a REAL local model needs and the frozen provider lacks: pinned inference parameters, a refusal to send a prompt that would not fit the
+  declared context window (servers silently truncate the START of the prompt, where the instructions are), truncated replies treated as failures, and reasoning blocks removed before parsing.
 """
 from __future__ import annotations
 
 import json
 import re
+import urllib.error
 import urllib.request
 from collections.abc import Callable
 from typing import Any
@@ -235,6 +238,64 @@ def local_provider(base_url: str = "http://127.0.0.1:11434/v1", model: str = "",
     if not model:
         raise ValueError("a model name is required")
     return OpenAICompatProvider(base_url, model, timeout=timeout)
+
+
+_THINK = re.compile(r"(?is)<(think|thinking|reasoning)>.*?</\1>")
+_THINK_OPEN = re.compile(r"(?i)<(think|thinking|reasoning)>")
+
+
+def strip_reasoning(text: str) -> str:
+    """Remove `<think>...</think>` style reasoning blocks (some local models emit them in the reply). An unterminated block swallows the rest. Reasoning is never parsed, stored or shown."""
+    t = _THINK.sub("", text or "")
+    m = _THINK_OPEN.search(t)
+    return t[: m.start()] if m else t
+
+
+class ConfiguredProvider(OpenAICompatProvider):
+    """OpenAI-compatible local provider with pinned parameters and pre-flight/post-flight checks (the frozen provider sends no parameters at all). `context_tokens` is what the SERVER was
+    configured with; the prompt is estimated at the conservative bound of 3 characters per token and refused if prompt + reply reserve would not fit. No credential is sent unless `api_key` is set."""
+    MAX_TOKENS = {"DIAGNOSE": 1200, "PLAN": 800, "DRAFT": 800}
+
+    def __init__(self, base_url: str, model: str, *, context_tokens: int = 8192, reply_reserve: int = 1024, temperature: float = 0.0, seed: int = 20260101, json_mode: bool = True,
+                 timeout: float = 120.0, api_key: str = ""):
+        super().__init__(base_url, model, api_key, timeout)
+        self.context_tokens, self.reply_reserve, self.temperature, self.seed, self.json_mode = context_tokens, reply_reserve, temperature, seed, json_mode
+        self.name = f"{model} via {base_url} (local, configured: temperature={temperature}, seed={seed}, context={context_tokens})"
+
+    @staticmethod
+    def prompt_tokens_upper_bound(messages: list[Message]) -> int:
+        return sum((len(m.content) + 2) // 3 for m in messages)
+
+    def complete(self, messages, tools=None):
+        need = self.prompt_tokens_upper_bound(messages)
+        if need + self.reply_reserve > self.context_tokens:
+            raise ProviderError(f"prompt (~{need} tokens) plus the reply reserve does not fit the declared context window ({self.context_tokens}); refusing to let the server truncate it", retryable=False, kind="context")
+        body: dict[str, Any] = {"model": self.model, "messages": [self._wire(m) for m in messages], "temperature": self.temperature, "seed": self.seed, "max_tokens": self.MAX_TOKENS.get(_stage(messages), 800)}
+        if self.json_mode:
+            body["response_format"] = {"type": "json_object"}
+        req = urllib.request.Request(self.base_url + "/chat/completions", data=json.dumps(body).encode(), method="POST",           # noqa: S310 - the base URL is chosen by the operator
+                                     headers={"Content-Type": "application/json", **({"Authorization": "Bearer " + self.api_key} if self.api_key else {})})
+        try:
+            with urllib.request.urlopen(req, timeout=self.timeout) as r:                       # noqa: S310
+                data = json.loads(r.read().decode())
+        except urllib.error.HTTPError as e:
+            e.close()
+            raise ProviderError(f"HTTP {e.code}", retryable=e.code in (408, 429, 500, 502, 503, 504), kind="http") from None
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
+            raise ProviderError(f"network: {e}", retryable=True, kind="network") from None
+        except json.JSONDecodeError:
+            raise ProviderError("provider returned non-JSON", retryable=True, kind="malformed") from None
+        try:
+            choice = data["choices"][0]
+            msg = choice["message"]
+            content = msg.get("content") or ""
+            u = data.get("usage") or {}
+        except (KeyError, IndexError, TypeError, AttributeError):
+            raise ProviderError("unexpected response shape", retryable=False, kind="malformed") from None
+        if choice.get("finish_reason") == "length":
+            raise ProviderError("reply truncated by the token limit (finish_reason=length)", retryable=False, kind="truncated")
+        content = strip_reasoning(content)
+        return ModelResponse(content, [], Usage(u.get("prompt_tokens", messages_tokens(messages)), u.get("completion_tokens", estimate_tokens(content))))
 
 
 def local_server_info(base_url: str = "http://127.0.0.1:11434", timeout: float = 2.0) -> dict[str, Any] | None:

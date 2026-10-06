@@ -266,7 +266,7 @@ class CaseRunner:
                 problems = trust.check_diagnosis(data, known)
         else:
             kinds = {e["kind"] for e in st.errors}
-            error = "MODEL_OUTPUT_INVALID" if kinds & {"structured", "malformed"} else "MODEL_UNAVAILABLE"
+            error = "MODEL_CONTEXT_TOO_SMALL" if "context" in kinds else "MODEL_OUTPUT_INVALID" if kinds & {"structured", "malformed", "truncated"} else "MODEL_UNAVAILABLE"
         if error is None and problems:                                          # repair path: the SAME structured-output repair the runtime provides
             ms = ModelStage(self.d.provider, tracer, sleep=self.d.sleep, invocation_id=inv)
             out = ms.structured("DIAGNOSE", instr, ctx, S.DIAGNOSIS, lambda d: trust.check_diagnosis(d, known))

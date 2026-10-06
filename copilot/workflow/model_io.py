@@ -24,7 +24,7 @@ class StageOutcome:
     data: dict[str, Any] | None
     problems: list[str] = field(default_factory=list)       # remaining semantic problems after repair
     repairs: int = 0
-    error: str | None = None                                # MODEL_UNAVAILABLE | MODEL_OUTPUT_INVALID | MODEL_BUDGET_EXCEEDED | MODEL_TIMEOUT
+    error: str | None = None                                # MODEL_UNAVAILABLE | MODEL_OUTPUT_INVALID | MODEL_BUDGET_EXCEEDED | MODEL_TIMEOUT | MODEL_CONTEXT_TOO_SMALL
     tokens: int = 0
 
 
@@ -50,7 +50,7 @@ class ModelStage:
                 self.tracer.emit("model_call", invocation_id=self.invocation_id, stage=stage, ok=True, duration_ms=round((time.perf_counter() - t0) * 1000, 3), prompt_tokens=usage.prompt_tokens, completion_tokens=usage.completion_tokens, repairs=r)
             except ProviderError as e:
                 self.tracer.emit("model_call", invocation_id=self.invocation_id, stage=stage, ok=False, duration_ms=round((time.perf_counter() - t0) * 1000, 3), error_kind=e.kind)
-                code = "MODEL_OUTPUT_INVALID" if e.kind in ("structured", "malformed") else ("MODEL_TIMEOUT" if "timeout" in str(e).lower() or "timed out" in str(e).lower() else "MODEL_UNAVAILABLE")
+                code = "MODEL_CONTEXT_TOO_SMALL" if e.kind == "context" else "MODEL_OUTPUT_INVALID" if e.kind in ("structured", "malformed", "truncated") else ("MODEL_TIMEOUT" if "timeout" in str(e).lower() or "timed out" in str(e).lower() else "MODEL_UNAVAILABLE")
                 return self._done(stage, StageOutcome(None, [], repairs, code, self.used_tokens))
             self.calls += 1
             repairs += r

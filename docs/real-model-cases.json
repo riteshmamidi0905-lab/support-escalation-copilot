@@ -1,0 +1,93 @@
+{
+ "rule": "first 2 tickets (file order of synthetic_labels.jsonl) of each of S1, S2, S3, S4, S5, S6, S7, S8, S14, S15, S16",
+ "cases": [
+  {
+   "scenario": "S1",
+   "ticket_id": "TCK-0029"
+  },
+  {
+   "scenario": "S1",
+   "ticket_id": "TCK-0035"
+  },
+  {
+   "scenario": "S2",
+   "ticket_id": "TCK-0010"
+  },
+  {
+   "scenario": "S2",
+   "ticket_id": "TCK-0044"
+  },
+  {
+   "scenario": "S3",
+   "ticket_id": "TCK-0018"
+  },
+  {
+   "scenario": "S3",
+   "ticket_id": "TCK-0052"
+  },
+  {
+   "scenario": "S4",
+   "ticket_id": "TCK-0011"
+  },
+  {
+   "scenario": "S4",
+   "ticket_id": "TCK-0012"
+  },
+  {
+   "scenario": "S5",
+   "ticket_id": "TCK-0002"
+  },
+  {
+   "scenario": "S5",
+   "ticket_id": "TCK-0015"
+  },
+  {
+   "scenario": "S6",
+   "ticket_id": "TCK-0007"
+  },
+  {
+   "scenario": "S6",
+   "ticket_id": "TCK-0032"
+  },
+  {
+   "scenario": "S7",
+   "ticket_id": "TCK-0003"
+  },
+  {
+   "scenario": "S7",
+   "ticket_id": "TCK-0022"
+  },
+  {
+   "scenario": "S8",
+   "ticket_id": "TCK-0064"
+  },
+  {
+   "scenario": "S8",
+   "ticket_id": "TCK-0065"
+  },
+  {
+   "scenario": "S14",
+   "ticket_id": "TCK-0001"
+  },
+  {
+   "scenario": "S14",
+   "ticket_id": "TCK-0004"
+  },
+  {
+   "scenario": "S15",
+   "ticket_id": "TCK-0016"
+  },
+  {
+   "scenario": "S15",
+   "ticket_id": "TCK-0049"
+  },
+  {
+   "scenario": "S16",
+   "ticket_id": "TCK-0008"
+  },
+  {
+   "scenario": "S16",
+   "ticket_id": "TCK-0082"
+  }
+ ]
+}

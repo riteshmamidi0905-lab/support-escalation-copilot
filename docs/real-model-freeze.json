@@ -1,0 +1,9 @@
+{
+ "files": {
+  "docs/m5-real-model-protocol.md": "70e0914341bb6a356c9cfbadb565e79dff445edac1167ee7a926eb65b0e25943",
+  "docs/real-model-cases.json": "d5da5acc34fa334635d47fbe76f431ba8c82c2668ad47154029332bef303098f"
+ },
+ "protocol_version": "v1",
+ "executed": false,
+ "note": "frozen before any real model was run; no real model has been run"
+}

@@ -1,0 +1,62 @@
+{
+ "machine": {
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "arch": "arm64",
+  "python": "3.12.15",
+  "ram_gb": 8.6
+ },
+ "servers": {
+  "ollama": {
+   "port": 11434,
+   "listening": false,
+   "models": []
+  },
+  "lm_studio": {
+   "port": 1234,
+   "listening": false,
+   "models": []
+  },
+  "vllm": {
+   "port": 8000,
+   "listening": true,
+   "models": []
+  },
+  "llama_cpp_server": {
+   "port": 8080,
+   "listening": false,
+   "models": []
+  }
+ },
+ "binaries": {
+  "ollama": null,
+  "llama-server": null,
+  "llama-cli": null,
+  "llamafile": null,
+  "lms": null,
+  "vllm": null,
+  "mlx_lm.server": null,
+  "mlx_lm.generate": null
+ },
+ "python_libraries": {
+  "llama_cpp": false,
+  "mlx_lm": false,
+  "mlx": false,
+  "transformers": false,
+  "torch": false,
+  "vllm": false,
+  "ctransformers": false,
+  "onnxruntime_genai": false
+ },
+ "model_files": {
+  "~/.cache/huggingface/hub": {
+   "exists": true,
+   "size_gb": 1.24,
+   "entries": [
+    "models--Qdrant--bge-small-en-v1.5-onnx-Q",
+    "models--Xenova--ms-marco-MiniLM-L-6-v2"
+   ]
+  }
+ },
+ "usable_runtime": false,
+ "decision": "no local language-model server is answering. Nothing is installed or downloaded by this project to change that (no large downloads, no invasive installs, no paid API). Real-model evaluation was NOT executed."
+}

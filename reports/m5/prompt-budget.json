@@ -1,0 +1,70 @@
+{
+ "method": "first 3 tickets of each scenario S1-S16 (33 cases) through the real workflow; prompts recorded as sent; token figures are estimates (chars/4 and chars/3), not a real tokenizer's",
+ "model": "none: the deterministic stand-in answered; prompts are independent of the answering model",
+ "calls": 83,
+ "stages": {
+  "DIAGNOSE": {
+   "calls": 33,
+   "chars": {
+    "p50": 4669,
+    "p95": 5601,
+    "max": 6078
+   },
+   "est_tokens_chars_div_4": {
+    "p50": 1167,
+    "p95": 1400,
+    "max": 1519
+   },
+   "est_tokens_chars_div_3": {
+    "p50": 1556,
+    "p95": 1867,
+    "max": 2026
+   }
+  },
+  "DRAFT": {
+   "calls": 26,
+   "chars": {
+    "p50": 5238,
+    "p95": 6059,
+    "max": 6106
+   },
+   "est_tokens_chars_div_4": {
+    "p50": 1309,
+    "p95": 1514,
+    "max": 1526
+   },
+   "est_tokens_chars_div_3": {
+    "p50": 1746,
+    "p95": 2019,
+    "max": 2035
+   }
+  },
+  "PLAN": {
+   "calls": 24,
+   "chars": {
+    "p50": 6039,
+    "p95": 7249,
+    "max": 7631
+   },
+   "est_tokens_chars_div_4": {
+    "p50": 1509,
+    "p95": 1812,
+    "max": 1907
+   },
+   "est_tokens_chars_div_3": {
+    "p50": 2013,
+    "p95": 2416,
+    "max": 2543
+   }
+  }
+ },
+ "worst_case_prompt_tokens_estimate": 2543,
+ "fits": {
+  "2048": false,
+  "4096": true,
+  "8192": true,
+  "16384": true,
+  "32768": true
+ },
+ "note": "'fits' leaves 1024 tokens for the reply. A server default of 2048/4096 tokens would silently truncate the prompt for the larger stages; configure the server's context window (or refuse) explicitly."
+}

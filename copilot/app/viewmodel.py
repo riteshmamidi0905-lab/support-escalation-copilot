@@ -17,7 +17,7 @@ REASONS = {
     "NO_SLA_BREACH_EVIDENCED_IN_TICKET_HISTORY": "No SLA breach is recorded by the system SLA monitor in the ticket history.", "INCIDENT_NOT_OPEN_FOR_ACCOUNT": "The cited incident is not open for this account.",
     "INCIDENT_LINKED_AND_VERIFIED_OPEN": "The linked incident was verified open for this account.", "UNVERIFIED_STATE_ACTIONS_DISABLED": "Live status could not be verified; actions are disabled until a human re-checks.",
     "MODEL_UNAVAILABLE": "The language-model provider was unavailable.", "MODEL_TIMEOUT": "The language-model call timed out.", "MODEL_OUTPUT_INVALID": "The model's output was invalid after repair and was discarded.",
-    "MODEL_BUDGET_EXCEEDED": "The model token budget was exhausted.", "RETRIEVAL_UNAVAILABLE": "Evidence retrieval failed completely.", "TICKETING_UNAVAILABLE": "The ticketing system could not be reached.",
+    "MODEL_BUDGET_EXCEEDED": "The model token budget was exhausted.", "MODEL_CONTEXT_TOO_SMALL": "The prompt does not fit the model's declared context window; the system refuses to let the server silently truncate it.", "RETRIEVAL_UNAVAILABLE": "Evidence retrieval failed completely.", "TICKETING_UNAVAILABLE": "The ticketing system could not be reached.",
     "PROPOSAL_STORED_INTERNALLY_NO_EXTERNAL_EFFECT": "Stored as an internal artifact; nothing is sent.", "SECRET_IN_PARAMS": "A parameter contained a credential-like value and was refused.",
     "FORBIDDEN_ACTION": "The model asked for something that can never be done (e.g. e-mail the customer, run SQL, approve its own action).", "UNKNOWN_ACTION_TYPE": "The model invented an action type that does not exist.",
     "SCHEMA_INVALID": "The proposed action did not match its schema (unexpected or missing fields).", "NO_VALID_EVIDENCE_CITED": "The proposal cited no valid evidence.", "PROPOSAL_STILL_INVALID_AFTER_REPAIR": "Some proposals stayed invalid after one repair round and were dropped.",
@@ -66,7 +66,8 @@ def banner(row: dict[str, Any], f: dict[str, Any]) -> dict[str, str]:
     if st == "HANDED_OFF":
         return {"tone": "warn", "label": "HANDED OFF", "text": "A human takes over this case."}
     if st == "REFUSED":
-        return {"tone": "warn", "label": "REFUSED", "text": "The request is outside policy. Nothing was executed" + ("; flag for finance." if any("FLAG_FOR_FINANCE" in c for c in (f.get("reason") or {}).get("constraints", [])) else ".")}
+        tail = " An approver also denied the one action that was put to them." if disp == "DENIED" else " An approval timed out, which counts as a denial." if disp == "EXPIRED" else ""
+        return {"tone": "warn", "label": "REFUSED", "text": "The request is outside policy. Nothing was executed" + ("; flag for finance." if any("FLAG_FOR_FINANCE" in c for c in (f.get("reason") or {}).get("constraints", [])) else ".") + tail}
     if st == "ABSTAINED":
         return {"tone": "warn", "label": "ABSTAINED" if out == "INSUFFICIENT_EVIDENCE" else "NEEDS CLARIFICATION", "text": "No applicable evidence was found, so the system does not guess." if out == "INSUFFICIENT_EVIDENCE" else "The request is too vague to act on; a clarifying question is drafted."}
     if st == "ESCALATED":
