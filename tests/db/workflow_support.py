@@ -1,4 +1,5 @@
 """Harness for the M4 workflow tests/scripts: a World (M3 control plane) plus the case machine, retrieval service, mock Status/Carrier/Ticketing APIs and a CaseRunner."""
+import itertools
 import secrets
 
 import psycopg
@@ -80,15 +81,22 @@ class WorkflowWorld(World):
         return self.approvals.decide(approval_id, self.user(role), verdict, reason)
 
 
+_TICKET_SEQ = itertools.count(1000)
+
+
+def next_ticket_id() -> str:
+    """Unique per process (a random id collided in CI: 9,000 values and ~30 inserts in one database). Matches the contract pattern TCK-[0-9]{4,6}; never equals the demo rows TCK-9001/9002 (4 digits)."""
+    return f"TCK-9{next(_TICKET_SEQ):04d}"
+
+
 def uniq():
     return secrets.token_hex(3)
 
 
 def insert_ticket(w, subject, body, account_id=None, severity="P3"):
     """Insert a hostile/custom ticket row (loader role) and register it with the mock ticketing API."""
-    import secrets as _s
     account_id = account_id or w.ticket(w.resync_ticket())["account_id"]
-    tid = "TCK-9" + str(int(_s.token_hex(2), 16) % 9000 + 1000)
+    tid = next_ticket_id()
     acc = next(a for a in w.env.accounts if a["account_id"] == account_id)
     contact = acc["contacts"][0]
     row = (tid, account_id, "2026-03-02T08:00:00Z", "carrier_integrations", severity, subject, body, contact["name"], contact["email"], "portal")

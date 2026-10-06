@@ -19,6 +19,7 @@ from copilot.app.web import OperatorApp
 from copilot.control.clock import FakeClock
 from copilot.control.identity import IdentityAuthority
 from copilot.db.session import make_pool
+from tests.db.workflow_support import next_ticket_id
 
 _SEEDED: dict[str, dict[str, str]] = {}
 
@@ -150,7 +151,7 @@ class AppWorld:
 
     def insert_ticket(self, subject: str, body: str, account_id: str | None = None) -> str:
         acc_id = account_id or self.picks["account"]
-        tid = "TCK-9" + str(int(secrets.token_hex(2), 16) % 9000 + 1000)
+        tid = next_ticket_id()
         acc = next(a for a in self.env.accounts if a["account_id"] == acc_id)
         ct = acc["contacts"][0]
         row = (tid, acc_id, "2026-03-02T08:00:00Z", "carrier_integrations", "P3", subject, body, ct["name"], ct["email"], "portal")
