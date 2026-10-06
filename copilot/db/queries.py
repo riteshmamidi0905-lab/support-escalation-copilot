@@ -15,8 +15,9 @@ from .session import scoped
 _Q: dict[str, tuple] = {
     # name: (sql, ((param_name, type), ...))
     "get_account": ("SELECT account_id, name, tier, region, status FROM copilot.accounts WHERE account_id = %(account_id)s", (("account_id", str),)),
-    "list_contracts": ("SELECT contract_id, tier, sla_response_minutes, sla_resolution_hours, max_agent_requestable_pct, max_manager_approvable_pct FROM copilot.contracts WHERE account_id = %(account_id)s ORDER BY effective_from DESC", (("account_id", str),)),
+    "list_contracts": ("SELECT contract_id, tier, sla_response_minutes, sla_resolution_hours, max_agent_requestable_pct, max_manager_approvable_pct, effective_from, effective_to FROM copilot.contracts WHERE account_id = %(account_id)s ORDER BY effective_from DESC", (("account_id", str),)),
     "list_integrations": ("SELECT integration_id, kind, provider, status, last_sync_at, last_resync_at FROM copilot.integrations WHERE account_id = %(account_id)s ORDER BY integration_id", (("account_id", str),)),
+    "get_case": ("SELECT case_id, account_id, ticket_id, status FROM copilot.cases WHERE case_id = %(case_id)s", (("case_id", str),)),
     "get_ticket": ("SELECT ticket_id, account_id, created_at, product_area, severity, subject, body FROM copilot.tickets WHERE ticket_id = %(ticket_id)s", (("ticket_id", str),)),
     "ticket_history": ("SELECT seq, at, author, text FROM copilot.ticket_history WHERE ticket_id = %(ticket_id)s ORDER BY seq", (("ticket_id", str),)),
     "account_tickets": ("SELECT ticket_id, created_at, product_area, severity, subject FROM copilot.tickets WHERE account_id = %(account_id)s ORDER BY created_at DESC LIMIT %(limit)s", (("account_id", str), ("limit", int))),

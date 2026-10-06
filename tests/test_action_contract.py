@@ -4,7 +4,7 @@ import pytest
 
 from copilot import contracts as C
 
-BASE = {"action_id": "ACT-1", "case_id": "CASE-1", "requested_by": "agent", "evidence_refs": ["RBK-0002"], "idempotency_key": "case1-act1-0123456789"}
+BASE = {"action_id": "ACT-1", "case_id": "CASE-000001", "requested_by": "agent", "evidence_refs": ["RBK-0002"], "idempotency_key": "case1-act1-0123456789"}
 
 
 def action(t, role, params):

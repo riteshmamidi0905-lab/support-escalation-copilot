@@ -20,10 +20,12 @@
       ],
       "properties": {
         "action_id": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^ACT-[A-Za-z0-9-]{1,40}$"
         },
         "case_id": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^CASE-[0-9]{6}$"
         },
         "requested_by": {
           "enum": [
@@ -32,14 +34,18 @@
         },
         "evidence_refs": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "uniqueItems": true,
           "items": {
-            "type": "string"
-          },
-          "minItems": 1
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
         },
         "idempotency_key": {
           "type": "string",
-          "minLength": 16
+          "pattern": "^[A-Za-z0-9._:-]{16,128}$"
         },
         "type": {
           "const": "draft_reply"
@@ -55,7 +61,9 @@
           ],
           "properties": {
             "body": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8000
             }
           }
         }
@@ -76,10 +84,12 @@
       ],
       "properties": {
         "action_id": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^ACT-[A-Za-z0-9-]{1,40}$"
         },
         "case_id": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^CASE-[0-9]{6}$"
         },
         "requested_by": {
           "enum": [
@@ -88,14 +98,18 @@
         },
         "evidence_refs": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "uniqueItems": true,
           "items": {
-            "type": "string"
-          },
-          "minItems": 1
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
         },
         "idempotency_key": {
           "type": "string",
-          "minLength": 16
+          "pattern": "^[A-Za-z0-9._:-]{16,128}$"
         },
         "type": {
           "const": "add_internal_note"
@@ -111,7 +125,9 @@
           ],
           "properties": {
             "text": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4000
             }
           }
         }
@@ -132,10 +148,12 @@
       ],
       "properties": {
         "action_id": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^ACT-[A-Za-z0-9-]{1,40}$"
         },
         "case_id": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^CASE-[0-9]{6}$"
         },
         "requested_by": {
           "enum": [
@@ -144,14 +162,18 @@
         },
         "evidence_refs": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "uniqueItems": true,
           "items": {
-            "type": "string"
-          },
-          "minItems": 1
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
         },
         "idempotency_key": {
           "type": "string",
-          "minLength": 16
+          "pattern": "^[A-Za-z0-9._:-]{16,128}$"
         },
         "type": {
           "const": "escalate_engineering"
@@ -175,12 +197,19 @@
               ]
             },
             "summary": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
             },
             "incident_id": {
-              "type": [
-                "string",
-                "null"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^INC-[0-9]{4,6}$"
+                },
+                {
+                  "type": "null"
+                }
               ]
             }
           }
@@ -202,10 +231,12 @@
       ],
       "properties": {
         "action_id": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^ACT-[A-Za-z0-9-]{1,40}$"
         },
         "case_id": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^CASE-[0-9]{6}$"
         },
         "requested_by": {
           "enum": [
@@ -214,14 +245,18 @@
         },
         "evidence_refs": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "uniqueItems": true,
           "items": {
-            "type": "string"
-          },
-          "minItems": 1
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
         },
         "idempotency_key": {
           "type": "string",
-          "minLength": 16
+          "pattern": "^[A-Za-z0-9._:-]{16,128}$"
         },
         "type": {
           "const": "request_sla_credit"
@@ -243,7 +278,9 @@
               "maximum": 100
             },
             "reason": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
             }
           }
         }
@@ -264,10 +301,12 @@
       ],
       "properties": {
         "action_id": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^ACT-[A-Za-z0-9-]{1,40}$"
         },
         "case_id": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^CASE-[0-9]{6}$"
         },
         "requested_by": {
           "enum": [
@@ -276,14 +315,18 @@
         },
         "evidence_refs": {
           "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "uniqueItems": true,
           "items": {
-            "type": "string"
-          },
-          "minItems": 1
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
         },
         "idempotency_key": {
           "type": "string",
-          "minLength": 16
+          "pattern": "^[A-Za-z0-9._:-]{16,128}$"
         },
         "type": {
           "const": "trigger_resync"
@@ -304,7 +347,9 @@
               "pattern": "^INT-[0-9]{4,6}$"
             },
             "blast_radius": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
             }
           }
         }

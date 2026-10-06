@@ -78,6 +78,7 @@ jobs:
           COPILOT_APP_PASSWORD: ci-app-throwaway-1
           COPILOT_LOADER_PASSWORD: ci-loader-throwaway-1
           COPILOT_INTAKE_PASSWORD: ci-intake-throwaway-1
+          COPILOT_CONTROL_PASSWORD: ci-control-throwaway-1
           COPILOT_SCOPE_SECRET: ci-only-scope-secret-0123456789abcdef0123456789
         run: python -m copilot.db.rebuild --dbname copilot_ci_rebuild
       - name: DB tests against the compose database

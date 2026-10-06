@@ -28,25 +28,27 @@ def same(a, b, path="", tol=2e-3):
         assert a == b, f"{path}: {a!r} vs {b!r}"
 
 
-def test_replay_reproduces_the_committed_results(tmp_path, env):
+@pytest.mark.parametrize("order,committed", [("abstain_first", "reports/m2/results.json"), ("conflict_first", "reports/m2-m3-rerun/results.json")])
+def test_replay_reproduces_the_committed_results(tmp_path, env, order, committed):
+    """`abstain_first` reproduces the PUBLISHED M2 results exactly (provenance); `conflict_first` (current code) reproduces the M3 re-run. Same frozen sets, caches and thresholds."""
     out = tmp_path / "rep"
     try:
-        r = _run(out)
+        r = _run(out, order)
     finally:
         # Database roles are CLUSTER-wide: the benchmark's own bootstrap gives copilot_* new passwords, which would lock the shared test environment out on a
         # password-authenticating server (CI). Put the shared environment's passwords back.
         dbadmin.bootstrap(env.admin_dsn, env.passwords, env.scope_secret)
-    _check(r, out)
+    _check(r, out, committed)
 
 
-def _run(out):
-    return subprocess.run([sys.executable, str(ROOT / "scripts" / "run_benchmark.py"), "--out", str(out)], capture_output=True, text=True, cwd=ROOT, timeout=900)  # noqa: S603
+def _run(out, order):
+    return subprocess.run([sys.executable, str(ROOT / "scripts" / "run_benchmark.py"), "--out", str(out), "--control-order", order], capture_output=True, text=True, cwd=ROOT, timeout=900)  # noqa: S603
 
 
-def _check(r, out):
+def _check(r, out, committed):
     assert r.returncode == 0, r.stdout[-2000:] + r.stderr[-2000:]
     new = json.loads((out / "results.json").read_text())
-    old = json.loads((ROOT / "reports" / "m2" / "results.json").read_text())
+    old = json.loads((ROOT / committed).read_text())
     assert new["meta"]["mode"] == "replay-from-committed-caches"
     for key in ("thresholds", "embedding_model", "reranker", "chunks", "documents", "dataset_manifest_sha256", "frozen_hashes"):
         assert new["meta"][key] == old["meta"][key], key

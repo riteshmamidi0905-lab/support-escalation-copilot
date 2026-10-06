@@ -121,7 +121,7 @@ def test_abstention_mechanics_with_the_plumbing_embedder_and_lexical_zero_hits(e
     assert res["outcome"] == NO_EVIDENCE and res["evidence"] == [] and not list(SCHEMA.iter_errors(res))
     plumb = Retriever(env.pool, embed.PlumbingEmbedder(), thresholds={"vector": 0.9999})
     out = plumb.retrieve("some ordinary ticket text about shipments", "vector")
-    assert out["outcome"] == NO_EVIDENCE and out["evidence"] == []
+    assert out["outcome"] in (NO_EVIDENCE, CONFLICT) and out["outcome"] != "EVIDENCE"      # conflict-first: a known conflict among the best matches is reported even below the threshold
     ok = Retriever(env.pool, embed.PlumbingEmbedder(), thresholds={"vector": -1.0}).retrieve("some ordinary ticket text about shipments", "vector")
     assert ok["outcome"] != NO_EVIDENCE            # (on non-semantic vectors the content may even look conflicting; only the abstention mechanics are tested)
 
@@ -333,3 +333,13 @@ def test_retrieval_tenant_evidence_includes_the_case_accounts_open_incidents_and
     t2 = next(t for t in env.tickets if t["account_id"] == free)
     te2 = rt.retrieve("carrier feed duplicate events", "lexical", scope=env.intake.open_case(t2["ticket_id"])[1], guard=env.guard, ticket_id=t2["ticket_id"])["tenant_evidence"]
     assert te2["open_incidents"] == []
+
+
+def test_conflict_is_reported_before_abstention_in_the_current_order_and_the_m2_order_is_reproducible(env, hand):      # M3 correction of the M2 control-order finding
+    t = next(t for t in hand if t["ticket_id"] == "TCK-8018")
+    cur = Retriever(env.pool, embed.CachedEmbedder(), embed.Reranker())
+    legacy = Retriever(env.pool, embed.CachedEmbedder(), embed.Reranker(), control_order="abstain_first")
+    assert cur.retrieve(q(t), "lexical")["outcome"] == CONFLICT, "the known conflict must not be hidden by a low-confidence abstention"
+    assert legacy.retrieve(q(t), "lexical")["outcome"] == NO_EVIDENCE, "the published M2 behaviour (abstain first) stays reproducible for provenance"
+    with pytest.raises(ValueError):
+        Retriever(env.pool, embed.CachedEmbedder(), control_order="whatever")

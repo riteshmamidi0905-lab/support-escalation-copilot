@@ -11,7 +11,7 @@ from copilot import contracts as C
 from copilot.retrieval import chunker, embed
 
 DATA_TABLES = ["accounts", "account_contacts", "contracts", "integrations", "incidents", "incident_accounts", "deployments", "release_notes",
-               "runbook_docs", "runbook_chunks", "tickets", "ticket_history", "cases"]
+               "runbook_docs", "runbook_chunks", "tickets", "ticket_history", "approvals", "idempotency_records", "case_artifacts", "cases"]
 
 
 def load_dataset(loader_dsn: str, dataset: Path, embedder=None) -> dict:

@@ -17,7 +17,10 @@ def calls(path):
 
 
 def test_no_sql_execution_outside_the_db_package():                               # A-I2-23
-    offenders = [f"{p.relative_to(ROOT)}:{c.lineno}" for p in ROOT.rglob("*.py") if "db" not in p.relative_to(ROOT).parts[:1] and p.name != "rebuild.py" for c in calls(p)]
+    # copilot.db is the data layer. The trusted control service (never model-facing) runs its own FIXED statements as the control role: only these four modules may.
+    allowed = {"audit.py", "approvals.py", "ledger.py", "gateway.py"}
+    offenders = [f"{p.relative_to(ROOT)}:{c.lineno}" for p in ROOT.rglob("*.py") if "db" not in p.relative_to(ROOT).parts[:1] and p.name != "rebuild.py"
+                 and not (p.relative_to(ROOT).parts[0] == "control" and p.name in allowed) for c in calls(p)]
     assert offenders == [], f"SQL executed outside copilot/db: {offenders}"
 
 

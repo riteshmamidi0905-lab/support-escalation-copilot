@@ -36,3 +36,25 @@ def redact_obj(v: Any) -> Any:
     if isinstance(v, (list, tuple)):
         return [redact_obj(x) for x in v]
     return v
+
+
+_EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+")
+HIDDEN_REASONING_KEYS = frozenset({"thought", "thoughts", "reasoning", "chain_of_thought", "cot", "scratchpad", "hidden_reasoning", "internal_monologue",
+                                   "reasoning_trace"})
+
+
+def mask_pii(text: str) -> str:
+    """Mask e-mail addresses (the only personal identifier this synthetic system carries in free text). Used for audit payloads and control-plane logs."""
+    return _EMAIL.sub("[email]", text)
+
+
+def scrub(v: Any, max_str: int = 300) -> Any:
+    """Secrets redacted + e-mail addresses masked + long strings truncated, recursively. Everything written to the audit log or a control-plane log goes through this."""
+    if isinstance(v, str):
+        out = mask_pii(redact(v))
+        return out if len(out) <= max_str else out[:max_str] + f"...[truncated {len(out) - max_str}]"
+    if isinstance(v, dict):
+        return {k: scrub(x, max_str) for k, x in v.items()}
+    if isinstance(v, (list, tuple)):
+        return [scrub(x, max_str) for x in v]
+    return v

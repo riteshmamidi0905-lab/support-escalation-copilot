@@ -82,11 +82,12 @@ class Env:
     labels: list
     counts: dict
     pool: object
+    control_dsn: str = ""
 
 
 def build_env(prefix: str, seed: int = SEED, scope_secret: str | None = None) -> Env:
     dbname = f"{prefix}_{secrets.token_hex(4)}"
-    pw = {"copilot_app": secrets.token_hex(12), "copilot_loader": secrets.token_hex(12), "copilot_intake": secrets.token_hex(12)}
+    pw = {"copilot_app": secrets.token_hex(12), "copilot_loader": secrets.token_hex(12), "copilot_intake": secrets.token_hex(12), "copilot_control": secrets.token_hex(12)}
     secret = scope_secret or secrets.token_hex(32)
     db_admin = dbadmin.create_database(DSN, dbname)
     dbadmin.migrate(db_admin)
@@ -99,7 +100,7 @@ def build_env(prefix: str, seed: int = SEED, scope_secret: str | None = None) ->
     app_dsn = dbadmin.role_dsn(DSN, "copilot_app", pw["copilot_app"], dbname)
     return Env(dbname, db_admin, DSN, app_dsn, dbadmin.role_dsn(DSN, "copilot_loader", pw["copilot_loader"], dbname), dbadmin.role_dsn(DSN, "copilot_intake", pw["copilot_intake"], dbname),
                pw, secret, signer, ScopeGuard(signer), intake, ds, C.read_jsonl(ds / "tickets.jsonl"), C.read_jsonl(ds / "accounts.jsonl"), C.read_jsonl(ds / "synthetic_labels.jsonl"), counts,
-               make_pool(app_dsn, min_size=1, max_size=1))
+               make_pool(app_dsn, min_size=1, max_size=1), dbadmin.role_dsn(DSN, "copilot_control", pw["copilot_control"], dbname))
 
 
 @pytest.fixture(scope="session")

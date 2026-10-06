@@ -1,0 +1,8 @@
+{
+  "resync_cooldown_hours": 48,
+  "resync_blocking_components": ["carrier_gateway"],
+  "approval_ttl_seconds": 900,
+  "max_execution_attempts": 3,
+  "lease_seconds": 60,
+  "_note": "Customer-specific configuration (the spec's 'policy YAML'). Credit thresholds are NOT here: they come from the account's contract (contracts.credit_policy)."
+}

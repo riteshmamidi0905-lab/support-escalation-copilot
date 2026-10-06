@@ -13,7 +13,7 @@ pytestmark = pytest.mark.db
 
 
 def envvars():
-    return {"app_password": secrets.token_hex(12), "loader_password": secrets.token_hex(12), "intake_password": secrets.token_hex(12), "scope_secret": secrets.token_hex(32)}
+    return {"app_password": secrets.token_hex(12), "loader_password": secrets.token_hex(12), "intake_password": secrets.token_hex(12), "control_password": secrets.token_hex(12), "scope_secret": secrets.token_hex(32)}
 
 
 def test_clean_rebuild_runs_migrations_generation_loading_validation_and_isolation_sweep():

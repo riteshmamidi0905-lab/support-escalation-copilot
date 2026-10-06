@@ -12,13 +12,14 @@ Principle: **tests try to violate the invariants; they do not merely assert that
 | Invariant attack tests | the catalogue in `copilot/invariants.py` (I1–I4) | varies | CI |
 | Scenario suite | S1–S16 with expected terminal outcomes, deterministic providers | Postgres | CI from M4 |
 | Fault-injection suite | timeouts, 500s, malformed, rate limits, breaker open | mocks | CI from M5 |
+| Control-plane tests (M3) | action validation, canonical identity, policy matrix (incl. positive controls that fail under blanket denial), approvals, idempotency/concurrency, audit chain tampering, mocks, I1–I4 attacks; `scripts/mutation_check_m3.py` (31 mutations) and the clean-database run `scripts/run_m3_scenarios.py` | Postgres | CI |
 | Retrieval infrastructure tests | chunking, lifecycle/duplicate/conflict governance, citation resolution, evidence schema, tenant + injection attacks; real-model embeddings replayed from a committed cache, or the labelled NON-SEMANTIC plumbing embedder | Postgres | CI |
 | Retrieval benchmark (measured) | A/B/C/D on the frozen hand set and the dev set; replay from caches must reproduce the committed results; live mode (real models) is manual | Postgres (+ models for live) | replay in CI; **quality numbers are reported, not gated** |
 | Real-model evaluation | local/hosted model on the same sets | model | **never in CI**; separate evidence class |
 | Compose smoke | stack comes up healthy; end-to-end run | Docker | CI |
 
 ## Invariant attack catalogue
-`copilot/invariants.py` lists 54 attacks (I1: 11, I2: 30, I3: 6, I4: 7) with a milestone and honest status; after M2, 32 have executable tests (M1: 22; M2 added A-I2-09, A-I2-25..30, A-I1-11, A-I3-06, A-I4-07). Before M2 it was: 22 have executable tests (all in I2 and I4) and 23 are planned (I1/I3 arrive with M3–M4). `tests/test_invariant_catalog.py` fails if an attack is missing from the threat model, if a test references an unknown attack, or if an attack is marked *implemented* without a test naming it.
+`copilot/invariants.py` lists 68 attacks (I1: 20, I2: 32, I3: 7, I4: 9) with a milestone and honest status; **after M3, 61 have executable tests** (I1 19 of 20, I2 29 of 32, I3 5 of 7, I4 8 of 9; the 7 still planned are A-I1-07, A-I2-06, A-I2-07, A-I2-10, A-I3-04, A-I3-05, A-I4-02: they need the real case workflow/model (M4) or audit queries (M5)). History: after M2, 32 had executable tests (M1: 22; M2 added A-I2-09, A-I2-25..30, A-I1-11, A-I3-06, A-I4-07). Before M2 it was: 22 have executable tests (all in I2 and I4) and 23 are planned (I1/I3 arrive with M3–M4). `tests/test_invariant_catalog.py` fails if an attack is missing from the threat model, if a test references an unknown attack, or if an attack is marked *implemented* without a test naming it.
 
 ## Principles
 1. Fail first: write the violating test, watch it fail against a deliberately weak implementation where practical, then make it pass. Where a mutation is cheap, include it in the suite (e.g. weaken the policy and assert the invariant test notices).

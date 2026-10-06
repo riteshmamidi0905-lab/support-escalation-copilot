@@ -1,6 +1,6 @@
 """Rebuild the whole customer environment from scratch on a CLEAN database:
 create database -> migrate -> bootstrap roles/signing key -> generate (seed) -> validate contracts + design -> load -> verify counts and a tenant sweep.
-Used by tests, CI and the Compose job.  Environment: COPILOT_ADMIN_DSN, COPILOT_APP_PASSWORD, COPILOT_LOADER_PASSWORD, COPILOT_INTAKE_PASSWORD, COPILOT_SCOPE_SECRET."""
+Used by tests, CI and the Compose job.  Environment: COPILOT_ADMIN_DSN, COPILOT_APP_PASSWORD, COPILOT_LOADER_PASSWORD, COPILOT_INTAKE_PASSWORD, COPILOT_CONTROL_PASSWORD, COPILOT_SCOPE_SECRET."""
 from __future__ import annotations
 
 import argparse
@@ -40,7 +40,7 @@ def rebuild(admin_dsn: str, dbname: str, seed: int, env: dict, out_dir: Path | N
     db_admin = admin.create_database(admin_dsn, dbname)
     summary: dict = {"database": dbname, "seed": seed}
     summary["migrations"] = admin.migrate(db_admin)
-    admin.bootstrap(db_admin, {"copilot_app": env["app_password"], "copilot_loader": env["loader_password"], "copilot_intake": env["intake_password"]}, env["scope_secret"])
+    admin.bootstrap(db_admin, {"copilot_app": env["app_password"], "copilot_loader": env["loader_password"], "copilot_intake": env["intake_password"], "copilot_control": env["control_password"]}, env["scope_secret"])
     ds = out_dir or Path(tempfile.mkdtemp(prefix="meridian-"))
     summary["file_hashes"] = generator.write_dataset(seed, ds)
     rep, drep = C.validate_dataset(ds), design.design_report(ds)
@@ -81,7 +81,7 @@ def main(argv=None) -> int:
     ap.add_argument("--dbname", default="copilot_dev")
     ap.add_argument("--seed", type=int, default=generator.DEFAULT_SEED)
     a = ap.parse_args(argv)
-    env = {"app_password": os.environ["COPILOT_APP_PASSWORD"], "loader_password": os.environ["COPILOT_LOADER_PASSWORD"], "intake_password": os.environ["COPILOT_INTAKE_PASSWORD"], "scope_secret": os.environ["COPILOT_SCOPE_SECRET"]}
+    env = {"app_password": os.environ["COPILOT_APP_PASSWORD"], "loader_password": os.environ["COPILOT_LOADER_PASSWORD"], "intake_password": os.environ["COPILOT_INTAKE_PASSWORD"], "control_password": os.environ["COPILOT_CONTROL_PASSWORD"], "scope_secret": os.environ["COPILOT_SCOPE_SECRET"]}
     s = rebuild(os.environ["COPILOT_ADMIN_DSN"], a.dbname, a.seed, env)
     print(json.dumps(s, indent=1, default=str))
     print("REBUILD OK", hashlib.sha256(json.dumps(s["table_digest"], sort_keys=True).encode()).hexdigest()[:16])

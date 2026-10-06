@@ -58,7 +58,15 @@
         "abstained",
         "injection_detected",
         "isolation_violation_blocked",
-        "case_closed"
+        "case_closed",
+        "policy_decided",
+        "execution_attempted",
+        "execution_uncertain",
+        "idempotent_replay",
+        "idempotency_conflict_blocked",
+        "draft_created",
+        "forbidden_action_attempted",
+        "approval_denied_by_approver"
       ]
     },
     "payload": {
@@ -72,6 +80,54 @@
     },
     "hash": {
       "type": "string"
+    },
+    "account_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "correlation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "request_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "action_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "action_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "approval_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "idempotency_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
     }
   },
   "required": [

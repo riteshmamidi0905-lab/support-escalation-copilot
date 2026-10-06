@@ -13,5 +13,6 @@
 - [0011-minimal-server-rendered-ui](0011-minimal-server-rendered-ui.md) — Minimal server-rendered operational UI
 - [0012-signed-trusted-scope](0012-signed-trusted-scope.md) — Signed trusted scope for tenant context
 - [0013-retrieval-architecture](0013-retrieval-architecture.md) — Vector search plus lifecycle governance; similarity is not a sufficiency detector
+- [0014-policy-approvals-idempotency-audit](0014-policy-approvals-idempotency-audit.md) — Deterministic policy, role-bound approvals, idempotent execution, tamper-evident audit (M3); ADR-0013 control-order addendum
 
 Format: context · decision · consequences · alternatives. An ADR changes only by a new ADR that supersedes it.

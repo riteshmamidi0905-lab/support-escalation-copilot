@@ -40,3 +40,6 @@ Single AI reviewer and author-of-everything contamination risk; n=40 (25/11/4); 
 
 ## Alternatives considered
 BM25 extension / `pg_search` (rejected: another dependency for the strategy that lost); hosted embedding API (rejected: paid, non-reproducible in CI); ANN index (premature); LLM-judged sufficiency inside retrieval (rejected: would move model judgement into the evidence layer and is not measurable without a real-model evaluation).
+
+## Addendum (M3): control-order correction
+See ADR-0014 and `docs/m2-conflict-order-rerun.md`: conflict detection now precedes abstention (as the frozen protocol specified). The decision above is unchanged; the published tables in this ADR are the original M2 results (abstain-first) and remain reproducible with `--control-order abstain_first`.

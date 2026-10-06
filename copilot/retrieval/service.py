@@ -25,7 +25,10 @@ def ticket_query(subject: str, body: str) -> str:
 
 
 class Retriever:
-    def __init__(self, pool, embedder: Embedder, reranker: Reranker | None = None, thresholds: dict | None = None):
+    def __init__(self, pool, embedder: Embedder, reranker: Reranker | None = None, thresholds: dict | None = None, control_order: str = config.CONTROL_ORDER):
+        if control_order not in ("conflict_first", "abstain_first"):
+            raise ValueError("control_order must be 'conflict_first' (current) or 'abstain_first' (the published M2 behaviour, kept only to reproduce it)")
+        self.control_order = control_order
         self.pool, self.embedder, self.reranker = pool, embedder, reranker
         self.thresholds = config.thresholds() if thresholds is None else thresholds
         rows = Q.run(pool, None, None, "list_runbooks", {})
@@ -100,19 +103,35 @@ class Retriever:
         top_conf = active[0]["score"] if active else None
         base = {"schema_version": "1", "strategy": strategy, "query_sha256": hashlib.sha256(query.encode()).hexdigest()[:16], "threshold": thr, "top_confidence": _num(top_conf), "excluded": excluded}
         tenant = self._tenant_evidence(query, scope, guard, ticket_id)
-        if not active or (thr is not None and top_conf is not None and top_conf < thr):
+
+        def conflict_sets_in(items):
+            sets, seen = [], set()
+            for a in items[: config.CONFLICT_TOPN]:
+                cs = reg.conflict_set(a["doc_id"])
+                if cs and tuple(cs) not in seen:
+                    seen.add(tuple(cs))
+                    sets.append(cs)
+            return sets
+
+        def conflict_result(sets):
+            members = sorted({m for cs in sets for m in cs})
+            items = [self._item(m, next((a for a in active if m in reg.group(a["doc_id"])), None), strategy, sets) for m in members]
+            return {**base, "outcome": CONFLICT, "evidence": items, "conflict_sets": sets, "abstain_reason": "active documents disagree; no winner is chosen", "tenant_evidence": tenant}
+
+        low = not active or (thr is not None and top_conf is not None and top_conf < thr)
+        if self.control_order == "conflict_first":
+            # A known disagreement between ACTIVE documents among the best matches is a fact about the corpus, not a similarity judgement. A low-confidence abstention
+            # must never hide it (hiding a conflict is the unsafe error; surfacing one only costs a human look). Matches the frozen protocol: conflict (step 3) before abstention (step 4).
+            sets = conflict_sets_in(active)
+            if sets:
+                return conflict_result(sets)
+        if low:
             return {**base, "outcome": NO_EVIDENCE, "evidence": [], "conflict_sets": [], "abstain_reason": "no active evidence above the confidence threshold" if active else "no active document retrieved", "tenant_evidence": tenant}
         top = [a for a in active if thr is None or a["score"] >= thr][:top_k]
-        conflict_sets, seen = [], set()
-        for a in top[: config.CONFLICT_TOPN]:
-            cs = reg.conflict_set(a["doc_id"])
-            if cs and tuple(cs) not in seen:
-                seen.add(tuple(cs))
-                conflict_sets.append(cs)
-        if conflict_sets:
-            members = sorted({m for cs in conflict_sets for m in cs})
-            items = [self._item(m, next((a for a in active if m in reg.group(a["doc_id"])), None), strategy, conflict_sets) for m in members]
-            return {**base, "outcome": CONFLICT, "evidence": items, "conflict_sets": conflict_sets, "abstain_reason": "active documents disagree; no winner is chosen", "tenant_evidence": tenant}
+        if self.control_order == "abstain_first":
+            sets = conflict_sets_in(top)
+            if sets:
+                return conflict_result(sets)
         return {**base, "outcome": EVIDENCE, "evidence": [self._item(a["doc_id"], a, strategy, []) for a in top], "conflict_sets": [], "abstain_reason": None, "tenant_evidence": tenant}
 
     def _item(self, doc_id: str, hit: dict | None, strategy: str, conflict_sets: list[list[str]]) -> dict:

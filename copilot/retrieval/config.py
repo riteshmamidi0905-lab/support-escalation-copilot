@@ -8,6 +8,7 @@ RERANK_DEPTH = 20          # fixed a priori (protocol)
 TOP_K = 5                  # evidence items returned
 CONFLICT_TOPN = 3          # a conflict set is raised when one of the top-3 governed items belongs to it (fixed a priori)
 MAX_QUERY_CHARS = 2000     # the fixed query catalogue caps text parameters
+CONTROL_ORDER = "conflict_first"   # M3 fix of the M2 finding; "abstain_first" reproduces the published M2 results only
 STRATEGIES = ("lexical", "vector", "hybrid", "rerank")
 _P = Path(__file__).with_name("thresholds.json")
 

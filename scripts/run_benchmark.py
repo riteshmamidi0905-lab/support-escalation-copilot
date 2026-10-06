@@ -96,6 +96,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--live", action="store_true")
     ap.add_argument("--out", default="reports/m2")
+    ap.add_argument("--control-order", default=config.CONTROL_ORDER, choices=("conflict_first", "abstain_first"), help="abstain_first reproduces the published M2 results")
     a = ap.parse_args()
     frozen = check_freeze()
     tuned = config.load_tuned()
@@ -109,7 +110,7 @@ def main():
     env = bench_env.build(emb)
     build_s = time.perf_counter() - t_build
     try:
-        rt = Retriever(env.pool, emb, reranker)
+        rt = Retriever(env.pool, emb, reranker, control_order=a.control_order)
         all_t = C.read_jsonl(DS / "tickets.jsonl")
         dev = C.tuning_view(all_t, HAND)
         syn = {r["ticket_id"]: r for r in C.read_jsonl(DS / "synthetic_labels.jsonl")}
@@ -123,7 +124,7 @@ def main():
         hand_rows = score_set(rt, config.STRATEGIES, hand_t, hand_l, env, cases)
         res = {"meta": {
             "git_sha": git_sha(), "mode": "live" if a.live else "replay-from-committed-caches", "platform": platform.platform(), "python": platform.python_version(), "cpu": platform.processor() or platform.machine(),
-            "postgres": env.pg_version, "pgvector": env.pgvector_version, "embedding_model": emb.name, "embedding_dim": embed.DIM, "reranker": reranker.name, "query_prefix": bool(prefix), "rrf_k": config.rrf_k(),
+            "postgres": env.pg_version, "pgvector": env.pgvector_version, "embedding_model": emb.name, "embedding_dim": embed.DIM, "reranker": reranker.name, "query_prefix": bool(prefix), "rrf_k": config.rrf_k(), "control_order": a.control_order,
             "thresholds": tuned["thresholds"], "chunks": env.counts["runbook_chunks"], "documents": env.counts["runbook_docs"], "dev_tickets": len(dev), "heldout_tickets": len(hand_t),
             "frozen_hashes": frozen, "dataset_manifest_sha256": hashlib.sha256((DS / "manifest.json").read_bytes()).hexdigest(), "clean_db_build_seconds": round(build_s, 2),
             "labeller": "single AI reviewer (Claude); not independent human annotation"},
