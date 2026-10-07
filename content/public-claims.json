@@ -469,7 +469,7 @@
   },
   {
    "id": "test-suite",
-   "claim": "474 automated tests pass with 1 documented expected failure (the frozen runtime's approver hook is a bool callback, wrapped at the control boundary) and 0 failures; 0 skipped.",
+   "claim": "488 automated tests pass with 1 documented expected failure (the frozen runtime's approver hook is a bool callback, wrapped at the control boundary) and 0 failures; 0 skipped.",
    "kind": "measurement",
    "category": "testing",
    "evidence_class": "deterministic_tests",
@@ -485,8 +485,8 @@
     "resume": true
    },
    "value": {
-    "collected": 475,
-    "passed": 474,
+    "collected": 489,
+    "passed": 488,
     "xfailed": 1,
     "skipped": 0,
     "failed": 0

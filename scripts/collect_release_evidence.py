@@ -7,6 +7,7 @@ The historical M3/M4 reports and docs are NOT overwritten: the scenario scripts 
 restore them; do not edit sources while it runs). If the working tree is dirty the result says so."""
 import argparse
 import ast
+import hashlib
 import json
 import platform
 import re
@@ -124,6 +125,7 @@ def real_model_evidence() -> dict:
             "action_parameter_schema": {"actions_rejected": sum(len(v) for v in plan.values()), "in_cases": sum(len(v) for k, v in plan.items() if not k.startswith("INJ#")), "in_injection_runs": sum(len(v) for k, v in plan.items() if k.startswith("INJ#")),
                                         "codes": sorted({x["code"] for v in plan.values() for x in v}), "action_types": sorted({x["action_type"] for v in plan.values() for x in v})},
             "draft_rejected_after_repair": {"draft_stages_in_cases": an["stages"]["DRAFT"]["cases_where_stage_ran"], "rejected": sum(1 for r in rows if (r.get("draft") or {}).get("error") == "DRAFT_INVALID_AFTER_REPAIR"), "first_reply_accepted": an["stages"]["DRAFT"]["first_reply_accepted"]}},
+        "artefact_sha256": {str(f.relative_to(ROOT)): hashlib.sha256(f.read_bytes()).hexdigest() for f in sorted([*pa.parent.glob("real-model-results-*"), *pa.parent.glob("real-model-raw-calls-*"), *pa.parent.glob("replay-*"), ROOT / "docs/real-model-amendment-A1.json", ROOT / "docs/real-model-amendment-A1.md", ROOT / "docs/m5-real-model-protocol.md", ROOT / "docs/real-model-freeze.json"])},
         "replay": {"reproduced_exactly": rp["reproduced_exactly"], "model_calls_served": rp["model_calls_served"], "model_calls_recorded": rp["model_calls_recorded"], "mismatches": rp["mismatches"], "enforced_by": "tests/db/test_real_model_replay.py"},
     })
     return out

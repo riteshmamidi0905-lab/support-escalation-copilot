@@ -110,6 +110,18 @@ def test_no_code_changed_since_the_evidence_commit(evidence):
     assert not changed, f"code/tests changed after the evidence was collected ({changed[:5]}): collect the evidence again"
 
 
+def test_the_recorded_real_model_evidence_is_fresh_and_names_the_hash_of_every_raw_artefact(evidence):
+    """The real_model section of the evidence is derived from the committed run artefacts; if any of them (results, raw replies, replay, amendment) changed after collection, this fails."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("collect_release_evidence", ROOT / "scripts" / "collect_release_evidence.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    assert evidence["real_model"] == mod.real_model_evidence(), "a real-model artefact changed after the evidence was collected: collect the evidence again"
+    hashes = evidence["real_model"]["artefact_sha256"]
+    for needle in ("real-model-raw-calls-qwen3-4b-instruct-2507-q4_k_m-A1-pass1.jsonl", "real-model-raw-calls-qwen3-4b-instruct-2507-q4_k_m-pass1.jsonl", "real-model-results-qwen3-4b-instruct-2507-q4_k_m-A1-pass1.json", "replay-A1-pass1.json", "docs/real-model-amendment-A1.json"):
+        assert any(k.endswith(needle) for k in hashes), needle
+
+
 def test_catalogue_numbers_in_the_evidence_are_the_current_catalogue(evidence):
     cat = evidence["attack_catalogue"]
     assert cat["total"] == len(ATTACKS) == cat["executable"] == sum(a.status == "implemented" for a in ATTACKS)
