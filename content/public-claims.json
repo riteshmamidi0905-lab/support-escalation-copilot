@@ -10,7 +10,7 @@
  },
  "evidence": {
   "file": "reports/m6/release-evidence.json",
-  "code_sha": "7048646b2d61b12d6a1084e262189cbf4658fc7d"
+  "code_sha": "4b53068a1f7437a5491fdba90b1369b1e34ee3cf"
  },
  "claims": [
   {
@@ -469,7 +469,7 @@
   },
   {
    "id": "test-suite",
-   "claim": "488 automated tests pass with 1 documented expected failure (the frozen runtime's approver hook is a bool callback, wrapped at the control boundary) and 0 failures; 0 skipped.",
+   "claim": "474 automated tests pass with 1 documented expected failure (the frozen runtime's approver hook is a bool callback, wrapped at the control boundary) and 0 failures; 0 skipped.",
    "kind": "measurement",
    "category": "testing",
    "evidence_class": "deterministic_tests",
@@ -477,7 +477,7 @@
    "source_artifacts": [
     "reports/m6/release-evidence.json"
    ],
-   "source_commit": "7048646b2d61b12d6a1084e262189cbf4658fc7d",
+   "source_commit": "4b53068a1f7437a5491fdba90b1369b1e34ee3cf",
    "qualification": "One full run at the evidence commit on one machine; the database tests need PostgreSQL 16 with pgvector and are executed (not skipped) in CI. Python 3.12.15.",
    "suitable_for": {
     "readme": true,
@@ -485,8 +485,8 @@
     "resume": true
    },
    "value": {
-    "collected": 489,
-    "passed": 488,
+    "collected": 475,
+    "passed": 474,
     "xfailed": 1,
     "skipped": 0,
     "failed": 0
@@ -504,7 +504,7 @@
     "docs/threat-model.md",
     "reports/m6/release-evidence.json"
    ],
-   "source_commit": "7048646b2d61b12d6a1084e262189cbf4658fc7d",
+   "source_commit": "4b53068a1f7437a5491fdba90b1369b1e34ee3cf",
    "qualification": "The catalogue is the author's own; tests attempt known attack classes, not an independent penetration test.",
    "suitable_for": {
     "readme": true,
@@ -536,7 +536,7 @@
     "scripts/mutation_check_m5.py",
     "reports/m6/release-evidence.json"
    ],
-   "source_commit": "7048646b2d61b12d6a1084e262189cbf4658fc7d",
+   "source_commit": "4b53068a1f7437a5491fdba90b1369b1e34ee3cf",
    "qualification": "Hand-chosen mutations by the author (not a systematic mutation tool); a first M5 run had one survivor, which led to an added test. Mutation checks are manual, not run in CI.",
    "suitable_for": {
     "readme": true,
@@ -565,7 +565,7 @@
     "docs/m4-scenarios.md",
     "docs/m4-injection.md"
    ],
-   "source_commit": "7048646b2d61b12d6a1084e262189cbf4658fc7d",
+   "source_commit": "4b53068a1f7437a5491fdba90b1369b1e34ee3cf",
    "qualification": "This measures the controls around the model, not the model: the model is the stand-in and, in the injection runs, a deliberately obedient scripted model. Containment is not the same as a correct outcome.",
    "suitable_for": {
     "readme": true,
@@ -712,7 +712,7 @@
     "reports/m6/release-evidence.json",
     "docs/m4-scenarios.md"
    ],
-   "source_commit": "7048646b2d61b12d6a1084e262189cbf4658fc7d",
+   "source_commit": "4b53068a1f7437a5491fdba90b1369b1e34ee3cf",
    "qualification": "NOT a model-accuracy figure: the stand-in is rule-based and its heuristics were tuned during development while looking at these scenarios; use it only to show the orchestration and controls run end to end.",
    "suitable_for": {
     "readme": true,

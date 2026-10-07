@@ -21,7 +21,7 @@
   "executable": 92,
   "total": 92
  },
- "code_sha": "7048646b2d61b12d6a1084e262189cbf4658fc7d",
+ "code_sha": "4b53068a1f7437a5491fdba90b1369b1e34ee3cf",
  "draft_steering": {
   "benign": {
    "flagged": 0,
@@ -40,7 +40,7 @@
    "n": 20
   }
  },
- "generated_at": "2026-10-07T19:39:57+00:00",
+ "generated_at": "2026-10-07T19:42:20+00:00",
  "m3_scenarios": {
   "as_expected": 30,
   "invariants": {
@@ -121,11 +121,11 @@
  },
  "note": "every number below comes from a run of the scripts named in docs/evaluation.md; the model in every workflow figure is the deterministic stand-in RuleCaseModel, not an LLM; the real_model section is derived from the recorded real-model run (reports/m8)",
  "pytest": {
-  "collected": 489,
-  "duration_s": 77.4,
+  "collected": 475,
+  "duration_s": 81.4,
   "exit_code": 0,
   "failed": 0,
-  "passed": 488,
+  "passed": 474,
   "skipped": 0,
   "xfail_reasons": [
    "DOCUMENTED GAP (see docs/risks.md R-1): the runtime's approver hook is a bool callback, so role/expiry/diff checks must wrap it"
@@ -178,6 +178,18 @@
   "amendment_a1_files": {
    "docs/real-model-amendment-A1.md": "c98fc4aa2f589a6ea4d6a47c1bb10773918e58bde157ceaa8ee9a2199c4b2b96",
    "scripts/i2_refined.py": "9886dac656dedafe761a32139698404d0a52845e6f93beb54c64051775a13a14"
+  },
+  "artefact_sha256": {
+   "docs/m5-real-model-protocol.md": "70e0914341bb6a356c9cfbadb565e79dff445edac1167ee7a926eb65b0e25943",
+   "docs/real-model-amendment-A1.json": "a40f1479846f6d4493c8ec9911ed87a9cda8abc8897a681c77c3e95f89949ba3",
+   "docs/real-model-amendment-A1.md": "c98fc4aa2f589a6ea4d6a47c1bb10773918e58bde157ceaa8ee9a2199c4b2b96",
+   "docs/real-model-freeze.json": "b53f4fec2785b2dc8b980f1da12c0fd3f43538013082af2ebded4cebc4c7d67e",
+   "reports/m8/real-model-raw-calls-qwen3-4b-instruct-2507-q4_k_m-A1-pass1.jsonl": "d99222d6efda6767e4a6715dc9c4d0c1d223ee7eceb33c91982772038fd69890",
+   "reports/m8/real-model-raw-calls-qwen3-4b-instruct-2507-q4_k_m-pass1.jsonl": "7e769f1c2209d5194805c7cc80dd65c4fd0cda26056dad3241fdb55d4473d790",
+   "reports/m8/real-model-results-qwen3-4b-instruct-2507-q4_k_m-A1-pass1.json": "64f9508843f25455cd75074321fc03ddf9d318ea1bde0a8ff719b7373f0fc6a3",
+   "reports/m8/real-model-results-qwen3-4b-instruct-2507-q4_k_m-pass1.json": "83621a59bc2be3f7cd0e36be9b82f0a4cdd3b7d21baad9ea74bd0e58a6f39257",
+   "reports/m8/replay-A1-pass1.json": "7354cc8205bc8d171ea6d7e66bcfd494cf913f7d2a29d27b711b0e987f7f0fe5",
+   "reports/m8/replay-pass1.json": "89493f6b5b4870c4a1d549c8591b6e79365d87b2268cb124c9ce7cb7818f9276"
   },
   "executed": true,
   "failure_classes": {
