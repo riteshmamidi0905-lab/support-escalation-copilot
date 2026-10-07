@@ -6,11 +6,18 @@ same trust checks, same state machine) and checks that it reaches the same outco
   * DIAGNOSIS: the frozen harness did not keep WHY a reply was rejected (the trust/grounding problems). The replay records them, for every rejected reply, without calling a model again.
 
   python scripts/with_local_pg.py python scripts/replay_real_model.py reports/m8/real-model-results-<label>-<tag>.json [--out PATH]
-Writes reports/m8/replay-<tag>.json (or PATH). It never changes a result; a divergence is reported, not hidden. Exit status 0 only if every outcome was reproduced."""
+Writes reports/m8/replay-<tag>.json (or PATH). It never changes a result; a divergence is reported, not hidden. Exit status 0 only if every outcome was reproduced.
+The database session time zone is pinned to America/Chicago (the recording machine's): see the comment below; without it a UTC server diverges at the first draft that quotes a timestamp."""
 import json
+import os
 import sys
 from collections import defaultdict
 from pathlib import Path
+
+# The recorded replies were produced on a machine in US Central time, and the evidence the model saw contained timestamps rendered in the database SESSION time zone (for example "2026-03-02T03:54:00-06:00");
+# a recorded draft quotes that rendering, and the grounding check compares a draft's numbers with the evidence. The replay therefore reproduces the model's inputs only if the session time zone is the recording's.
+# PGTZ is read by libpq for every connection this process opens, so the replay is independent of the host and of the database server's default time zone (CI servers run in UTC). Forced, not defaulted.
+os.environ["PGTZ"] = "America/Chicago"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import bench_env  # noqa: E402
