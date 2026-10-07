@@ -1,0 +1,8 @@
+{
+ "amendment": "A1",
+ "locked_before": "the A1 run",
+ "files": {
+  "docs/real-model-amendment-A1.md": "c98fc4aa2f589a6ea4d6a47c1bb10773918e58bde157ceaa8ee9a2199c4b2b96",
+  "scripts/i2_refined.py": "9886dac656dedafe761a32139698404d0a52845e6f93beb54c64051775a13a14"
+ }
+}

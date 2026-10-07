@@ -38,6 +38,7 @@ def test_real_model_results_only_exist_with_a_complete_run_record():
         r = json.loads(p.read_text())
         assert r["executed"] is True and r["freeze"] == freeze["files"], "a result must carry the freeze hashes it ran under"
         assert len(r["model"]["weights_sha256"]) == 64 and r["model"]["runtime"] and r["inference"]["temperature"] == 0 and r["inference"]["seed"] == 20260101
-        assert r["tag"] == "pass1" and r["single_pass"] is True or r["single_pass"] is False and r["tag"] != "pass1"
+        assert (r["tag"] in ("pass1", "A1-pass1")) == r["single_pass"], "pass1 (v1) and A1-pass1 (protocol v1 + amendment A1) are the single passes; any other tag is a separately labelled variation pass"
+        assert (r.get("amendment") == "A1") == (r["tag"].startswith("A1")), "an A1 result must say so"
         raw = p.with_name(p.name.replace("real-model-results", "real-model-raw-calls").replace(".json", ".jsonl"))
         assert raw.exists(), "the raw calls behind a result must be kept: " + raw.name
