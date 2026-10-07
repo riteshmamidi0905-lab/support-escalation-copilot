@@ -17,7 +17,7 @@
         "customer": {"const": "Meridian Freight Systems is fictional"},
         "data": {"const": "all data is synthetic and generated from a seed"},
         "deployment": {"const": "reference implementation; never deployed; no production use; no real customers"},
-        "model": {"const": "the workflow's model is the deterministic stand-in RuleCaseModel, not an LLM"},
+        "model": {"const": "the workflow's default model is the deterministic stand-in RuleCaseModel, not an LLM; one recorded real-model run used a small local LLM through the same provider boundary"},
         "real_model_evaluation": {"enum": ["not executed", "executed"]}
       }
     },
@@ -39,7 +39,7 @@
           "claim": {"type": "string", "minLength": 20, "maxLength": 600},
           "kind": {"enum": ["capability", "measurement", "limitation"]},
           "category": {"enum": ["architecture", "security", "tenant_isolation", "approvals", "idempotency", "recovery", "observability", "retrieval", "workflow", "testing", "draft_safety", "operator_experience", "real_model", "scope"]},
-          "evidence_class": {"enum": ["deterministic_tests", "mutation_checks", "frozen_heldout_retrieval_eval", "synthetic_dev_retrieval_eval", "standin_workflow_runs", "adversarial_dev_corpus", "manual_browser_pass", "design_documented", "not_executed"]},
+          "evidence_class": {"enum": ["deterministic_tests", "mutation_checks", "frozen_heldout_retrieval_eval", "synthetic_dev_retrieval_eval", "standin_workflow_runs", "adversarial_dev_corpus", "real_model_single_run", "manual_browser_pass", "design_documented", "not_executed"]},
           "model": {"enum": ["none", "deterministic_stand_in", "real_llm"]},
           "value": {"type": "object"},
           "source_artifacts": {"type": "array", "minItems": 1, "items": {"type": "string"}},

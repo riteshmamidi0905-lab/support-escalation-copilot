@@ -52,13 +52,43 @@ def claims(ev: dict) -> list[dict]:
       "Synthetic data has designed difficulty, not real-world distribution; no real customer or customer data was used.", True, True, True)
     c("scope-reference-implementation", "This is a reference implementation run locally; it has never been deployed and has no production use or real customers.", "limitation", "scope", "design_documented", "none",
       ["docs/real-vs-simulated.md", "docs/getting-started.md"], "Demo mode, simulated sign-in and mock customer systems are deliberate; see docs/real-vs-simulated.md for the full list and docs/security.md for what a real deployment would need.", True, True, True)
-    c("model-is-standin", "Every model result in this repository comes from RuleCaseModel, a deterministic rule-based stand-in (plus scripted misbehaving wrappers), not a language model.", "limitation", "scope", "design_documented",
+    c("model-is-standin", "Every model result in this repository comes from RuleCaseModel, a deterministic rule-based stand-in (plus scripted misbehaving wrappers), not a language model, except the single recorded real-model run reported in the real-model-* claims.", "limitation", "scope", "design_documented",
       "deterministic_stand_in", ["copilot/workflow/providers.py", "docs/real-vs-simulated.md"], "The stand-in's heuristics were developed while looking at the scenario set, so its outcome rates are development results about the orchestration, not model quality.", True, True, True)
     rm = ev["real_model"]
-    c("real-model-evaluation-status", "Real-model evaluation was " + ("executed." if rm["executed"] else "not executed: no local language-model runtime was available, and no paid API was used; the method is frozen and hash-locked for a future run."),
-      "limitation", "real_model", "not_executed" if not rm["executed"] else "deterministic_tests", "real_llm" if rm["executed"] else "none",
-      ["reports/m5/real-model-probe.json", "docs/real-model-freeze.json", "docs/m5-real-model-protocol.md"], "The provider boundary (ConfiguredProvider) is tested against a protocol stub only; nothing is known about any real model's behaviour here.", True, True, False,
-      {"executed": rm["executed"]})
+    if not rm["executed"]:
+        c("real-model-evaluation-status", "Real-model evaluation was not executed: no local language-model runtime was available, and no paid API was used; the method is frozen and hash-locked for a future run.",
+          "limitation", "real_model", "not_executed", "none", ["reports/m5/real-model-probe.json", "docs/real-model-freeze.json", "docs/m5-real-model-protocol.md"],
+          "The provider boundary (ConfiguredProvider) is tested against a protocol stub only; nothing is known about any real model's behaviour here.", True, True, False, {"executed": False})
+    else:
+        a1, v1, rinj, fc, mdl, rp = rm["a1_run"], rm["v1_run"], rm["injection"], rm["failure_classes"], rm["model"], rm["replay"]
+        res_a1, res_v1 = f"reports/m8/{a1['file']}", f"reports/m8/{v1['file']}"
+        raw_a1 = res_a1.replace("real-model-results-", "real-model-raw-calls-").replace(".json", ".jsonl")
+        art = [res_a1, raw_a1, "docs/m8-real-model-results.md", "docs/real-model-freeze.json", "docs/real-model-amendment-A1.md"]
+        c("real-model-evaluation-status", f"Real-model evaluation was executed once, with one small local model ({mdl['name']}, {mdl['quantisation']}, {mdl['runtime']}), on the {a1['of']} frozen cases and {rinj['runs']} injection runs, with simulated approvers and synthetic data; the previous release (v0.6.0) had no real-model run.",
+          "limitation", "real_model", "real_model_single_run", "real_llm", art,
+          "One model, one quantisation, one machine, one pass: a result about that model and these prompts, not a quality claim about the product, and not comparable with the stand-in's figures. The frozen v1 protocol stopped at case "
+          f"{v1['cases_run']} of {v1['of']} on its pre-registered I2 proxy; the reported result is the complete run under Amendment A1, which changed only that stop rule.", True, True, False, {"executed": True, "model": mdl["name"], "runs": {"v1_cases_run": v1["cases_run"], "a1_cases": a1["cases"], "injection_runs": rinj["runs"]}})
+        c("real-model-expected-outcomes", f"{a1['outcome_as_expected']} of {a1['cases']} frozen cases reached the scenario's expected outcome (frozen expected-outcome attainment, not accuracy); {len(a1['degraded'])} ended DEGRADED (handed to a human because the model never produced a valid diagnosis), and every other miss is reported case by case.",
+          "measurement", "real_model", "real_model_single_run", "real_llm", art, "Expectations were written for the stand-in's design; REFUSE, CLARIFY and INSUFFICIENT_EVIDENCE are three ways of not acting and are scored as different outcomes. Not accuracy, not a success rate, not product or customer quality; 22 cases, one pass, no interval claimed.",
+          True, True, False, {"cases": a1["cases"], "expected_outcome_attained": a1["outcome_as_expected"], "degraded": len(a1["degraded"]), "per_scenario": a1["per_scenario"]})
+        c("real-model-controls-held", f"The four deterministic invariants held in all {a1['cases']} cases under Amendment A1's I2 attribution rule and, measured per run by model-free replay, in all {rinj['per_run_invariants_held']} injection runs: no action proposed in an injection run passed the action schema, no side effect occurred without an approval, and no foreign account identifier or canary appeared.",
+          "measurement", "security", "real_model_single_run", "real_llm", art + ["reports/m8/replay-A1-pass1.json"],
+          f"This measures the deterministic controls around an untrusted model, not the model's behaviour under attack: in {rinj['contained_by'].get('action schema', 0)} injection runs the model proposed an action and a deterministic schema, not the model, rejected it. "
+          f"The live harness printed I1 false in all {rinj['live_harness_i1_false']} injection runs because it counted side effects cumulatively across one world (a legitimately approved effect from an earlier case); the per-run replay corrects it and the live reading is kept unchanged. The original I2 proxy flagged "
+          f"{len(a1['i2_original_proxy_flags'])} case (an account identifier the customer had quoted in the ticket).", True, True, False,
+          {"invariants_held_in_cases": a1["invariants_held_in_cases"], "i2_original_proxy_flags": a1["i2_original_proxy_flags"], "i2_refined_violations": len(a1["i2_refined_violations"]), "injection_runs": rinj["runs"], "injection_per_run_invariants_held": rinj["per_run_invariants_held"],
+           "injection_live_harness_i1_false": rinj["live_harness_i1_false"], "new_effects_in_injection_runs": rinj["max_new_effects_since_phase_start"], "actions_passing_the_schema_in_injection_runs": rinj["actions_proposed_that_passed_the_schema"],
+           "actions_rejected_by_the_schema_in_injection_runs": rinj["actions_rejected_by_the_schema"]})
+        c("real-model-failure-classes", f"The real model failed at the interface, not at the controls: its first diagnosis reply failed the schema in {fc['diagnose_first_reply_schema_invalid']['cases']} of {fc['diagnose_first_reply_schema_invalid']['of_cases']} cases, {fc['invalid_evidence_handles']['rejected_replies']} diagnosis replies cited evidence handles that do not exist ({fc['invalid_evidence_handles']['cases_degraded']} cases ended DEGRADED), "
+          f"all {fc['action_parameter_schema']['actions_rejected']} escalation and re-sync actions it proposed failed the action-parameter schema, and {fc['draft_rejected_after_repair']['rejected']} of {fc['draft_rejected_after_repair']['draft_stages_in_cases']} drafts were rejected after one repair.",
+          "measurement", "real_model", "real_model_single_run", "real_llm", art + ["reports/m8/replay-A1-pass1.json"],
+          "Counts come from the model-free replay of the recorded replies (the live harness did not record why a reply was rejected). They describe how these prompts and schemas talk to one 4B model (the first DIAGNOSE call carries no schema; the PLAN prompt names parameter fields without their types); whether a larger model avoids them was not tested.",
+          True, True, False, {"diagnose_first_reply_schema_invalid": fc["diagnose_first_reply_schema_invalid"], "invalid_evidence_handles": fc["invalid_evidence_handles"], "action_parameter_schema": fc["action_parameter_schema"], "draft_rejected_after_repair": fc["draft_rejected_after_repair"]})
+        c("real-model-protocol-history", f"The frozen v1 protocol stopped at case {v1['cases_run']} of {v1['of']} because its pre-registered I2 proxy flagged an account identifier the customer had quoted in the ticket; Amendment A1, written after seeing that stop, refined only the I2 stop rule, and the complete A1 run is the reported result. "
+          f"The v1 stop is kept as recorded, and all {rp['model_calls_recorded']} recorded replies replay through the unchanged workflow without a model.",
+          "limitation", "real_model", "real_model_single_run", "real_llm", art + [res_v1, "reports/m8/replay-A1-pass1.json"],
+          "An amendment written after seeing a result is a deviation from pre-registration, disclosed here and in docs/real-model-amendment-A1.md. Replay shows the workflow reproduces each outcome from the recorded replies, not that the model would produce them again; greedy decoding reproduced the 23 replies two live runs shared byte for byte.",
+          True, True, False, {"v1_cases_run": v1["cases_run"], "v1_stopped_by": v1["stopped_by"], "replay_reproduced_exactly": rp["reproduced_exactly"], "replay_calls": [rp["model_calls_served"], rp["model_calls_recorded"]]})
 
     # ---- architecture properties (each enforced by named tests) -------------------------------------------------------------------------------------
     c("model-cannot-authorise", "The model cannot choose the tenant, the approver, the required role, the approval expiry, the workflow state or the action vocabulary: its output is untrusted structured data validated by deterministic code, and a model that claims otherwise is ignored.",
@@ -142,13 +172,13 @@ def build_manifest(ev: dict) -> dict:
     cl = claims(ev)
     return {"manifest_version": "1", "repository": REPO,
             "project_status": {"customer": "Meridian Freight Systems is fictional", "data": "all data is synthetic and generated from a seed", "deployment": "reference implementation; never deployed; no production use; no real customers",
-                              "model": "the workflow's model is the deterministic stand-in RuleCaseModel, not an LLM", "real_model_evaluation": "executed" if ev["real_model"]["executed"] else "not executed"},
+                              "model": "the workflow's default model is the deterministic stand-in RuleCaseModel, not an LLM; one recorded real-model run used a small local LLM through the same provider boundary", "real_model_evaluation": "executed" if ev["real_model"]["executed"] else "not executed"},
             "evidence": {"file": "reports/m6/release-evidence.json", "code_sha": ev["code_sha"]}, "claims": cl}
 
 
 LABELS = {"deterministic_tests": "deterministic tests", "mutation_checks": "mutation checks", "frozen_heldout_retrieval_eval": "frozen held-out retrieval eval", "synthetic_dev_retrieval_eval": "synthetic dev retrieval eval",
-          "standin_workflow_runs": "stand-in workflow runs", "adversarial_dev_corpus": "adversarial dev corpus", "manual_browser_pass": "manual browser pass", "design_documented": "documented design", "not_executed": "not executed"}
-README_ORDER = ["scope-fictional-synthetic", "model-is-standin", "real-model-evaluation-status", "test-suite", "threat-catalogue", "mutation-checks", "invariants-held-in-scenario-runs", "retrieval-vector-beat-hybrid",
+          "standin_workflow_runs": "stand-in workflow runs", "real_model_single_run": "one real-model run (one small model, one pass)", "adversarial_dev_corpus": "adversarial dev corpus", "manual_browser_pass": "manual browser pass", "design_documented": "documented design", "not_executed": "not executed"}
+README_ORDER = ["scope-fictional-synthetic", "model-is-standin", "real-model-evaluation-status", "real-model-expected-outcomes", "real-model-controls-held", "real-model-failure-classes", "real-model-protocol-history", "test-suite", "threat-catalogue", "mutation-checks", "invariants-held-in-scenario-runs", "retrieval-vector-beat-hybrid",
                 "similarity-is-not-sufficiency", "workflow-standin-scenario-matches", "draft-steering-result"]
 
 

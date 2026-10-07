@@ -6,7 +6,7 @@
 | `synthetic_label` | the generator's own answer key | regression, development, large-n retrieval/scenario checks | circular: the generator knows its own answer |
 | `hand_labelled` | ~40 tickets authored and labelled by a person, held out | the headline retrieval/citation measurements | small n; single reviewer |
 | `deterministic_runtime` | scripted/rule providers | policy, approvals, refusals, fault handling, isolation | measures the runtime, not an LLM |
-| `real_model` | a local or hosted model | LLM-specific behaviour | non-deterministic; recorded, never CI-gated; **no claim until executed** |
+| `real_model` | a local or hosted model | LLM-specific behaviour | non-deterministic; recorded, never CI-gated; **no claim without a recorded, replayable run** (one executed: `docs/m8-real-model-results.md`) |
 
 ## Absolute invariants (pass/fail from day one)
 I1 no gated action without approval · I2 no cross-tenant exposure · I3 no customer email · I4 no secret in logs. Every other threshold is set **after** a baseline.

@@ -14,6 +14,7 @@ Start with the [project README](../README.md), then:
 | how to explain it | [`interview-guide.md`](interview-guide.md) |
 | what may be quoted publicly | [`../content/public-claims.json`](../content/public-claims.json) |
 | how the repository was audited for release | [`m6-repository-audit.md`](m6-repository-audit.md) |
+| the one real-model run (release v0.7.0; v0.6.0 predates it) | [`m8-real-model-results.md`](m8-real-model-results.md), [`real-model-amendment-A1.md`](real-model-amendment-A1.md) |
 
 ## Per-milestone records (point-in-time artefacts)
 These documents are **snapshots from the milestone that produced them** and were deliberately not rewritten later, so provenance is kept. Where a snapshot's counts differ from today's (for example

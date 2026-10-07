@@ -6,7 +6,7 @@
 It shows how to let a model help with the reading, reconciling and drafting in a support escalation while the things that can hurt a customer (acting, approving, crossing tenants, sending e-mail, leaking secrets) stay in deterministic code and in human hands.
 
 > **Read this first.** The customer, *Meridian Freight Systems*, is **fictional** and all data is **synthetic**. This is a reference implementation: it has never been deployed, has no real customers, and has no production use. The workflow's
-> model is a **deterministic stand-in (`RuleCaseModel`), not an LLM**, and **real-model evaluation has not been executed**. Sign-in, customer systems and human reviewers are simulated. [What is real and what is not](docs/real-vs-simulated.md).
+> default model is a **deterministic stand-in (`RuleCaseModel`), not an LLM**. **One** real-model evaluation (one small local model, one machine, one pass) was executed for release v0.7.0 and mostly exposed failures at the model interface: [read it](docs/m8-real-model-results.md). Release v0.6.0 predates it and had no real-model run. Sign-in, customer systems and human reviewers are simulated. [What is real and what is not](docs/real-vs-simulated.md).
 
 ## The problem
 Meridian sells dock scheduling, shipment tracking and carrier integrations to enterprise customers. Its Tier-2 support engineers handle the escalations nobody else could close. For each one they read a ticket, hunt through runbooks (some stale, some contradicting each other),
@@ -104,8 +104,18 @@ More diagrams in [`docs/architecture.md`](docs/architecture.md): trust boundarie
 - **Recovery.** A PostgreSQL lease-based worker resumes cases from durable state; tests with concurrent workers, including workers that ignore the lease, produce one effect per approved action.
 - **Observability.** An append-only event stream and metrics derived from real tables (an empty system shows zeros), correlated by request, model invocation, action, approval and execution ids; the operator UI exposes a per-case audit trace and a dashboard.
 
+## Real-model evaluation (one run, release v0.7.0)
+The frozen protocol was executed once: **Qwen3-4B-Instruct-2507 (Q4_K_M, llama.cpp), 22 frozen cases and 12 injection runs, synthetic data, simulated approvers, one machine, one pass, $0.** The model is treated as untrusted, and the deterministic controls are scored separately from task completion.
+- **Task completion: 10 of 22 cases reached the frozen expected outcome** (expected-outcome attainment: not accuracy, not a success rate; the expectations were written for the stand-in). Three cases ended DEGRADED (handed to a person) because the model never produced a valid diagnosis.
+- **Four failure classes, all at the interface:** the first DIAGNOSE reply failed the schema in 22 of 22 cases (that first call carries no schema); 21 diagnosis replies cited evidence handles that do not exist; all 13 escalation and re-sync actions it proposed failed the action-parameter schema; 8 of 19 drafts were rejected after one repair.
+- **Controls:** the four invariants held in all 22 cases (I2 under Amendment A1's attribution rule) and, measured per run by model-free replay, in all 12 injection runs. No action proposed in an injection run passed the action schema and no side effect occurred without an approval. This measures the controls around an untrusted model, not the model's behaviour under attack.
+- **Disclosed:** the frozen v1 run stopped at case 5 of 22 on its pre-registered I2 proxy (a draft echoed an account id the customer had quoted); Amendment A1 refined only that stop rule, and the complete A1 run is the reported result. The live harness printed I1 false in all 12 injection runs because it counted effects cumulatively across one world; the per-run replay corrects it and the live reading is kept.
+- **Replayable:** all 154 recorded replies replay through the unchanged workflow without a model and reproduce every outcome (`tests/db/test_real_model_replay.py`).
+
+The lesson: the failures were at the interface between a model and typed contracts, which the scripted and deterministic providers had never exercised. Full account and limits: [`docs/m8-real-model-results.md`](docs/m8-real-model-results.md).
+
 ## Evidence
-Every number below is generated from a recorded run and checked in CI. The workflow figures use the **stand-in model**, the retrieval figures a **single AI reviewer**, and the draft-steering result is a **development corpus**: read the *Limit* column. The evidence classes are never merged ([`docs/evaluation.md`](docs/evaluation.md)).
+Every number below is generated from a recorded run and checked in CI. The workflow figures use the **stand-in model** (except the real-model rows), the retrieval figures a **single AI reviewer**, and the draft-steering result is a **development corpus**: read the *Limit* column. The evidence classes are never merged ([`docs/evaluation.md`](docs/evaluation.md)).
 
 <!-- claims:readme:begin -->
 | Claim | Evidence | Limit |
@@ -130,10 +140,10 @@ Four invariants hold through the model path, the control plane, the database and
 Tests *attempt* to violate them (full catalogue: [`docs/threat-model.md`](docs/threat-model.md)). Public security model, representative attacks and **residual risks** (unlabelled-secret redaction, misleading grounded drafts, simulated authentication, operator reconciliation trust, no external audit anchor, deployment assumptions): [`docs/security.md`](docs/security.md).
 
 ## Important failures discovered
-A masked privilege bug that only mutation testing exposed; a synthetic dev set that flattered every retrieval strategy; similarity thresholds that did not transfer; a conflict-before-abstention ordering that hid a known conflict; a circuit breaker that never recovered; a masker that treated citations as e-mail addresses; a CI-only test-id collision; deterministic grounding that missed every rephrasing. [`docs/engineering-lessons.md`](docs/engineering-lessons.md).
+A masked privilege bug that only mutation testing exposed; a synthetic dev set that flattered every retrieval strategy; similarity thresholds that did not transfer; a conflict-before-abstention ordering that hid a known conflict; a circuit breaker that never recovered; a masker that treated citations as e-mail addresses; a CI-only test-id collision; deterministic grounding that missed every rephrasing; and, in the one real-model run, a first diagnosis reply that never validated, invented evidence handles and action parameters that failed their schema (plus a cumulative-effect defect in the live harness, disclosed). [`docs/engineering-lessons.md`](docs/engineering-lessons.md).
 
 ## Limitations
-No real LLM was evaluated (the method is frozen for a future run) · the model is a rule-based stand-in tuned during development · sign-in, customer systems and reviewers are simulated · retrieval labels come from a single AI reviewer on 40 tickets · a misleading draft built from grounded words is undetectable by rules · unlabelled secrets pass redaction · not deployed, no real customers. [`docs/real-vs-simulated.md`](docs/real-vs-simulated.md), [`docs/risks.md`](docs/risks.md) (67 findings).
+One real-model run only (one 4B model, one machine, one pass; 10 of 22 frozen cases as expected, not accuracy) · the default model is a rule-based stand-in tuned during development · sign-in, customer systems and reviewers are simulated · retrieval labels come from a single AI reviewer on 40 tickets · a misleading draft built from grounded words is undetectable by rules · unlabelled secrets pass redaction · not deployed, no real customers. [`docs/real-vs-simulated.md`](docs/real-vs-simulated.md), [`docs/risks.md`](docs/risks.md) (67 findings).
 
 ## Local setup
 Python 3.11+, git, network for `pip`. No Docker, API key, paid service or model download is needed. Details, the Docker Compose path (verified in CI, not locally), configuration, teardown and reset: [`docs/getting-started.md`](docs/getting-started.md).

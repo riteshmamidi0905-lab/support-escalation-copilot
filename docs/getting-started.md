@@ -1,6 +1,6 @@
 # Getting started: from a clean checkout to a running demo
 
-Everything here is **synthetic and local**. No paid service, no API key, no model download and no real data is needed. Sign-in is simulated and the model is a deterministic stand-in (not an LLM).
+Everything here is **synthetic and local**. No paid service, no API key, no model download and no real data is needed. Sign-in is simulated and the demo's model is a deterministic stand-in (not an LLM); the one real-model run is recorded separately and needs no model to read or replay.
 
 ## What was verified where
 | Path | Verified by |

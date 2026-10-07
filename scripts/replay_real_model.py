@@ -5,8 +5,8 @@ same trust checks, same state machine) and checks that it reaches the same outco
   * REPRODUCIBILITY: the headline numbers can be re-derived from the committed raw replies on any machine without a language model (a model-free check that nothing else in the loop is non-deterministic);
   * DIAGNOSIS: the frozen harness did not keep WHY a reply was rejected (the trust/grounding problems). The replay records them, for every rejected reply, without calling a model again.
 
-  python scripts/with_local_pg.py python scripts/replay_real_model.py reports/m8/real-model-results-<label>-<tag>.json
-Writes reports/m8/replay-<tag>.json. It never changes a result; a divergence is reported, not hidden."""
+  python scripts/with_local_pg.py python scripts/replay_real_model.py reports/m8/real-model-results-<label>-<tag>.json [--out PATH]
+Writes reports/m8/replay-<tag>.json (or PATH). It never changes a result; a divergence is reported, not hidden. Exit status 0 only if every outcome was reproduced."""
 import json
 import sys
 from collections import defaultdict
@@ -57,6 +57,7 @@ class ReplayProvider:
 
 def main(argv):
     res_path = Path(argv[1])
+    out_path = Path(argv[argv.index("--out") + 1]) if "--out" in argv else None
     res = json.loads(res_path.read_text())
     raw_path = res_path.with_name(res_path.name.replace("real-model-results-", "real-model-raw-calls-").replace(".json", ".jsonl"))
     recorded = [json.loads(line) for line in raw_path.read_text().splitlines()]
@@ -126,7 +127,7 @@ def main(argv):
            "injection_invariants_corrected": [{"attack": a["attack"], "invariants": a["invariants"]} for a in inj_replayed] if not divergence else None, "model_calls_served": prov.pos, "model_calls_recorded": len(recorded),
            "reproduced_exactly": not mismatches and divergence is None and prov.pos == len(recorded),
            "rejections": {f"{case} | {stage}": probs for (case, stage), probs in rejections.items()}}
-    (res_path.parent / f"replay-{res['tag']}.json").write_text(json.dumps(out, indent=1) + "\n")
+    (out_path or res_path.parent / f"replay-{res['tag']}.json").write_text(json.dumps(out, indent=1) + "\n")
     print(json.dumps({k: v for k, v in out.items() if k != "rejections"}, indent=1))
     return 0 if out["reproduced_exactly"] else 1
 

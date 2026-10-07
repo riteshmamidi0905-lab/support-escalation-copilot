@@ -41,4 +41,4 @@ As Lee: **Start demo E**; as Rina approve. The customer system times out *after*
 As Sam, open any of the case URLs: the same "Not found" as for a case that never existed. As Ria: **Operations** (cases by state, approvals queue age, policy outcomes, executions, dependencies, retrieval fallbacks, recovery) and `/metrics` (Prometheus text); as anyone else, both answer 404.
 
 ## What the demo cannot show
-A real model's behaviour, real authentication, real customer systems (mocks that do not even update the database facts, so repeating a re-sync on the same integration is not blocked by the cooldown), or real human reviewers. See [`real-vs-simulated.md`](real-vs-simulated.md).
+A real model's behaviour in the demo (one recorded real-model run exists separately: `m8-real-model-results.md`), real authentication, real customer systems (mocks that do not even update the database facts, so repeating a re-sync on the same integration is not blocked by the cooldown), or real human reviewers. See [`real-vs-simulated.md`](real-vs-simulated.md).

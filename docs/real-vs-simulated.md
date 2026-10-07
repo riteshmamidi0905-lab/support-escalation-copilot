@@ -23,7 +23,7 @@
 | Frozen runtime integration (provider abstraction, structured-output repair, Agent loop in DIAGNOSE, budgets/retries, tracer) | **used**, unmodified (pinned `231b186`) |
 | Model decisions in the workflow (diagnosis, applicability, proposals, drafts) | produced by a **deterministic stand-in (`RuleCaseModel`) and deliberately misbehaving wrappers — NOT an LLM**. The OpenAI-compatible local path is tested against a protocol stub only |
 | S1–S16 end-to-end runs (315 case executions) | **real workflow/control plane, scripted stand-in model**; measures orchestration and safety, not model quality; stand-in tuned during development |
-| Real local model evaluation (Ollama etc.) | **NOT EXECUTED** (probe: no local model server; 8.6 GB RAM machine); frozen protocol, harness (`scripts/run_real_model_eval.py`, exercised only against a stub server) and provider boundary exist |
+| Real local model evaluation | **executed once** (v0.7.0): Qwen3-4B-Instruct-2507 Q4_K_M via llama.cpp, 22 frozen cases and 12 injection runs, one machine, one pass; recorded replies replay without a model. Earlier releases (v0.6.0) had no real-model run. Result: `docs/m8-real-model-results.md` |
 | Status / Carrier / Ticketing APIs | **deterministic mocks** with fault injection |
 | Operator UI (server-rendered, no JavaScript): case file, evidence/provenance, diagnosis, contradictions, policy, approvals, executions, draft review, audit trace, queue, dashboard | **implemented; browser-verified** at desktop and 375 px; the automated tests are authoritative |
 | Operator sign-in | **simulated**: pick a persona, the server mints a signed identity (grants signed); **no real authentication**, no revocation, no rate limiting |
@@ -33,12 +33,12 @@
 | Observability: ops events, metrics derived from real tables, Prometheus text, correlation ids | **implemented**; no external metrics backend, tracing system, alerting or retention policy |
 | Recovery worker (PostgreSQL leases, `SKIP LOCKED`, back-off, parking) | **implemented; tested with concurrent workers** and workers that ignore leases; not tested under real network partitions or multi-host |
 | Draft grounding checks | **implemented**; evaluation is on a hand-written corpus by the rules' author (development result); **misleading-but-grounded drafts are not detected** (0/10) |
-| `ConfiguredProvider`, frozen real-model protocol, probe, measured prompt sizes | **implemented / measured** (token figures are estimates); **no real model was run** |
+| `ConfiguredProvider`, frozen real-model protocol, probe, measured prompt sizes | **implemented / measured** (token figures are estimates); exercised by the single real-model run of v0.7.0 |
 | Docker Compose | provides **only the PostgreSQL + pgvector database**; verified in **CI** (including the demo walk-through), **not executed locally** (no Docker on the development machine). The application is deliberately not containerised |
 | Deployment, runbook for operations, real identity provider, TLS | **not built**; the project has never been deployed (see `security.md`, "What a real deployment would have to change") |
 | Public claims manifest (`content/public-claims.json`) and CI checks that keep README, evaluation and interview docs in step with recorded evidence | **implemented** (M6) |
 | Retrieval quality (hand-labelled held-out), abstention, conflicts, lifecycle, latency/resources on one laptop | **measured** (`docs/m2-results.md`); descriptive, small n |
-| Real-model (LLM) behaviour, task completion, business metrics | **nothing measured** |
+| Real-model (LLM) behaviour beyond the single v0.7.0 run, business metrics | **nothing measured** (the one run: one small model, one pass; see `docs/m8-real-model-results.md`) |
 | Approval/refusal/idempotency behaviour of the control plane | **demonstrated by deterministic tests and the clean-database run** (`docs/m3-scenarios.md`): a property of the controls, not a performance metric |
 | Evidence-gap detection by similarity thresholds | **measured and found unreliable** (ADR-0013 §5) |
 | That a model or workflow ignores injected text in retrieved documents | **not demonstrated** (M3/M4); only that retrieval is inert |

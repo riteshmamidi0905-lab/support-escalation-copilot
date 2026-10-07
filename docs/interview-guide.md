@@ -6,7 +6,7 @@ say so; the honest edge of the work is part of the story. Numbers come from the 
 ## 30 seconds
 "It's a reference implementation of an approval-gated AI case workflow for a fictional B2B SaaS support team. Hard tickets get a case file (cited evidence, a diagnosis, a proposed plan, a draft reply) but the
 model never gets to act: it proposes typed actions, deterministic code decides whether they're allowed, a human with the exact role approves the exact action, and every write is idempotent and audited. I
-built it to find out where an agent can be trusted and where it can't, and I attacked it to see: there are 92 catalogued attacks with executable tests. The model in it is a deterministic stand-in, not an LLM, and I
+built it to find out where an agent can be trusted and where it can't, and I attacked it to see: there are 92 catalogued attacks with executable tests. The default model in it is a deterministic stand-in, not an LLM; one real-model run (a 4B local model, one pass) exists and mostly exposed interface failures, and I
 haven't run a real model against it; that's stated everywhere."
 
 ## 2 minutes
@@ -15,7 +15,7 @@ a credit outside policy) and cross-account slips. Then the design choice: a **fi
 customer deployment needs predictable, auditable steps; the model works *inside* stages and returns structured conclusions, nothing else. Then the three decisions that matter: (1) the model is outside the
 trust boundary (it cannot choose tenant, role, approver, expiry, state or what's allowed); (2) approvals are bound to the exact action by hash, the exact role and the tenant, and are re-checked with fresh policy at execution;
 (3) tenant isolation is in the database (forced row-level security under a signed scope), not in application code. Then evidence: held-out retrieval evaluation that picked vector search over hybrid, a threat catalogue
-where every attack has a test, mutation checks that break each defence, and the findings that went wrong. Close with the limits: stand-in model, simulated auth and customer systems, one AI reviewer for the retrieval labels.
+where every attack has a test, mutation checks that break each defence, and the findings that went wrong. Close with the limits: stand-in default model, one real-model run on one small model, simulated auth and customer systems, one AI reviewer for the retrieval labels.
 
 ## Architecture walkthrough (use [`architecture.md`](architecture.md))
 1. **Operator → app:** a server-rendered UI with no JavaScript; the browser is untrusted; every read and action is re-authorised on the server with signed account grants.
@@ -34,7 +34,7 @@ tickets still got evidence), so sufficiency is judged from content and policy.
 ## Why the model isn't trusted with authorization
 Authorization depends on facts a model could be talked out of: who the user is, which tenant, which role may approve, whether a policy limit applies. So none of those are model inputs. The model's output is parsed against a
 schema, any privileged field makes it invalid, citations must resolve to retrieved evidence, and the only thing that can create an effect is a gateway that re-derives everything from trusted facts. A model that says "approved" in text is
-ignored (A-I1-06). I tested this against the stand-in and a deliberately obedient scripted model: that proves the *architecture* holds when a model misbehaves; it doesn't tell you how often a real model misbehaves.
+ignored (A-I1-06). I tested this against the stand-in and a deliberately obedient scripted model: that proves the *architecture* holds when a model misbehaves; it doesn't tell you how often a real model misbehaves (the one real-model run measured the controls, not adversarial behaviour).
 
 ## Approval design
 An approval is a database record bound to the canonical action's hash, the exact role (no hierarchy: a manager can't approve a re-sync), the tenant and case, with an expiry where timeout means denial. The requester and the amender can't approve;
@@ -59,7 +59,7 @@ Pick the conflict-order bug: the frozen protocol said detect conflicts before ab
 published the cost (vector governed success 0.88 → 0.84; false conflicts 0 → 0.04). Alternates in [`engineering-lessons.md`](engineering-lessons.md): the masked privilege bug that only mutation testing exposed, or the draft-grounding rules that missed every rephrasing.
 
 ## What is simulated
-The model (a rule-based stand-in whose heuristics were tuned while looking at the scenarios, so its S1-S16 match rate is *not* model accuracy), the customer systems (deterministic mocks with fault injection), authentication (a persona picker), the human reviewers (me), and all data (synthetic; the customer is fictional). Real-model evaluation was not executed; the method is frozen for a future run. See [`real-vs-simulated.md`](real-vs-simulated.md).
+The model (a rule-based stand-in whose heuristics were tuned while looking at the scenarios, so its S1-S16 match rate is *not* model accuracy), the customer systems (deterministic mocks with fault injection), authentication (a persona picker), the human reviewers (me), and all data (synthetic; the customer is fictional). One real-model evaluation was executed (v0.7.0; one 4B model, one pass); earlier releases had none. See [`real-vs-simulated.md`](real-vs-simulated.md).
 
 ## What would change for production
 Real authentication and session revocation behind TLS; separate credentials per trusted component and key management; an external anchor for the audit chain and a retention policy; real integrations with an authoritative lookup for reconciliation; metrics and alerting; a measured real-model evaluation and a human-review study of drafts; an independent security review. ([`security.md`](security.md))
@@ -68,7 +68,8 @@ Real authentication and session revocation behind TLS; separate credentials per 
 | Question | Answer (evidence) |
 |---|---|
 | Why an agent at all? | Reading evidence and drafting are where a model may help; deciding and acting are not. The workflow is fixed; the model's judgement is advisory (`architecture.md`, ADR-0002). |
-| Did you evaluate it with an LLM? | No. Not executed; no local runtime; frozen protocol and a tested provider boundary exist. |
+| Did you evaluate it with an LLM? | Once, with one small local model (Qwen3-4B Q4): 10 of 22 frozen cases reached the expected outcome, and the failures were at the interface (schema, evidence handles, action parameters, drafts). v0.6.0 predates it. |
+| Is 10/22 your accuracy? | No. It is expected-outcome attainment against expectations written for the stand-in, one model, one pass; the controls held and that is scored separately. |
 | Is 280/315 your accuracy? | No. It's the stand-in's development result; it shows orchestration reaches expected states, nothing about model quality. |
 | How do you know the defences work? | Every attack has an executable test, and mutation checks break each defence and require a failing test; a first run had a survivor that produced a test. |
 | What's the weakest part? | Drafts: a misleading draft made of grounded words isn't detectable by rules. Then simulated auth and unlabelled-secret redaction. |

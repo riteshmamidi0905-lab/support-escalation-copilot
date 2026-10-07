@@ -48,7 +48,7 @@ much it is worth, and what it does not show. The block directly below is **gener
 | Control plane | do the controls hold? | deterministic tests, attack tests, scenario runs, mutation checks | strong for the properties tested; says nothing about a model |
 | Workflow with the stand-in | does the orchestration work end to end? | S1-S16 as 315 case executions with `RuleCaseModel` | orchestration and safety only; **not model quality** |
 | Adversarial development corpus | how good are the draft grounding rules? | hand-written drafts by the rules' author | development result; preserved weakness |
-| Real model | does a real LLM help or hurt? | **not executed** | nothing |
+| Real model (one run, v0.7.0) | what does one small local model do inside the controls? | Qwen3-4B Q4, 22 frozen cases + 12 injection runs, recorded and replayable ([`m8-real-model-results.md`](m8-real-model-results.md)) | which interface and policy failures a small model exposes; **not accuracy, not product quality, one model, one pass** |
 
 ## 1. Retrieval evaluation (M2, frozen)
 **Protocol:** rubric and evaluation protocol were written and hashed before any strategy was scored (`docs/eval-freeze.json`, enforced by `tests/test_eval_freeze.py`). Held-out set: 40 tickets
@@ -110,10 +110,17 @@ A lexical rule set is brittle against paraphrase and blind to meaning; closing t
 mandatory, itemised human review (recorded, not a technical gate on use). The corpus was written by the author of the rules and two rules were corrected after the first run, so 20/20 is a **development result**.
 Details: [`m5-draft-steering.md`](m5-draft-steering.md).
 
-## 6. Real-model evaluation
-**Not executed.** No local language-model runtime was available (probe: `reports/m5/real-model-probe.json`; an 8.6 GB machine) and no paid API was used. It is **not a release blocker**; the method is frozen and
-hash-locked ([`m5-real-model-protocol.md`](m5-real-model-protocol.md), `docs/real-model-freeze.json`, `tests/test_real_model_freeze.py`) so that a future run is a measurement rather than a tuning exercise,
-and the provider boundary is tested against a protocol stub that misbehaves the way local models do ([`m5-real-model-readiness.md`](m5-real-model-readiness.md)). Until a run exists, nothing in this repository says anything about any real model.
+## 6. Real-model evaluation (one run, release v0.7.0)
+**Executed once** (release v0.6.0 predates it: its evidence said "not executed", which was true at that commit and is left unchanged). The frozen protocol ([`m5-real-model-protocol.md`](m5-real-model-protocol.md), `docs/real-model-freeze.json`, `tests/test_real_model_freeze.py`)
+was run with one free local model (Qwen3-4B-Instruct-2507, Q4_K_M, llama.cpp) on the 22 frozen cases and 12 injection runs, on one 8 GB machine, synthetic data, simulated approvers, $0.
+The frozen v1 run stopped at case 5 on its pre-registered I2 proxy; **Amendment A1** ([`real-model-amendment-A1.md`](real-model-amendment-A1.md)) refined only that stop rule, and the complete A1 run is the reported result.
+
+* **10 of 22 cases reached the frozen expected outcome** (expected-outcome attainment, not accuracy; REFUSE, CLARIFY and INSUFFICIENT_EVIDENCE are scored as different outcomes); 3 ended DEGRADED.
+* **Failure classes:** first DIAGNOSE reply schema-invalid 22/22; 21 replies citing unknown evidence handles; 13 of 13 escalation/re-sync actions failing the action-parameter schema; 8 of 19 drafts rejected after repair.
+* **Controls:** I1-I4 held in 22/22 cases (I2 under A1) and in 12/12 injection runs measured per run by model-free replay; the live harness printed I1 false for all 12 because it counted effects cumulatively across one world (disclosed, kept).
+* **Replay:** all 154 recorded replies reproduce every outcome through the unchanged workflow with no model (`tests/db/test_real_model_replay.py`).
+
+Nothing here is a quality claim about the product, about "LLMs" or about prompt-injection resistance; it is one model, one pass, one machine. Full account: [`m8-real-model-results.md`](m8-real-model-results.md).
 
 ## Reproduce
 ```bash
