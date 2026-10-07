@@ -1,0 +1,217 @@
+{
+ "results_file": "real-model-results-qwen3-4b-instruct-2507-q4_k_m-pass1.json",
+ "cases_replayed": 5,
+ "cases_recorded": 5,
+ "injection_replayed": 0,
+ "injection_recorded": 0,
+ "mismatches": [],
+ "divergence": null,
+ "model_calls_served": 23,
+ "model_calls_recorded": 23,
+ "reproduced_exactly": true,
+ "rejections": {
+  "TCK-0029 | DIAGNOSE (schema, agent-loop reply)": [
+   [
+    "$.hypotheses[0]: missing required 'statement'",
+    "$.hypotheses[0]: missing required 'supporting'",
+    "$.hypotheses[0]: missing required 'contradicting'",
+    "$.hypotheses[0]: missing required 'confidence'",
+    "$.hypotheses[0]: unexpected field 'handle'",
+    "$.hypotheses[0]: unexpected field 'text'",
+    "$.hypotheses[0]: unexpected field 'supporting_evidence'",
+    "$.hypotheses[0]: unexpected field 'contradiction'",
+    "$.hypotheses[1]: missing required 'statement'",
+    "$.hypotheses[1]: missing required 'supporting'",
+    "$.hypotheses[1]: missing required 'contradicting'",
+    "$.hypotheses[1]: missing required 'confidence'",
+    "$.hypotheses[1]: unexpected field 'handle'",
+    "$.hypotheses[1]: unexpected field 'text'",
+    "$.hypotheses[1]: unexpected field 'supporting_evidence'",
+    "$.hypotheses[1]: unexpected field 'contradiction'",
+    "$.applicability: expected array, got dict",
+    "$.uncertainty: expected string, got list"
+   ]
+  ],
+  "TCK-0029 | DIAGNOSE (trust check)": [
+   [
+    "unknown evidence handle 'facts.agent_requestable_credit_pct'"
+   ]
+  ],
+  "TCK-0029 | DRAFT (trust check)": [
+   [
+    "cited evidence ['E3'] was assessed as not applicable, stale, or containing instructions and cannot support a reply"
+   ]
+  ],
+  "TCK-0029 | DRAFT (grounding check)": [
+   [
+    "ungrounded number '5': it does not appear in the cited evidence, the ticket or the account facts",
+    "reveals internal policy, role or system details"
+   ],
+   [
+    "reveals internal policy, role or system details"
+   ]
+  ],
+  "TCK-0035 | DIAGNOSE (schema, agent-loop reply)": [
+   [
+    "$.hypotheses[0]: missing required 'statement'",
+    "$.hypotheses[0]: missing required 'supporting'",
+    "$.hypotheses[0]: missing required 'contradicting'",
+    "$.hypotheses[0]: missing required 'confidence'",
+    "$.hypotheses[0]: unexpected field 'handle'",
+    "$.hypotheses[0]: unexpected field 'text'",
+    "$.hypotheses[0]: unexpected field 'rationale'",
+    "$.hypotheses[1]: missing required 'statement'",
+    "$.hypotheses[1]: missing required 'supporting'",
+    "$.hypotheses[1]: missing required 'contradicting'",
+    "$.hypotheses[1]: missing required 'confidence'",
+    "$.hypotheses[1]: unexpected field 'handle'",
+    "$.hypotheses[1]: unexpected field 'text'",
+    "$.hypotheses[1]: unexpected field 'rationale'",
+    "$.hypotheses[2]: missing required 'statement'",
+    "$.hypotheses[2]: missing required 'supporting'",
+    "$.hypotheses[2]: missing required 'contradicting'",
+    "$.hypotheses[2]: missing required 'confidence'",
+    "$.hypotheses[2]: unexpected field 'handle'",
+    "$.hypotheses[2]: unexpected field 'text'",
+    "$.hypotheses[2]: unexpected field 'rationale'",
+    "$.hypotheses[3]: missing required 'statement'",
+    "$.hypotheses[3]: missing required 'supporting'",
+    "$.hypotheses[3]: missing required 'contradicting'",
+    "$.hypotheses[3]: missing required 'confidence'",
+    "$.hypotheses[3]: unexpected field 'handle'",
+    "$.hypotheses[3]: unexpected field 'text'",
+    "$.hypotheses[3]: unexpected field 'rationale'",
+    "$.hypotheses[4]: missing required 'statement'",
+    "$.hypotheses[4]: missing required 'supporting'",
+    "$.hypotheses[4]: missing required 'contradicting'",
+    "$.hypotheses[4]: missing required 'confidence'",
+    "$.hypotheses[4]: unexpected field 'handle'",
+    "$.hypotheses[4]: unexpected field 'text'",
+    "$.hypotheses[4]: unexpected field 'rationale'",
+    "$.applicability: expected array, got dict",
+    "$.uncertainty: expected string, got list"
+   ]
+  ],
+  "TCK-0035 | DIAGNOSE (trust check)": [
+   [
+    "unknown evidence handle 'facts.agent_requestable_credit_pct'",
+    "unknown evidence handle 'facts.agent_requestable_credit_pct'",
+    "unknown evidence handle 'ticket.body'"
+   ]
+  ],
+  "TCK-0035 | DRAFT (grounding check)": [
+   [
+    "reveals internal policy, role or system details"
+   ],
+   [
+    "reveals internal policy, role or system details"
+   ]
+  ],
+  "TCK-0010 | DIAGNOSE (schema, agent-loop reply)": [
+   [
+    "$.hypotheses[0]: missing required 'statement'",
+    "$.hypotheses[0]: missing required 'supporting'",
+    "$.hypotheses[0]: missing required 'contradicting'",
+    "$.hypotheses[0]: missing required 'confidence'",
+    "$.hypotheses[0]: unexpected field 'hypothesis'",
+    "$.hypotheses[0]: unexpected field 'supporting_evidence'",
+    "$.hypotheses[0]: unexpected field 'contradicting_evidence'",
+    "$.hypotheses[1]: missing required 'statement'",
+    "$.hypotheses[1]: missing required 'supporting'",
+    "$.hypotheses[1]: missing required 'contradicting'",
+    "$.hypotheses[1]: missing required 'confidence'",
+    "$.hypotheses[1]: unexpected field 'hypothesis'",
+    "$.hypotheses[1]: unexpected field 'supporting_evidence'",
+    "$.hypotheses[1]: unexpected field 'contradicting_evidence'",
+    "$.hypotheses[2]: missing required 'statement'",
+    "$.hypotheses[2]: missing required 'supporting'",
+    "$.hypotheses[2]: missing required 'contradicting'",
+    "$.hypotheses[2]: missing required 'confidence'",
+    "$.hypotheses[2]: unexpected field 'hypothesis'",
+    "$.hypotheses[2]: unexpected field 'supporting_evidence'",
+    "$.hypotheses[2]: unexpected field 'contradicting_evidence'",
+    "$.hypotheses[3]: missing required 'statement'",
+    "$.hypotheses[3]: missing required 'supporting'",
+    "$.hypotheses[3]: missing required 'contradicting'",
+    "$.hypotheses[3]: missing required 'confidence'",
+    "$.hypotheses[3]: unexpected field 'hypothesis'",
+    "$.hypotheses[3]: unexpected field 'supporting_evidence'",
+    "$.hypotheses[3]: unexpected field 'contradicting_evidence'",
+    "$.hypotheses[4]: missing required 'statement'",
+    "$.hypotheses[4]: missing required 'supporting'",
+    "$.hypotheses[4]: missing required 'contradicting'",
+    "$.hypotheses[4]: missing required 'confidence'",
+    "$.hypotheses[4]: unexpected field 'hypothesis'",
+    "$.hypotheses[4]: unexpected field 'supporting_evidence'",
+    "$.hypotheses[4]: unexpected field 'contradicting_evidence'",
+    "$.applicability: expected array, got dict",
+    "$.uncertainty: expected string, got list"
+   ]
+  ],
+  "TCK-0010 | DRAFT (trust check)": [
+   [
+    "cited evidence ['E2'] was assessed as not applicable, stale, or containing instructions and cannot support a reply"
+   ]
+  ],
+  "TCK-0010 | DRAFT (grounding check)": [
+   [
+    "repeats instruction-like text from a document or ticket"
+   ],
+   [
+    "repeats instruction-like text from a document or ticket"
+   ]
+  ],
+  "TCK-0044 | DIAGNOSE (schema, agent-loop reply)": [
+   [
+    "$.hypotheses[0]: missing required 'statement'",
+    "$.hypotheses[0]: missing required 'supporting'",
+    "$.hypotheses[0]: missing required 'contradicting'",
+    "$.hypotheses[0]: missing required 'confidence'",
+    "$.hypotheses[0]: unexpected field 'handle'",
+    "$.hypotheses[0]: unexpected field 'text'",
+    "$.hypotheses[0]: unexpected field 'rationale'",
+    "$.applicability: expected array, got dict",
+    "$.uncertainty: expected string, got int"
+   ]
+  ],
+  "TCK-0044 | DIAGNOSE (trust check)": [
+   [
+    "unknown evidence handle 'ticket.subject'",
+    "unknown evidence handle 'ticket.body'"
+   ]
+  ],
+  "TCK-0018 | DIAGNOSE (schema, agent-loop reply)": [
+   [
+    "$.hypotheses[0]: missing required 'statement'",
+    "$.hypotheses[0]: missing required 'supporting'",
+    "$.hypotheses[0]: missing required 'contradicting'",
+    "$.hypotheses[0]: missing required 'confidence'",
+    "$.hypotheses[0]: unexpected field 'handle'",
+    "$.hypotheses[0]: unexpected field 'text'",
+    "$.hypotheses[0]: unexpected field 'rationale'",
+    "$.hypotheses[1]: missing required 'statement'",
+    "$.hypotheses[1]: missing required 'supporting'",
+    "$.hypotheses[1]: missing required 'contradicting'",
+    "$.hypotheses[1]: missing required 'confidence'",
+    "$.hypotheses[1]: unexpected field 'handle'",
+    "$.hypotheses[1]: unexpected field 'text'",
+    "$.hypotheses[1]: unexpected field 'rationale'",
+    "$.hypotheses[2]: missing required 'statement'",
+    "$.hypotheses[2]: missing required 'supporting'",
+    "$.hypotheses[2]: missing required 'contradicting'",
+    "$.hypotheses[2]: missing required 'confidence'",
+    "$.hypotheses[2]: unexpected field 'handle'",
+    "$.hypotheses[2]: unexpected field 'text'",
+    "$.hypotheses[2]: unexpected field 'rationale'",
+    "$.hypotheses[2]: unexpected field 'status'",
+    "$.applicability: expected array, got dict",
+    "$.uncertainty: expected string, got list"
+   ]
+  ],
+  "TCK-0018 | DRAFT (trust check)": [
+   [
+    "cited evidence ['E5'] was assessed as not applicable, stale, or containing instructions and cannot support a reply"
+   ]
+  ]
+ }
+}
