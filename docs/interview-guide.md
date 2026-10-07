@@ -112,7 +112,7 @@ Real authentication and session revocation behind TLS; separate credentials per 
   *Limit:* No external metrics backend, tracing system, alerting or retention policy. *(use: portfolio only; evidence: deterministic tests; id `observability-from-real-events`)*
 - **The operator UI is server-rendered with no JavaScript, a strict Content-Security-Policy and CSRF-protected forms; every read and action is re-authorised on the server because the browser is not trusted.**  
   *Limit:* Sign-in is simulated (a persona picker); no session revocation, rate limiting or MFA. *(use: portfolio only; evidence: deterministic tests; id `operator-ui-no-javascript`)*
-- **474 automated tests pass with 1 documented expected failure (the frozen runtime's approver hook is a bool callback, wrapped at the control boundary) and 0 failures; 0 skipped.**  
+- **489 automated tests pass with 1 documented expected failure (the frozen runtime's approver hook is a bool callback, wrapped at the control boundary) and 0 failures; 0 skipped.**  
   *Limit:* One full run at the evidence commit on one machine; the database tests need PostgreSQL 16 with pgvector and are executed (not skipped) in CI. Python 3.12.15. *(use: CV, portfolio; evidence: deterministic tests; id `test-suite`)*
 - **92 attacks against the four invariants are catalogued, and 92 have executable tests that attempt the violation (I1 34, I2 37, I3 9, I4 12).**  
   *Limit:* The catalogue is the author's own; tests attempt known attack classes, not an independent penetration test. *(use: CV, portfolio; evidence: deterministic tests; id `threat-catalogue`)*

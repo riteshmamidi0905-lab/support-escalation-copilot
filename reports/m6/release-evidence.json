@@ -40,7 +40,7 @@
    "n": 20
   }
  },
- "generated_at": "2026-10-07T19:42:20+00:00",
+ "generated_at": "2026-10-07T19:48:29+00:00",
  "m3_scenarios": {
   "as_expected": 30,
   "invariants": {
@@ -121,11 +121,11 @@
  },
  "note": "every number below comes from a run of the scripts named in docs/evaluation.md; the model in every workflow figure is the deterministic stand-in RuleCaseModel, not an LLM; the real_model section is derived from the recorded real-model run (reports/m8)",
  "pytest": {
-  "collected": 475,
-  "duration_s": 81.4,
+  "collected": 490,
+  "duration_s": 81.5,
   "exit_code": 0,
   "failed": 0,
-  "passed": 474,
+  "passed": 489,
   "skipped": 0,
   "xfail_reasons": [
    "DOCUMENTED GAP (see docs/risks.md R-1): the runtime's approver hook is a bool callback, so role/expiry/diff checks must wrap it"
